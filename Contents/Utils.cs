@@ -7,9 +7,53 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria;
+using Terraria.ID;
+using Terraria.GameContent;
 
 namespace StoneOfThePhilosophers.Contents
 {
+    public static class StoneOfThePhilosophersHelper
+    {
+        public static void VertexDraw(CustomVertexInfo[] vertexs, Texture2D baseTex, Texture2D aniTex, Vector2 uTime = default)
+        {
+            Effect effect = StoneOfThePhilosophers.VertexDraw;
+            if (effect == null) return;
+            SpriteBatch spriteBatch = Main.spriteBatch;
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            //List<CustomVertexInfo> triangleList = new List<CustomVertexInfo>();
+            //for (int i = 0; i < vertexs.Length - 2; i += 2)
+            //{
+            //    triangleList.Add(vertexs[i]);
+            //    triangleList.Add(vertexs[i + 2]);
+            //    triangleList.Add(vertexs[i + 1]);
+
+            //    triangleList.Add(vertexs[i + 1]);
+            //    triangleList.Add(vertexs[i + 2]);
+            //    triangleList.Add(vertexs[i + 3]);
+            //}
+            RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
+            var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
+            var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
+            effect.Parameters["uTransform"].SetValue(model * Main.GameViewMatrix.TransformationMatrix * projection);
+            effect.Parameters["uTimeX"].SetValue(uTime.X);
+            effect.Parameters["uTimeY"].SetValue(uTime.Y);
+            Main.graphics.GraphicsDevice.Textures[0] = baseTex;
+            Main.graphics.GraphicsDevice.Textures[1] = aniTex;
+            Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
+            Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
+            effect.CurrentTechnique.Passes[0].Apply();
+            //Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList.ToArray(), 0, triangleList.Count / 3);
+            Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
+            Main.graphics.GraphicsDevice.RasterizerState = originalState;
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+        }
+        public static void VertexDraw3DPlanes()
+        {
+
+        }
+    }
     public struct CustomVertexInfo : IVertexType
     {
         private static VertexDeclaration _vertexDeclaration = new VertexDeclaration(new VertexElement[3]
@@ -51,6 +95,8 @@ namespace StoneOfThePhilosophers.Contents
     }
     public abstract class MagicArea : ModProjectile
     {
+        public override string Texture => "StoneOfThePhilosophers/MagicArea_1";//{StarBound.NPCs.Bosses.BigApe.BigApeTools.ApePath}StrawBerryArea
+
         public Projectile projectile => Projectile;
         public Player player => Main.player[projectile.owner];
         public bool Released => projectile.timeLeft < 12;
@@ -76,7 +122,7 @@ namespace StoneOfThePhilosophers.Contents
         public float Size => Released ? MathHelper.Lerp(128, 160, (12 - projectile.timeLeft) / 12f) : 128;
         public const float l = 240;
         public const float dis = 64;
-        public virtual int Cycle => 60; 
+        public virtual int Cycle => 60;
         public virtual Color MainColor => Color.White;
         public virtual bool UseMana => (int)projectile.ai[0] % Cycle == 0;
         public override void SetDefaults()
@@ -141,13 +187,14 @@ namespace StoneOfThePhilosophers.Contents
             RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
             var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
             var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
-            Effect effect = IllusionBoundMod.ShaderSwoosh;
+            Effect effect = StoneOfThePhilosophers.VertexDraw;
             effect.Parameters["uTransform"].SetValue(model * projection);
-            effect.Parameters["uTime"].SetValue(0);
-            Main.graphics.GraphicsDevice.Textures[0] = IllusionBoundMod.AniTexes[6];
-            Main.graphics.GraphicsDevice.Textures[1] = TextureAssets.Projectile[projectile.type].Value;
-            Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
-            Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.PointWrap;
+            effect.Parameters["uTimeX"].SetValue(Main.GameUpdateCount * -0.03f);
+            effect.Parameters["uTimeY"].SetValue(Main.GlobalTimeWrappedHourly * 0.2f);
+            Main.graphics.GraphicsDevice.Textures[0] = TextureAssets.Projectile[projectile.type].Value;
+            Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Style_4").Value;
+            Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
+            Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
             effect.CurrentTechnique.Passes[0].Apply();
             Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexInfos1, 0, 2);
             Main.graphics.GraphicsDevice.RasterizerState = originalState;
@@ -157,16 +204,16 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void Kill(int timeLeft)
         {
-            if (projectile.ai[0] >= 60f)
-            {
-                for (int n = 0; n < 10; n++)
-                {
-                    ShootProj(true);
-                }
-            }
+            //if (projectile.ai[0] >= 60f)
+            //{
+            //    for (int n = 0; n < 10; n++)
+            //    {
+            //    }
+            //}
         }
         public override void AI()
         {
+            projectile.friendly = false;
             //if (projectile.ai[0] == 0) 
             //{
 
@@ -208,6 +255,52 @@ namespace StoneOfThePhilosophers.Contents
                     }
                 }
             }
+            else 
+            {
+                if (projectile.ai[0] > 60f) 
+                {
+                    ShootProj(true);
+                }
+            }
+        }
+    }
+    public abstract class MagicStone : ModItem
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.ManaCrystal, 10);
+            recipe.AddTile(TileID.DemonAltar);
+            AddOtherIngredients(recipe);
+            recipe.Register();
+        }
+        public virtual void AddOtherIngredients(Recipe recipe)
+        {
+            recipe.AddIngredient(ItemID.HellstoneBar, 15);
+        }
+        public override bool CanUseItem(Player player)
+        {
+            return player.ownedProjectileCounts[item.shoot] < 1;
+        }
+        public Item item => Item;
+        public override void SetDefaults()
+        {
+            item.DamageType = DamageClass.Magic;
+            item.width = 34;
+            item.noUseGraphic = true;
+            item.noMelee = true;
+            item.height = 40;
+            item.rare = ItemRarityID.Cyan;
+            item.autoReuse = true;
+            item.useAnimation = 12;
+            item.useTime = 12;
+            item.useStyle = 5;
+            item.channel = true;
+            item.value = 150;
+            item.knockBack = 4f;
+            item.shootSpeed = 10;
+            item.damage = 50;
+            item.mana = 5;
         }
     }
 }
