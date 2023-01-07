@@ -27,6 +27,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfMetalProj>();
             base.SetDefaults();
+            item.damage = 30;
         }
     }
     public class StoneOfWood : MagicStone
@@ -45,6 +46,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfWoodProj>();
             base.SetDefaults();
+            item.damage = 15;
         }
     }
     public class StoneOfWater : MagicStone
@@ -63,6 +65,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfWaterProj>();
             base.SetDefaults();
+            item.damage = 30;
         }
     }
     public class StoneOfFire : MagicStone
@@ -143,7 +146,10 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Yellow;
         public override void ShootProj(bool dying = false)
         {
-
+            bool flag = dying && projectile.timeLeft % 3 != 0;
+            SoundEngine.PlaySound(SoundID.Item69);
+            for (int n = 0; n < (flag ? 3 : 1); n++)
+                Projectile.NewProjectile(projectile.GetSource_FromThis(), player.Center + (dying ? projectile.velocity.RotatedByRandom(MathHelper.Pi / 3) : projectile.velocity) * 64, projectile.velocity * 32 * (flag ? 1 : 1), ModContent.ProjectileType<MetalAttack>(), (int)(projectile.damage * Main.rand.NextFloat(1.25f, 0.95f)), projectile.knockBack * 3, projectile.owner, flag ? (Main.rand.Next(4) + 1) : 0);
         }
     }
     public class StoneOfWoodProj : MagicArea
@@ -151,15 +157,33 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Green;
         public override void ShootProj(bool dying = false)
         {
-
+            SoundEngine.PlaySound(SoundID.Item74);
+            int m = Main.rand.Next(5, 9);
+            float randAngle = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12);
+            for (int n = 0; n < m; n++)
+                Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(randAngle + MathHelper.Pi / 3 * (n / (m - 1f) - 0.5f)) * 32,
+                    ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(Main.rand.Next(5)));
         }
     }
     public class StoneOfWaterProj : MagicArea
     {
         public override Color MainColor => Color.Blue;
+        public override int Cycle => 6;
         public override void ShootProj(bool dying = false)
         {
-
+            if (dying)
+                for (int n = -2; n < 3; n += 2)
+                {
+                    var rand = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12) * .5f;
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n + rand) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    //for (int k = 0; k < 3; k++)
+                    //    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + (64 + 16 * k) * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n + rand) * (32 + 8 * k) / 3f, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                }
+            else
+                for (int n = -1; n < 2; n += 2)
+                {
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                }
         }
     }
     public class StoneOfFireProj : MagicArea
@@ -167,7 +191,9 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Red;
         public override void ShootProj(bool dying = false)
         {
-            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center, (Main.MouseWorld - projectile.Center).SafeNormalize(default).RotatedBy(Main.rand.NextFloat(-MathHelper.TwoPi / 48, MathHelper.TwoPi / 48) * (dying ? 2 : 1)) * 16,
+            SoundEngine.PlaySound(SoundID.Item74);
+
+            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, (Main.MouseWorld - projectile.Center).SafeNormalize(default).RotatedBy(Main.rand.NextFloat(-MathHelper.TwoPi / 48, MathHelper.TwoPi / 48) * (dying ? 2 : 1)) * 32,
                 ModContent.ProjectileType<FireAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
@@ -185,7 +211,6 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Purple;
         public override void ShootProj(bool dying = false)
         {
-            if (dying && projectile.timeLeft % 2 == 0) return;
             float r = Main.rand.Next(-32, 32) * (dying ? 8f : 1f);
             int randX = Main.rand.Next(-256, 256);//Main.rand.Next(-64, 64);
             var v = new Vector2(randX, -Main.rand.Next(280, 560));
@@ -204,7 +229,16 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override void SetDefaults()
         {
-            base.SetDefaults();
+            Projectile.width = Projectile.height = 16;
+            Projectile.timeLeft = 180;
+            Projectile.DamageType = DamageClass.Magic;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = 4;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 5;
+            Projectile.aiStyle = -1;
         }
         public override void SetStaticDefaults()
         {
@@ -212,14 +246,58 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            for (int n = 9; n > -1; n--)
+                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+            return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            base.OnHitNPC(target, damage, knockback, crit);
+            if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
+                target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f);
+            for (int n = 0; n < 5 - Projectile.penetrate; n++)
+            {
+                if (Projectile.ai[0] == 0)
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1);
+                for (int k = 0; k < 15; k++)
+                {
+                    Dust.NewDustPerfect(target.Center, DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 3));
+                }
+            }
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            if (Projectile.ai[0] == 0)
+                return targetHitbox.Intersects(Utils.CenteredRectangle(projHitbox.Center(), projHitbox.Size() * 3));
+            return base.Colliding(projHitbox, targetHitbox);
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            var vec = Projectile.velocity;
+            if (vec.X == oldVelocity.X) vec.X = -vec.X;
+            if (vec.Y == oldVelocity.Y) vec.Y = -vec.Y;
+
+            if (Projectile.ai[0] == 0)
+                for (int n = 0; n < Projectile.penetrate; n++)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, -vec + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1);
+                }
+            for (int k = 0; k < 30; k++)
+            {
+                Dust.NewDustPerfect(Projectile.Center + oldVelocity, DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity, 0, default, Main.rand.NextFloat(1, 3));
+            }
+            return base.OnTileCollide(oldVelocity);
         }
         public override void AI()
         {
+            if (Projectile.ai[0] > 0) Projectile.velocity += new Vector2(0, 1);
+            Projectile.rotation++;
+            for (int n = 9; n > 0; n--)
+            {
+                Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+            }
+            Projectile.oldPos[0] = Projectile.Center;
+            Projectile.oldRot[0] = Projectile.rotation;
             base.AI();
         }
     }
@@ -227,7 +305,16 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override void SetDefaults()
         {
-            base.SetDefaults();
+            Projectile.width = Projectile.height = 8;
+            Projectile.timeLeft = 180;
+            Projectile.DamageType = DamageClass.Magic;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = 3;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 5;
+            Projectile.aiStyle = -1;
         }
         public override void SetStaticDefaults()
         {
@@ -235,22 +322,74 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+
+            for (int n = 9; n > -1; n--)
+                for (int m = 0; m < 5; m++)
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f), 0, 0);
+            return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            base.OnHitNPC(target, damage, knockback, crit);
+            for (int n = 0; n < 4 - Projectile.penetrate; n++)
+            {
+                for (int k = 0; k < 15; k++)
+                {
+                    Dust.NewDustPerfect(target.Center, DustID.TerraBlade, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                }
+            }
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            for (int k = 0; k < 15; k++)
+            {
+                Dust.NewDustPerfect(Projectile.Center + oldVelocity, DustID.TerraBlade, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+            }
+            return base.OnTileCollide(oldVelocity);
         }
         public override void AI()
         {
-            base.AI();
+            NPC target = null;
+            float maxDistance = 512f;
+            foreach (var npc in Main.npc)
+            {
+                if (!npc.CanBeChasedBy() || npc.friendly) continue;
+                var currentDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                if (currentDistance < maxDistance)
+                {
+                    maxDistance = currentDistance;
+                    target = npc;
+                }
+            }
+            if (target != null)
+            {
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, (target.Center - Projectile.Center).SafeNormalize(default) * 32, Utils.GetLerpValue(32, 512, maxDistance, true) * 0.05f);
+                Projectile.timeLeft++;
+            }
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            for (int n = 9; n > 0; n--)
+            {
+                Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+            }
+            Projectile.oldPos[0] = Projectile.Center;
+            Projectile.oldRot[0] = Projectile.rotation;
         }
     }
     public class WaterAttack : ModProjectile
     {
         public override void SetDefaults()
         {
-            base.SetDefaults();
+            Projectile.width = Projectile.height = 8;
+            Projectile.timeLeft = 180;
+            Projectile.DamageType = DamageClass.Magic;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = 5;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 5;
+            Projectile.aiStyle = -1;
+            Projectile.extraUpdates = 2;
         }
         public override void SetStaticDefaults()
         {
@@ -258,19 +397,66 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+            for (int n = 9; n > -1; n--)
+            {
+                for (int m = 0; m < 4; m++)
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0, 0);
+
+            }
+            return false;
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            for (int k = 0; k < 7; k++)
+            {
+                Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+            }
+            for (int k = 0; k < 7; k++)
+            {
+                Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+            }
+            if (Projectile.timeLeft > 3)
+            {
+                Projectile.timeLeft = 3;
+                Projectile.velocity = oldVelocity;
+            }
+            return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
+            for (int n = 0; n < 6 - Projectile.penetrate; n++)
+            {
+                for (int k = 0; k < 7; k++)
+                {
+                    Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                }
+                for (int k = 0; k < 7; k++)
+                {
+                    Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                }
+            }
             base.OnHitNPC(target, damage, knockback, crit);
         }
         public override void AI()
         {
-            base.AI();
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            for (int n = 9; n > 0; n--)
+            {
+                Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+            }
+            Projectile.oldPos[0] = Projectile.Center;
+            Projectile.oldRot[0] = Projectile.rotation;
         }
     }
     public class FireAttack : ModProjectile
     {
+        Projectile projectile => Projectile;
+        /// <summary>
+        /// 0为火球 1大爆炸 2小爆炸
+        /// </summary>
+        int style => (int)projectile.ai[0];
         public override void SetDefaults()
         {
             Projectile.width = Projectile.height = 32;
@@ -288,21 +474,83 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            if (Projectile.width == 160)
-                return false;
-            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 }, Projectile.rotation, new Vector2(66, 21), 1f, 0, 0);
-            for (int n = 0; n < 8; n++)
+            switch (style) 
             {
-                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 4 + Main.rand.NextVector2Unit(), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.White with { A = 0 } * 0.125f, Projectile.rotation, new Vector2(66, 21), 1f, 0, 0);
+                case 0: 
+                    {
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 }, Projectile.rotation, new Vector2(66, 21), 1f, 0, 0);
+                        for (int n = 0; n < 8; n++)
+                        {
+                            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 4 + Main.rand.NextVector2Unit(), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.White with { A = 0 } * 0.125f, Projectile.rotation, new Vector2(66, 21), 1f, 0, 0);
+                        }
+                        break;
+                    }
+                case 1: 
+                    {
+                        var fac = 1 - projectile.timeLeft / 21f;
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("FireAttack", "ExplosionEffect")).Value, projectile.Center - Main.screenPosition, new Rectangle(0, 588 - projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2(1), projectile.rotation, new Vector2(49), 3f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+
+                        break;
+                    }
+                case 2:
+                    {
+                        var fac = 1 - projectile.timeLeft / 21f;
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("FireAttack", "ExplosionEffect")).Value, projectile.Center - Main.screenPosition, new Rectangle(0, 588 - projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2(1), projectile.rotation, new Vector2(49), 2f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                        break;
+                    }
             }
+
             return false;
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            return base.OnTileCollide(oldVelocity);
+        }
+        public override void Kill(int timeLeft)
+        {
+            switch (style) 
+            {
+                case 0: 
+                    {
+                        for (int n = 0; n < 6; n++)
+                        {
+                            var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
+                            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center, unit, projectile.type, projectile.damage, 8, projectile.owner, 7);
+                            proj.timeLeft = 21;
+                            proj.width = proj.height = 160;
+                            proj.penetrate = -1;
+                            proj.Center = projectile.Center + projectile.velocity;
+                            proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+                        }
+                        for (int num431 = 4; num431 < 31; num431++)
+                        {
+                            float num432 = projectile.oldVelocity.X * (30f / (float)num431);
+                            float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
+                            for (int n = 0; n < 4; n++)
+                            {
+                                int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
+                                Main.dust[num434].noGravity = true;
+                                Dust dust = Main.dust[num434];
+                                dust.velocity = projectile.velocity;
+                                dust.velocity *= 0.5f;
+                            }
+
+                        }
+                        SoundEngine.PlaySound(SoundID.Item62);
+                        break;
+                    }
+            }
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
             target.AddBuff(24, 300);
-            Projectile.width = Projectile.height = 160;
-            if (Projectile.timeLeft > 2)
-                Projectile.timeLeft = 2;
+            //target.immune[Projectile.owner] = 0;
+            if (style == 0) Projectile.Kill();
+            else 
+            {
+                target.immune[projectile.owner] = 2;
+                projectile.frameCounter++;
+            }
         }
         public override void AI()
         {
@@ -312,6 +560,10 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class EarthAttack : ModProjectile
     {
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            return base.OnTileCollide(oldVelocity);
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -335,6 +587,13 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class MoonAttack : ModProjectile
     {
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            for (int n = 0; n < 15; n++)
+            {
+                Dust.NewDustPerfect(target.Center, DustID.PinkTorch, dirVec.SafeNormalize(default).RotatedByRandom(MathHelper.Pi / 6) * Main.rand.NextFloat(-6, 6), 0, default, Main.rand.NextFloat(1, 2)).noGravity = true;
+            }
+        }
         public Projectile projectile => Projectile;
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -367,18 +626,20 @@ namespace StoneOfThePhilosophers.Contents
                 float fac = (30 - projectile.timeLeft) / 15f;
                 fac = MathHelper.Clamp(fac * fac, 0, 1);
                 factor = (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f));
-                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * 1.25f), 0, 0);
-                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition, null, Color.White with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * .625f), 0, 0);
+                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 12f, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * 1.25f), 0, 0);
+                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 8f, null, Color.White with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * .625f), 0, 0);
             }
+            var randSize = factor * Main.rand.NextFloat(0.5f);
+            #region 法阵
             Matrix transform =
-            Matrix.CreateScale(2) *
-            Matrix.CreateTranslation(-1, -1, -1) *
-            new Matrix(projectile.ai[1] * .5f, 0, 0, 0,
-                                            0, 48 * (1 + factor), 0, 0,
-                                            0, 0, 48 * (1 + factor), 0,
-                                            0, 0, 0, 1) *
-            Matrix.CreateRotationX(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi / 2f) *
-            Matrix.CreateRotationZ(projectile.ai[0]);
+                Matrix.CreateScale(2) *
+                Matrix.CreateTranslation(-1, -1, -1) *
+                new Matrix(projectile.ai[1] * .5f, 0, 0, 0,
+                                                0, 48 * (1 + factor + randSize), 0, 0,
+                                                0, 0, 48 * (1 + factor + randSize), 0,
+                                                0, 0, 0, 1) *
+                Matrix.CreateRotationX(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi / 2f) *
+                Matrix.CreateRotationZ(projectile.ai[0]);
             CustomVertexInfo[] vertexInfos = new CustomVertexInfo[16];
             for (int n = 0; n < 16; n++)
             {
@@ -389,18 +650,20 @@ namespace StoneOfThePhilosophers.Contents
                 vec = Vector3.Transform(vec, transform);
                 if (n == 7)
                 {
+                    randSize = factor * Main.rand.NextFloat(0.75f);
+
                     transform =
                     Matrix.CreateScale(2) *
                     Matrix.CreateTranslation(-1, -1, -1) *
                     new Matrix(projectile.ai[1] * .5f * 1.05f, 0, 0, 0,
-                                            0, 48 * (3 - factor) * .8f, 0, 0,
-                                            0, 0, 48 * (3 - factor) * .8f, 0,
+                                            0, 48 * (3 - factor - randSize) * .8f, 0, 0,
+                                            0, 0, 48 * (3 - factor - randSize) * .8f, 0,
                                             0, 0, 0, 1) *
                     Matrix.CreateRotationX(-Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) *
                     Matrix.CreateRotationZ(projectile.ai[0]);
                 }
                 vec += new Vector3(projectile.Center + dirVec * 0.5f - Main.screenPosition - new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
-                vec.Z = (1600 - vec.Z) / 1600f;
+                vec.Z = (2000 - vec.Z) / 2000f;
                 vec /= vec.Z;
                 vertexInfos[n].Position = new Vector2(vec.X, vec.Y) + Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f;
             }
@@ -426,6 +689,8 @@ namespace StoneOfThePhilosophers.Contents
                 vertexs[n] = vertexInfos[index];
             }
             StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>("StoneOfThePhilosophers/MagicArea_2").Value, TextureAssets.MagicPixel.Value);
+            #endregion
+
             return false;
         }
         public override bool ShouldUpdatePosition()
@@ -466,6 +731,10 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class SunAttack : ModProjectile
     {
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            return base.OnTileCollide(oldVelocity);
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();
