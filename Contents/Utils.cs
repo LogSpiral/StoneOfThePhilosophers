@@ -1441,7 +1441,7 @@ namespace StoneOfThePhilosophers.Contents
             item.knockBack = 4f;
             item.shootSpeed = 10;
             item.damage = 30;
-            item.mana = 5;
+            item.mana = 15;
         }
     }
 }
