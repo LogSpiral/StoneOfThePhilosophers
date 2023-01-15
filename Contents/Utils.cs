@@ -9,9 +9,12 @@ using Terraria.ModLoader;
 using Terraria;
 using Terraria.ID;
 using Terraria.GameContent;
+using Terraria.DataStructures;
 
 namespace StoneOfThePhilosophers.Contents
 {
+
+
     /// <summary>
     /// DXTsT自制的粒子ID表
     /// 制作时间：2017/1/31
@@ -920,6 +923,14 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class VirtualDreamFactorMethods
     {
+
+        public static T Sum<T, TValue>(T[] values) where T : IVector<T, TValue>
+        {
+            var vec = values[0];
+            for (int n = 1; n < values.Length; n++)
+                vec.Add(values[n]);
+            return vec;
+        }
         public static float Lerp(this float t, float from, float to, bool clamp = false)
         {
             if (clamp)
@@ -1087,18 +1098,18 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class StoneOfThePhilosophersHelper
     {
-        public static object Call(params object[] args) 
+        public static object Call(params object[] args)
         {
             string funcName = (string)args[0];
-            switch (funcName) 
+            switch (funcName)
             {
-                case "SymmetricFactor": 
+                case "SymmetricFactor":
                     {
                         float value = (float)args[1];
                         float whenGetMax = (float)args[2];
                         return MathHelper.Clamp((0.5f - Math.Abs(value - 0.5f)) / whenGetMax, 0, 1);
                     }
-                case "SmoothSymmetricFactor": 
+                case "SmoothSymmetricFactor":
                     {
                         return MathHelper.SmoothStep(0, 1, (float)Call("SymmetricFactor", (float)args[1], (float)args[2]));
                     }
@@ -1109,7 +1120,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             return MathHelper.SmoothStep(0, 1, SymmetricFactor(value, whenGetMax));
         }
-        public static float SymmetricFactor(this float value,float whenGetMax) 
+        public static float SymmetricFactor(this float value, float whenGetMax)
         {
             return MathHelper.Clamp((0.5f - Math.Abs(value - 0.5f)) / whenGetMax, 0, 1);
         }

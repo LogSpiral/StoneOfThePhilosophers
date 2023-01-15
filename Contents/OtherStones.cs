@@ -27,7 +27,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfMetalProj>();
             base.SetDefaults();
-            item.damage = 30;
+            item.damage = 20;
         }
     }
     public class StoneOfWood : MagicStone
@@ -46,7 +46,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfWoodProj>();
             base.SetDefaults();
-            item.damage = 15;
+            item.damage = 10;
         }
     }
     public class StoneOfWater : MagicStone
@@ -65,7 +65,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             item.shoot = ModContent.ProjectileType<StoneOfWaterProj>();
             base.SetDefaults();
-            item.damage = 30;
+            item.damage = 15;
             item.mana = 5;
         }
     }
@@ -83,8 +83,10 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetDefaults()
         {
-            item.shoot = ModContent.ProjectileType<StoneOfFireProj>();
             base.SetDefaults();
+            item.damage = 25;
+            item.shoot = ModContent.ProjectileType<StoneOfFireProj>();
+
         }
     }
     public class StoneOfEarth : MagicStone
@@ -121,7 +123,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             base.SetDefaults();
             item.shoot = ModContent.ProjectileType<StoneOfMoonProj>();
-            item.damage = 40;
+            item.damage = 30;
             item.mana = 5;
         }
     }
@@ -205,7 +207,7 @@ namespace StoneOfThePhilosophers.Contents
             if (dying && projectile.timeLeft % 2 == 1) return;
             SoundEngine.PlaySound(SoundID.Item74);
 
-            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, (Main.MouseWorld - projectile.Center).SafeNormalize(default).RotatedBy(Main.rand.NextFloat(-MathHelper.TwoPi / 48, MathHelper.TwoPi / 48) * (dying ? 2 : 1)) * 32,
+            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.TwoPi / 48f * (dying ? 2 : 1)) * 32,
                 ModContent.ProjectileType<FireAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
@@ -234,11 +236,15 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfSunProj : MagicArea
     {
         public override Color MainColor => Color.White;
-        public override int Cycle => 6;
+        public override int Cycle => 90;
 
         public override void ShootProj(bool dying = false)
         {
+            if (dying && projectile.timeLeft % 3 != 0) return;
+            SoundEngine.PlaySound(SoundID.Item74);
 
+            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.Pi / 48f) * 2,
+                ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
     public class MetalAttack : ModProjectile
@@ -274,7 +280,7 @@ namespace StoneOfThePhilosophers.Contents
             for (int n = 0; n < 5 - Projectile.penetrate; n++)
             {
                 if (Projectile.ai[0] == 0 && Main.rand.NextBool(2))
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage  * 3 / 4, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage * 3 / 4, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1);
                 for (int k = 0; k < 15; k++)
                 {
                     Dust.NewDustPerfect(target.Center, DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
@@ -467,6 +473,7 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
+            target.immune[Projectile.owner] = 2;
             for (int n = 0; n < 6 - Projectile.penetrate; n++)
             {
                 for (int k = 0; k < 7; k++)
@@ -492,8 +499,10 @@ namespace StoneOfThePhilosophers.Contents
             Projectile.oldRot[0] = Projectile.rotation;
         }
     }
+
     public class FireAttack : ModProjectile
     {
+        BezierCurve<FloatVector2, Vector2> bezierCurve;
         Projectile projectile => Projectile;
         /// <summary>
         /// 0为火球 1大爆炸 2小爆炸
@@ -521,15 +530,15 @@ namespace StoneOfThePhilosophers.Contents
                 case 0:
                     {
                         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-                        //alpha = 1f;
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), 1f, 0, 0);
+                        alpha = 1f;
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
                         for (int n = 0; n < 8; n++)
                         {
                             Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
                         }
                         for (int n = 0; n < 8; n++)
                         {
-                            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6,12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f) * 1.5f, 0, 0);
+                            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f) * 1.5f, 0, 0);
                         }
                         for (int n = 9; n > -1; n--)
                         {
@@ -553,53 +562,241 @@ namespace StoneOfThePhilosophers.Contents
                     }
             }
 
+            //IVector<FloatVector2, Vector2>[] vectors = new IVector<FloatVector2, Vector2>[4];
+            ////for (int n = 0; n < 6; n++)
+            ////{
+            ////    vectors[n] = new FloatVector2((MathHelper.TwoPi / 5 * 2 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
+            ////}
+            //for (int n = 0; n < 4; n++)
+            //{
+            //    vectors[n] = new FloatVector2((MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
+            //}
+            //if (bezierCurve == null)
+            //{
+            //    bezierCurve = new BezierCurve<FloatVector2, Vector2>(vectors);
+            //    bezierCurve.Recalculate(60);
+            //}
+            //var m = BezierCurve<FloatVector2, Vector2>.c_Matrixes[1];
+            //var str = m.ToString();
+            ////var vecs = BezierCurve<FloatVector2, Vector2>.c_Vectors;
+            ////if (vecs.Count < 4)
+            ////{
+            ////    vecs.Add(BezierCurve<FloatVector2, Vector2>.GetVectors(0));
+            ////    vecs.Add(BezierCurve<FloatVector2, Vector2>.GetVectors(1));
+            ////    vecs.Add(BezierCurve<FloatVector2, Vector2>.GetVectors(2));
+            ////    vecs.Add(BezierCurve<FloatVector2, Vector2>.GetVectors(3));
+            ////}
+            ////var matrix = BezierCurve<FloatVector2, Vector2>.GetMatrix(2);
+            ////var str = matrix.ToString();
+            ////str += "";
+            ////var vec = vecs[1];
+            ////var str2 = "(";
+            ////for (int i = 0; i < vec.Length; i++)
+            ////{
+            ////    str2 += $" {vec[i]}";
+            ////}
+            ////str2 += ")";
+            //foreach (var point in bezierCurve.results)
+            //{
+            //    var vec = point.Value;
+            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
+            //}
+            //foreach (var point in vectors)
+            //{
+            //    var vec = point.Value;
+            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Cyan, 0, new Vector2(.5f), 16, 0, 0);
+            //}
+            if (bezierCurve == null)
+            {
+                var wtf = new IVector<FloatVector2, Vector2>[4];
+                for (int n = 0; n < 4; n++)
+                {
+                    wtf[n] = new FloatVector2((MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
+                }
+                bezierCurve = new BezierCurve<FloatVector2, Vector2>(wtf);
+                //bezierCurve.Recalculate(60);
+            }
+            var input = new Vector2[4];
+            for (int n = 0; n < 4; n++)
+            {
+                input[n] = (MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560);
+            }
+            var vectors = new Vector2[4];
+            vectors[0] = input[0];
+            vectors[^1] = input[^1];
+            Vector2[] array = BezierCurve<FloatVector2, Vector2>.c_Matrixes[1].Apply(input[1..^1], input[0], input[1]);
+            for (int m = 0; m < 2; m++)
+                vectors[m + 1] = array[m];
+            array = new Vector2[60];
+
+            for (int n = 0; n < 60; n++)
+            {
+                float t = n / (60 - 1f);
+                for (int i = 0; i < 4; i++)
+                {
+                    if (i == 0) array[n] = vectors[0] * MathF.Pow(1 - t, 3);
+                    else array[n] = array[n] + vectors[i] * MathF.Pow(1 - t, 3 - i) * MathF.Pow(t, i) * BezierCurve<FloatVector2, Vector2>.c_Vectors[1][i];
+                }
+            }
+            #region MyRegion
+            //MatrixEX matrix = new MatrixEX(4, (i, j) => i switch
+            //{
+            //    0 => j switch
+            //    {
+            //        0 => 2,
+            //        1 => 3,
+            //        2 => 3,
+            //        3 or _ => 3
+            //    },
+            //    1 => j switch
+            //    {
+            //        0 => 1,
+            //        1 => 1,
+            //        2 => 4,
+            //        3 or _ => 5
+            //    },
+            //    2 => j switch
+            //    {
+            //        0 => 5,
+            //        1 => 1,
+            //        2 => 4,
+            //        3 or _ => 0
+            //    },
+            //    3 or _ => j switch
+            //    {
+            //        0 => 2,
+            //        1 => 7,
+            //        2 => 1,
+            //        3 or _ => 8
+            //    }
+            //});
+            //float[] values = matrix.Apply(new float[] { 1, 2, 3, 4 });
+            //var str = "(";
+            //for (int n = 0; n < 4; n++) 
+            //{
+            //    str += $" {values[n]},";
+            //}
+            //str += ")";
+            //str += "";
+            #endregion
+
+            foreach (var vec in array)
+            {
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
+            }
+            foreach (var vec in input)
+            {
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Cyan, 0, new Vector2(.5f), 16, 0, 0);
+            }
             return false;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            return base.OnTileCollide(oldVelocity);
+            if (style == 0)
+            {
+                Projectile.timeLeft = 15;
+                Projectile.friendly = false;
+                Projectile.tileCollide = false;
+                Projectile.velocity = oldVelocity * .375f;
+                for (int n = 0; n < 3; n++)
+                {
+                    var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
+                    var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * 16, unit * 4, projectile.type, projectile.damage, 8, projectile.owner, 1);
+                    proj.timeLeft = 21;
+                    proj.width = proj.height = 160;
+                    proj.penetrate = -1;
+                    proj.Center = projectile.Center + projectile.velocity;
+                    proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+                    proj.tileCollide = false;
+                }
+                for (int num431 = 4; num431 < 31; num431++)
+                {
+                    float num432 = projectile.oldVelocity.X * (30f / (float)num431);
+                    float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
+                    for (int n = 0; n < 4; n++)
+                    {
+                        int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
+                        Main.dust[num434].noGravity = true;
+                        Dust dust = Main.dust[num434];
+                        dust.velocity = projectile.velocity;
+                        dust.velocity *= 0.5f;
+                    }
+                }
+                SoundEngine.PlaySound(SoundID.Item62);
+            }
+            return false;
         }
         public override void Kill(int timeLeft)
         {
-            switch (style)
-            {
-                case 0:
-                    {
-                        for (int n = 0; n < 3; n++)
-                        {
-                            var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
-                            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * 16, unit * 4, projectile.type, projectile.damage, 8, projectile.owner, 1);
-                            proj.timeLeft = 21;
-                            proj.width = proj.height = 160;
-                            proj.penetrate = -1;
-                            proj.Center = projectile.Center + projectile.velocity;
-                            proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
-                            proj.tileCollide = false;
-                        }
-                        for (int num431 = 4; num431 < 31; num431++)
-                        {
-                            float num432 = projectile.oldVelocity.X * (30f / (float)num431);
-                            float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
-                            for (int n = 0; n < 4; n++)
-                            {
-                                int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
-                                Main.dust[num434].noGravity = true;
-                                Dust dust = Main.dust[num434];
-                                dust.velocity = projectile.velocity;
-                                dust.velocity *= 0.5f;
-                            }
+            //switch (style)
+            //{
+            //    case 0:
+            //        {
+            //            for (int n = 0; n < 3; n++)
+            //            {
+            //                var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
+            //                var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * 16, unit * 4, projectile.type, projectile.damage, 8, projectile.owner, 1);
+            //                proj.timeLeft = 21;
+            //                proj.width = proj.height = 160;
+            //                proj.penetrate = -1;
+            //                proj.Center = projectile.Center + projectile.velocity;
+            //                proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+            //                proj.tileCollide = false;
+            //            }
+            //            for (int num431 = 4; num431 < 31; num431++)
+            //            {
+            //                float num432 = projectile.oldVelocity.X * (30f / (float)num431);
+            //                float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
+            //                for (int n = 0; n < 4; n++)
+            //                {
+            //                    int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
+            //                    Main.dust[num434].noGravity = true;
+            //                    Dust dust = Main.dust[num434];
+            //                    dust.velocity = projectile.velocity;
+            //                    dust.velocity *= 0.5f;
+            //                }
 
-                        }
-                        SoundEngine.PlaySound(SoundID.Item62);
-                        break;
-                    }
-            }
+            //            }
+            //            SoundEngine.PlaySound(SoundID.Item62);
+            //            break;
+            //        }
+            //}
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
             target.AddBuff(24, 300);
             //target.immune[Projectile.owner] = 0;
-            if (style == 0) Projectile.Kill();
+            if (style == 0)
+            {
+                Projectile.timeLeft = 15;
+                Projectile.friendly = false;
+                for (int n = 0; n < 3; n++)
+                {
+                    var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
+                    var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * 16, unit * 4, projectile.type, projectile.damage, 8, projectile.owner, 1);
+                    proj.timeLeft = 21;
+                    proj.width = proj.height = 160;
+                    proj.penetrate = -1;
+                    proj.Center = projectile.Center + projectile.velocity;
+                    proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+                    proj.tileCollide = false;
+                }
+                for (int num431 = 4; num431 < 31; num431++)
+                {
+                    float num432 = projectile.oldVelocity.X * (30f / (float)num431);
+                    float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
+                    for (int n = 0; n < 4; n++)
+                    {
+                        int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
+                        Main.dust[num434].noGravity = true;
+                        Dust dust = Main.dust[num434];
+                        dust.velocity = projectile.velocity;
+                        dust.velocity *= 0.5f;
+                    }
+
+                }
+                SoundEngine.PlaySound(SoundID.Item62);
+            }
             else
             {
                 target.immune[projectile.owner] = 0;
@@ -825,13 +1022,21 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class SunAttack : ModProjectile
     {
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            return base.OnTileCollide(oldVelocity);
-        }
+        Projectile projectile => Projectile;
+        /// <summary>
+        /// 0为火球 1大爆炸 2小爆炸
+        /// </summary>
+        int style => (int)projectile.ai[0];
         public override void SetDefaults()
         {
-            base.SetDefaults();
+            Projectile.width = Projectile.height = 32;
+            Projectile.timeLeft = 180;
+            Projectile.DamageType = DamageClass.Magic;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = -1;
+            Projectile.aiStyle = -1;
         }
         public override void SetStaticDefaults()
         {
@@ -839,14 +1044,160 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            switch (style)
+            {
+                case 0:
+                    {
+                        float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+                        BlendState state = new BlendState();
+                        state.ColorBlendFunction = BlendFunction.Add;
+                        state.ColorDestinationBlend = Blend.InverseSourceAlpha;
+                        state.AlphaDestinationBlend = Blend.Zero;
+                        state.ColorSourceBlend = Blend.InverseDestinationColor;
+                        state.AlphaSourceBlend = Blend.One;
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, state, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        //alpha = 1f;
+                        //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, 960, 1120), Color.White);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, Projectile.rotation, new Vector2(16), new Vector2(2.5f, 1.75f) * .25f * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .5f + 1.5f) * 16, 0, 0);
+                        //for (int n = 0; n < 8; n++)
+                        //{
+                        //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), null, Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) * 0.125f * alpha, Projectile.rotation, new Vector2(16), new Vector2(2f, 1.5f), 0, 0);
+                        //}
+                        //for (int n = 0; n < 8; n++)
+                        //{
+                        //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), null, Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) * 0.0625f * alpha, Projectile.rotation, new Vector2(16), new Vector2(2f, 1.5f) * 1.5f, 0, 0);
+                        //}
+                        //for (int n = 9; n > -1; n--)
+                        //{
+                        //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), null, Color.Lerp(lightColor, Color.White, .5f) * ((10 - n) * .1f) * alpha * .25f * 10, Projectile.oldRot[n], new Vector2(16), 1f * ((10 - n) * .1f), 0, 0);
+                        //}
+                        Main.spriteBatch.End();
+                        state.Dispose();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+                        break;
+                    }
+                case 1:
+                    {
+                        var fac = 1 - projectile.timeLeft / 21f;
+                        var fac1 = fac.HillFactor2(1);
+
+                        for (int n = 0; n < 3; n++)
+                            Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "ExplosionEffect")).Value, projectile.Center - Main.screenPosition + Main.rand.NextVector2Unit() * 4, new Rectangle(0, 588 - projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac1 * .75f, projectile.rotation, new Vector2(49), 3f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "FlameOfNuclear")).Value, projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.Yellow, fac1) with { A = 0 } * fac1, projectile.rotation, new Vector2(128), 1.5f * fac, 0, 0);
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "FlameOfNuclear")).Value, projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Yellow, Color.White, fac1) * fac1, projectile.rotation, new Vector2(128), 1f * fac, 0, 0);
+
+                        break;
+                    }
+                case 2:
+                    {
+                        var fac = 1 - projectile.timeLeft / 21f;
+                        var fac1 = fac.HillFactor2(1);
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "ExplosionEffect")).Value, projectile.Center - Main.screenPosition, new Rectangle(0, 588 - projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac1, projectile.rotation, new Vector2(49), 2f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "FlameOfNuclear")).Value, projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.Yellow, fac1) with { A = 0 } * fac1, projectile.rotation, new Vector2(128), 1f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                        Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture.Replace("SunAttack", "FlameOfNuclear")).Value, projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Yellow, Color.White, fac1) with { A = 0 } * fac1, projectile.rotation, new Vector2(128), .5f * fac, 0, 0);
+
+                        break;
+                    }
+            }
+
+            return false;
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            return base.OnTileCollide(oldVelocity);
+        }
+        public override void Kill(int timeLeft)
+        {
+            switch (style)
+            {
+                case 0:
+                    {
+                        for (int n = 0; n < 3; n++)
+                        {
+                            var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation).ToRotationVector2();
+                            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * 16, unit * 4, projectile.type, projectile.damage, 8, projectile.owner, 1);
+                            proj.timeLeft = 21;
+                            proj.width = proj.height = 160;
+                            proj.penetrate = -1;
+                            proj.Center = projectile.Center + projectile.velocity;
+                            proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+                            proj.tileCollide = false;
+                        }
+                        for (int num431 = 4; num431 < 31; num431++)
+                        {
+                            float num432 = projectile.oldVelocity.X * (30f / (float)num431);
+                            float num433 = projectile.oldVelocity.Y * (30f / (float)num431);
+                            for (int n = 0; n < 4; n++)
+                            {
+                                int num434 = Dust.NewDust(new Vector2(projectile.oldPosition.X - num432, projectile.oldPosition.Y - num433) + Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + projectile.velocity, 8, 8, MyDustId.Fire, projectile.oldVelocity.X, projectile.oldVelocity.Y, 100, Color.Orange, 1.2f);
+                                Main.dust[num434].noGravity = true;
+                                Dust dust = Main.dust[num434];
+                                dust.velocity = projectile.velocity;
+                                dust.velocity *= 0.5f;
+                            }
+
+                        }
+                        SoundEngine.PlaySound(SoundID.Item62);
+                        break;
+                    }
+            }
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            base.OnHitNPC(target, damage, knockback, crit);
+            target.AddBuff(24, 300);
+            //target.immune[Projectile.owner] = 0;
+            if (style == 0) Projectile.Kill();
+            else
+            {
+                target.immune[projectile.owner] = 0;
+                projectile.frameCounter++;
+            }
         }
         public override void AI()
         {
+            switch (style)
+            {
+                case 0:
+                    {
+                        Projectile.rotation = Projectile.velocity.ToRotation();
+                        Dust.NewDustPerfect(projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White, 1f).noGravity = true;
+                        for (int n = 9; n > 0; n--)
+                        {
+                            Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                            Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+                        }
+                        Projectile.oldPos[0] = Projectile.Center;
+                        Projectile.oldRot[0] = Projectile.rotation;
+                        break;
+                    }
+                case 1:
+                case 2:
+                    {
+                        projectile.friendly = projectile.frameCounter == 0;
+                        break;
+                    }
+            }
+            //if (style == 1 && projectile.timeLeft == 10)
+            //{
+            //    for (int n = 0; n < 3; n++)
+            //    {
+            //        var unit = Main.rand.NextVector2Unit();
+            //        var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + unit * Main.rand.NextFloat(16, 32f) * 16, unit * Main.rand.NextFloat(2, 8), projectile.type, projectile.damage / 2, 8, projectile.owner, 2);
+            //        proj.timeLeft = 21;
+            //        proj.width = proj.height = 80;
+            //        proj.penetrate = -1;
+            //        proj.Center = projectile.Center + projectile.velocity;
+            //        proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
+            //        proj.tileCollide = false;
+            //        for (int m = 0; m < 8; m++)
+            //        {
+            //            Dust.NewDustPerfect(proj.Center, MyDustId.Fire, Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 8), 0, default, Main.rand.NextFloat(0.5f, 2f));
+            //        }
+            //    }
+            //    SoundEngine.PlaySound(SoundID.Item62);
+            //}
             base.AI();
         }
     }
