@@ -10,6 +10,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.GameContent;
 using Terraria.DataStructures;
+using Terraria.UI;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -1098,6 +1099,17 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class StoneOfThePhilosophersHelper
     {
+        public static UIElement SetSize(this UIElement uie, Vector2 size, float precentWidth = 0, float precentHeight = 0)
+        {
+            uie.SetSize(size.X, size.Y, precentWidth, precentHeight);
+            return uie;
+        }
+        public static UIElement SetSize(this UIElement uie, float width, float height, float precentWidth = 0, float precentHeight = 0)
+        {
+            uie.Width.Set(width, precentWidth);
+            uie.Height.Set(height, precentHeight);
+            return uie;
+        }
         public static object Call(params object[] args)
         {
             string funcName = (string)args[0];

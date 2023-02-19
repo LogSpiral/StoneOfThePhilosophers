@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -232,6 +231,84 @@ namespace StoneOfThePhilosophers.Contents
             return new ColorVector(Value * scaler);
         }
     }
+    public struct Matrix4X4 : IMatrix<Matrix4X4, Matrix>
+    {
+        public Matrix4X4(Matrix value)
+        {
+            Value = value;
+        }
+        public int Width => 4;
+
+        public int Height => 4;
+
+        /// <summary>
+        /// 只读，不要从这里写入数据
+        /// </summary>
+        public float[,] Elements
+        {
+            get
+            {
+                var result = new float[4, 4];
+                for (int i = 0; i < 4; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        var m = Value;
+                        result[i, j] =
+                            i switch
+                            {
+                                0 => j switch
+                                {
+                                    0 => m.M11,
+                                    1 => m.M12,
+                                    2 => m.M13,
+                                    3 or _ => m.M14
+                                },
+                                1 => j switch
+                                {
+                                    0 => m.M21,
+                                    1 => m.M22,
+                                    2 => m.M23,
+                                    3 or _ => m.M24
+                                },
+                                2 => j switch
+                                {
+                                    0 => m.M31,
+                                    1 => m.M32,
+                                    2 => m.M33,
+                                    3 or _ => m.M34
+                                },
+                                3 or _ => j switch
+                                {
+                                    0 => m.M41,
+                                    1 => m.M42,
+                                    2 => m.M43,
+                                    3 or _ => m.M44
+                                }
+                            };
+                    }
+                }
+                return result;
+            }
+        }
+
+        public Matrix Value { get; set; }
+
+        public Matrix4X4 Add(Matrix4X4 Another)
+        {
+            return new Matrix4X4(Value + Another.Value);
+        }
+
+        public Matrix4X4 Multiply(Matrix4X4 Another)
+        {
+            return new Matrix4X4(Another.Value * Value);
+        }
+
+        public Matrix4X4 Multiply(float scaler)
+        {
+            return new Matrix4X4(Value * scaler);
+        }
+    }
     /// <summary>
     /// 以float为元素的大矩阵
     /// </summary>
@@ -413,12 +490,12 @@ namespace StoneOfThePhilosophers.Contents
             if (height == 1 || width == 1) throw new ArgumentException("长或宽为1的无法求余子式");
             var result = new MatrixEX(height - 1, width - 1);
             bool flag1 = false;
-            bool flag2 = false;
             for (int m = 0; m < height - 1; m++)
             {
+                bool flag2 = false;
+                if (m == i) flag1 = true;
                 for (int n = 0; n < width - 1; n++)
                 {
-                    if (m == i) flag1 = true;
                     if (n == j) flag2 = true;
                     result[m, n] = this[m + (flag1 ? 1 : 0), n + (flag2 ? 1 : 0)];
                 }
@@ -468,7 +545,11 @@ namespace StoneOfThePhilosophers.Contents
             var result = new MatrixEX(height, width);
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++)
-                    result[i, j] = ((i + j) % 2 == 0 ? -1 : 1) * Cofactor(i, j).Determinant();
+                {
+                    var cofactor = Cofactor(i, j);
+                    var det = cofactor.Determinant();
+                    result[i, j] = ((i + j) % 2 == 0 ? 1 : -1) * det;
+                }
             return result.Transposition();
         }
         /// <summary>
@@ -484,7 +565,9 @@ namespace StoneOfThePhilosophers.Contents
                 result[0, 0] = 1 / this[0, 0];
                 return result;
             }
-            return Adjugate() / Determinant();
+            var adjugate = Adjugate();
+            var determinant = Determinant();
+            return adjugate / determinant;
         }
         /// <summary>
         /// 按行拓展矩阵
@@ -575,11 +658,7 @@ namespace StoneOfThePhilosophers.Contents
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
                     if (j == 0) result[i] = array[0].Multiply(this[i, 0]);
-                    else
-                    {
-                        if (this == null) throw new Exception("丫的怎么null了");
-                        result[i] = result[i].Add(array[j].Multiply(this[i, j]));
-                    }
+                    else result[i] = result[i].Add(array[j].Multiply(this[i, j]));
             return result;
         }
 
@@ -610,17 +689,12 @@ namespace StoneOfThePhilosophers.Contents
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
                     if (j == 0) result[i] = array[0] * this[i, 0];
-                    else
-                    {
-                        if (this == null) throw new Exception("丫的怎么null了");
-                        result[i] = result[i] + array[j] * this[i, j];
-                    }
+                    else result[i] = result[i] + array[j] * this[i, j];
             return result;
         }
 
         public Vector2[] Apply(Vector2[] array1, params Vector2[] array2)
         {
-            var str = this.ToString();
             var array = new Vector2[array1.Length + array2.Length];
             if (array.Length != Width) throw new ArgumentException($"向量的维数必须和矩阵的宽度相等，目前分别为{array.Length}和{Width}");
             for (int n = 0; n < array1.Length; n++)
@@ -631,11 +705,7 @@ namespace StoneOfThePhilosophers.Contents
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
                     if (j == 0) result[i] = array[0] * this[i, 0];
-                    else
-                    {
-                        if (this == null) throw new Exception("丫的怎么null了");
-                        result[i] = result[i] + array[j] * this[i, j];
-                    }
+                    else result[i] += array[j] * this[i, j];
             return result;
         }
 
@@ -651,11 +721,7 @@ namespace StoneOfThePhilosophers.Contents
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
                     if (j == 0) result[i] = array[0] * this[i, 0];
-                    else
-                    {
-                        if (this == null) throw new Exception("丫的怎么null了");
-                        result[i] = result[i] + array[j] * this[i, j];
-                    }
+                    else result[i] = result[i] + array[j] * this[i, j];
             return result;
         }
 
@@ -671,11 +737,7 @@ namespace StoneOfThePhilosophers.Contents
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
                     if (j == 0) result[i] = array[0] * this[i, 0];
-                    else
-                    {
-                        if (this == null) throw new Exception("丫的怎么null了");
-                        result[i] = result[i] + array[j] * this[i, j];
-                    }
+                    else result[i] = result[i] + array[j] * this[i, j];
             return result;
         }
 
@@ -774,22 +836,18 @@ namespace StoneOfThePhilosophers.Contents
                     return MathF.Pow(1 - t, n - j + 1) * MathF.Pow(t, j + 1) * c_Vectors[n][j + 1];
                 }
                 );
-            var str1 = M.ToString();
             MatrixEX T = new MatrixEX(n + 1, 2,
                 (i, j) =>
                 {
                     float t = (1 + i) / (n + 2f);
-                    if (j == 1)
+                    if (j == 0)
                     {
                         t = 1 - t;
                     }
                     return MathF.Pow(t, n + 2);
                 }
                 );
-            var str2 = T.ToString();
             M = M.Inverse();
-            str1 = M.ToString();
-            str1 += "";
             return MatrixEX.AppendByRow(M, -M * T);
         }
         public static float[] GetVectors(int n)
@@ -835,7 +893,7 @@ namespace StoneOfThePhilosophers.Contents
             vectors = new IVector<TSelf, TValue>[n + 2];
             vectors[0] = input[0];
             vectors[^1] = input[^1];
-            IVector<TSelf, TValue>[] array = c_Matrixes[n - 1].Apply(input[1..^1], input[0], input[1]);
+            IVector<TSelf, TValue>[] array = c_Matrixes[n - 1].Apply(input[1..^1], input[0], input[^1]);
             for (int m = 0; m < n; m++)
                 vectors[m + 1] = array[m];
         }

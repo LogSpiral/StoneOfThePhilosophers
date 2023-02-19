@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.Audio;
 using Terraria.GameContent;
+using ReLogic.Graphics;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -149,7 +150,7 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfMetalProj : MagicArea
     {
         public override Color MainColor => Color.Yellow;
-        public override int Cycle => 48;
+        public override int Cycle => 48;//48
 
         public override void ShootProj(bool dying = false)
         {
@@ -162,7 +163,7 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfWoodProj : MagicArea
     {
         public override Color MainColor => Color.Green;
-        public override int Cycle => 24;
+        public override int Cycle => 24;//24
 
         public override void ShootProj(bool dying = false)
         {
@@ -177,7 +178,7 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfWaterProj : MagicArea
     {
         public override Color MainColor => Color.Blue;
-        public override int Cycle => 6;
+        public override int Cycle => 6;//6
         public override void ShootProj(bool dying = false)
         {
             if (dying)
@@ -200,7 +201,7 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfFireProj : MagicArea
     {
         public override Color MainColor => Color.Red;
-        public override int Cycle => 30;
+        public override int Cycle => 30;//30
 
         public override void ShootProj(bool dying = false)
         {
@@ -223,7 +224,7 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfMoonProj : MagicArea
     {
-        public override int Cycle => 12;
+        public override int Cycle => 12;//12
         public override Color MainColor => Color.Purple;
         public override void ShootProj(bool dying = false)
         {
@@ -240,11 +241,11 @@ namespace StoneOfThePhilosophers.Contents
 
         public override void ShootProj(bool dying = false)
         {
-            if (dying && projectile.timeLeft % 3 != 0) return;
-            SoundEngine.PlaySound(SoundID.Item74);
+            //if (dying && projectile.timeLeft % 3 != 0) return;
+            //SoundEngine.PlaySound(SoundID.Item74);
 
-            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.Pi / 48f) * 2,
-                ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
+            //Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.Pi / 48f) * 2,
+            //    ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
     public class MetalAttack : ModProjectile
@@ -562,21 +563,31 @@ namespace StoneOfThePhilosophers.Contents
                     }
             }
 
-            //IVector<FloatVector2, Vector2>[] vectors = new IVector<FloatVector2, Vector2>[4];
-            ////for (int n = 0; n < 6; n++)
-            ////{
-            ////    vectors[n] = new FloatVector2((MathHelper.TwoPi / 5 * 2 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
-            ////}
-            //for (int n = 0; n < 4; n++)
+            #region BezierCurveTest
+            //IVector<FloatVector2, Vector2>[] vectors = new IVector<FloatVector2, Vector2>[8];
+            //for (int n = 0; n < 8; n++)
             //{
-            //    vectors[n] = new FloatVector2((MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
+            //    //vectors[n] = new FloatVector2((MathHelper.TwoPi / 7 * 2 * n).ToRotationVector2() * (1 + n * .125f));
+            //    vectors[n] = new FloatVector2(Main.rand.NextVector2Unit() * Main.rand.NextFloat(.5f, 2f));
             //}
+            ////for (int n = 0; n < 5; n++)
+            ////{
+            ////    vectors[n] = new FloatVector2((MathHelper.TwoPi / 5 * n).ToRotationVector2() * (n * n * .1f + 1));
+            ////}
             //if (bezierCurve == null)
             //{
             //    bezierCurve = new BezierCurve<FloatVector2, Vector2>(vectors);
-            //    bezierCurve.Recalculate(60);
+            //    bezierCurve.Recalculate(180);
             //}
-            //var m = BezierCurve<FloatVector2, Vector2>.c_Matrixes[1];
+            //else
+            //{
+            //    for (int n = 0; n < 8; n++)
+            //    {
+            //        float t = n / 7f;
+            //        vectors[n] = bezierCurve.results[(int)(t * 179f)];
+            //    }
+            //}
+            //var m = BezierCurve<FloatVector2, Vector2>.GetMatrix(2);
             //var str = m.ToString();
             ////var vecs = BezierCurve<FloatVector2, Vector2>.c_Vectors;
             ////if (vecs.Count < 4)
@@ -596,98 +607,119 @@ namespace StoneOfThePhilosophers.Contents
             ////    str2 += $" {vec[i]}";
             ////}
             ////str2 += ")";
+            //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, 1920, 1120), Color.Black);
             //foreach (var point in bezierCurve.results)
             //{
             //    var vec = point.Value;
-            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
+            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec * 128 + new Vector2(960, 560), new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
             //}
-            //foreach (var point in vectors)
-            //{
-            //    var vec = point.Value;
-            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Cyan, 0, new Vector2(.5f), 16, 0, 0);
-            //}
-            if (bezierCurve == null)
-            {
-                var wtf = new IVector<FloatVector2, Vector2>[4];
-                for (int n = 0; n < 4; n++)
-                {
-                    wtf[n] = new FloatVector2((MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
-                }
-                bezierCurve = new BezierCurve<FloatVector2, Vector2>(wtf);
-                //bezierCurve.Recalculate(60);
-            }
-            var input = new Vector2[4];
-            for (int n = 0; n < 4; n++)
-            {
-                input[n] = (MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560);
-            }
-            var vectors = new Vector2[4];
-            vectors[0] = input[0];
-            vectors[^1] = input[^1];
-            Vector2[] array = BezierCurve<FloatVector2, Vector2>.c_Matrixes[1].Apply(input[1..^1], input[0], input[1]);
-            for (int m = 0; m < 2; m++)
-                vectors[m + 1] = array[m];
-            array = new Vector2[60];
+            ////foreach (var point in vectors)
+            ////{
 
-            for (int n = 0; n < 60; n++)
-            {
-                float t = n / (60 - 1f);
-                for (int i = 0; i < 4; i++)
-                {
-                    if (i == 0) array[n] = vectors[0] * MathF.Pow(1 - t, 3);
-                    else array[n] = array[n] + vectors[i] * MathF.Pow(1 - t, 3 - i) * MathF.Pow(t, i) * BezierCurve<FloatVector2, Vector2>.c_Vectors[1][i];
-                }
-            }
-            #region MyRegion
-            //MatrixEX matrix = new MatrixEX(4, (i, j) => i switch
+            ////}
+            //for (int n = 0; n < vectors.Length; n++)
             //{
-            //    0 => j switch
-            //    {
-            //        0 => 2,
-            //        1 => 3,
-            //        2 => 3,
-            //        3 or _ => 3
-            //    },
-            //    1 => j switch
-            //    {
-            //        0 => 1,
-            //        1 => 1,
-            //        2 => 4,
-            //        3 or _ => 5
-            //    },
-            //    2 => j switch
-            //    {
-            //        0 => 5,
-            //        1 => 1,
-            //        2 => 4,
-            //        3 or _ => 0
-            //    },
-            //    3 or _ => j switch
-            //    {
-            //        0 => 2,
-            //        1 => 7,
-            //        2 => 1,
-            //        3 or _ => 8
-            //    }
-            //});
-            //float[] values = matrix.Apply(new float[] { 1, 2, 3, 4 });
-            //var str = "(";
-            //for (int n = 0; n < 4; n++) 
-            //{
-            //    str += $" {values[n]},";
+            //    var vec = vectors[n].Value;
+            //    var t = n / (vectors.Length - 1f);
+            //    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec * 128 + new Vector2(960, 560), new Rectangle(0, 0, 1, 1), Main.hslToRgb(t, 1, 0.75f), 0, new Vector2(.5f), 16, 0, 0);
+            //    Main.spriteBatch.DrawString(FontAssets.MouseText.Value, n.ToString(), vec * 128 + new Vector2(960, 560), Color.White);
             //}
-            //str += ")";
-            //str += "";
+            ////if (bezierCurve == null)
+            ////{
+            ////    var wtf = new IVector<FloatVector2, Vector2>[4];
+            ////    for (int n = 0; n < 4; n++)
+            ////    {
+            ////        wtf[n] = new FloatVector2((MathHelper.TwoPi / 3 * n).ToRotationVector2() * 128 + new Vector2(960, 560));
+            ////    }
+            ////    bezierCurve = new BezierCurve<FloatVector2, Vector2>(wtf);
+            ////    //bezierCurve.Recalculate(60);
+            ////}
+            ////var input = new Vector2[4];
+            ////for (int n = 0; n < 4; n++)
+            ////{
+            ////    //input[n] = (MathHelper.TwoPi / 3 * n).ToRotationVector2();
+            ////    input[n] = n switch
+            ////    {
+            ////        0 or 3 => new Vector2(1, 0),
+            ////        1 => new Vector2(0, 1),
+            ////        2 or _ => new Vector2(-1, 0)
+            ////    };
+            ////}
+            ////var vectors = new Vector2[4];
+            ////vectors[0] = input[0];
+            ////vectors[^1] = input[^1];
+            ////Vector2[] array = BezierCurve<FloatVector2, Vector2>.c_Matrixes[1].Apply(input[1..^1], input[0], input[^1]);
+            ////for (int m = 0; m < 2; m++)
+            ////    vectors[m + 1] = array[m];
+            ////array = new Vector2[60];
+
+
+            ////for (int n = 0; n < 4; n++) 
+            ////{
+            ////    var str = vectors[n].ToString();
+            ////    str += "";
+            ////}
+            ////for (int n = 0; n < 60; n++)
+            ////{
+            ////    float t = n / (60 - 1f);
+            ////    for (int i = 0; i < 4; i++)
+            ////    {
+            ////        if (i == 0) array[n] = vectors[0] * MathF.Pow(1 - t, 3);
+            ////        else array[n] = array[n] + vectors[i] * MathF.Pow(1 - t, 3 - i) * MathF.Pow(t, i) * BezierCurve<FloatVector2, Vector2>.c_Vectors[1][i];
+            ////    }
+            ////}
+            ////#region MyRegion
+            //////MatrixEX matrix = new MatrixEX(4, (i, j) => i switch
+            //////{
+            //////    0 => j switch
+            //////    {
+            //////        0 => 2,
+            //////        1 => 3,
+            //////        2 => 3,
+            //////        3 or _ => 3
+            //////    },
+            //////    1 => j switch
+            //////    {
+            //////        0 => 1,
+            //////        1 => 1,
+            //////        2 => 4,
+            //////        3 or _ => 5
+            //////    },
+            //////    2 => j switch
+            //////    {
+            //////        0 => 5,
+            //////        1 => 1,
+            //////        2 => 4,
+            //////        3 or _ => 0
+            //////    },
+            //////    3 or _ => j switch
+            //////    {
+            //////        0 => 2,
+            //////        1 => 7,
+            //////        2 => 1,
+            //////        3 or _ => 8
+            //////    }
+            //////});
+            //////float[] values = matrix.Apply(new float[] { 1, 2, 3, 4 });
+            //////var str = "(";
+            //////for (int n = 0; n < 4; n++) 
+            //////{
+            //////    str += $" {values[n]},";
+            //////}
+            //////str += ")";
+            //////str += "";
+            ////#endregion
+            ////BezierCurve<FloatVector2, Vector2>.GetMatrix(1);
+            ////foreach (var vec in array)
+            ////{
+            ////    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec * 128 + new Vector2(960, 560), new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
+            ////}
+            ////foreach (var vec in input)
+            ////{
+            ////    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec * 128 + new Vector2(960, 560), new Rectangle(0, 0, 1, 1), Color.Cyan, 0, new Vector2(.5f), 16, 0, 0);
+            ////}
             #endregion
 
-            foreach (var vec in array)
-            {
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 8, 0, 0);
-            }
-            foreach (var vec in input)
-            {
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, vec, new Rectangle(0, 0, 1, 1), Color.Cyan, 0, new Vector2(.5f), 16, 0, 0);
-            }
             return false;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
