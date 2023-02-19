@@ -181,7 +181,7 @@ namespace StoneOfThePhilosophers.UI
     {
         public bool Active;
         public Asset<Texture2D> Texture { get; private set; }
-        public ElementButton(Asset<Texture2D> texture, Color activeColor = default, Color inactiveColor = default)
+        public ElementButton(Asset<Texture2D> texture)
         {
             if (texture is not null)
             {

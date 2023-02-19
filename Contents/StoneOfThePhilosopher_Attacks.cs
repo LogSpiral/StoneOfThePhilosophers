@@ -151,34 +151,143 @@ namespace StoneOfThePhilosophers.Contents
         {
 
         }
+
+        #endregion
+
+        #region 水相关组合
         public static void FireWater(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+
+        public static void WaterWater(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
         #endregion
 
-        #region 水相关组合
-
-        #endregion
-
         #region 木相关组合
+        public static void FireWood(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
 
+        }
+
+        public static void WaterWood(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+
+        public static void WoodWood(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
         #endregion
 
         #region 金相关组合
+        public static void FireMetal(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
 
+        }
+
+        public static void WaterMetal(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void WoodMetal(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+
+        public static void MetalMetal(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
         #endregion
 
         #region 土相关组合
+        public static void FireSoil(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
 
+        }
+
+        public static void WaterSoil(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void WoodSoil(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void MetalSoil(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+
+        public static void SoilSoil(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
         #endregion
 
         #region 月相关组合
+        public static void FireLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
 
+        }
+
+        public static void WaterLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void WoodLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void MetalLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void SoilLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+
+        public static void LunarLunar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
         #endregion
 
         #region 日相关组合
+        public static void FireSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
 
+        }
+
+        public static void WaterSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void WoodSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void MetalSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void SoilSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void LunarSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
+        public static void SunSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        {
+
+        }
         #endregion
     }
     public delegate void ElementAttack(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying);
