@@ -17,17 +17,23 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
+            var elementPlr = player.GetModPlayer<ElementPlayer>();
+
             if (player.itemAnimation == player.itemAnimationMax)
             {
-                if (player.altFunctionUse != 2)
+                if (player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0)
                 {
                 }
                 else
                 {
                     if (ElementUI.Visible)
                         ElementSystem.Instance.elementUI.Close();
-                    else
+                    else 
+                    {
+                        ElementUI.IsSeven = !ElementUI.IsSeven;
                         ElementSystem.Instance.elementUI.Open();
+
+                    }
                 }
             }
         }
@@ -50,7 +56,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            return player.altFunctionUse != 2;
+            var elementPlr = player.GetModPlayer<ElementPlayer>();
+            return player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0;
         }
         public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
         {
@@ -62,7 +69,7 @@ namespace StoneOfThePhilosophers.Contents
         public override string Texture => "StoneOfThePhilosophers/MagicArea_1";
         public StoneElements Element1 => ElementPlr.element1;
         public StoneElements Element2 => ElementPlr.element2;
-        public (StoneElements, StoneElements) ElementCombination => (Element1, Element2);
+        public ElementCombination ElementCombination => (Element1, Element2);
 
         public Projectile projectile => Projectile;
         public Player player => Main.player[projectile.owner];

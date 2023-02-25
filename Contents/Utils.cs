@@ -1099,6 +1099,21 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class StoneOfThePhilosophersHelper
     {
+        /// <summary>
+        /// 缩放修复（这公式自己测的，没有游戏依据）
+        /// 将屏幕坐标转换为UI坐标
+        /// </summary>
+        public static Vector2 TransformToUIPosition(Vector2 vector)
+        {
+            // 获取相对屏幕中心的向量(一定要在调节xy前获取)
+            float oppositeX = (vector.X - Main.screenWidth / 2) / Main.UIScale;
+            float oppositeY = (vector.Y - Main.screenHeight / 2) / Main.UIScale;
+            vector.X = (int)(vector.X / Main.UIScale) + (int)(oppositeX * (Main.GameZoomTarget - 1f));
+            vector.Y = (int)(vector.Y / Main.UIScale) + (int)(oppositeY * (Main.GameZoomTarget - 1f));
+            return new(vector.X, vector.Y);
+        }
+
+        public static Vector2 MouseScreenUI => TransformToUIPosition(Main.MouseScreen);
         public static UIElement SetSize(this UIElement uie, Vector2 size, float precentWidth = 0, float precentHeight = 0)
         {
             uie.SetSize(size.X, size.Y, precentWidth, precentHeight);

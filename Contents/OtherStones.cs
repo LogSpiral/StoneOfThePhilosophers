@@ -503,7 +503,7 @@ namespace StoneOfThePhilosophers.Contents
 
     public class FireAttack : ModProjectile
     {
-        BezierCurve<FloatVector2, Vector2> bezierCurve;
+        //BezierCurve<FloatVector2, Vector2> bezierCurve;
         Projectile projectile => Projectile;
         /// <summary>
         /// 0为火球 1大爆炸 2小爆炸

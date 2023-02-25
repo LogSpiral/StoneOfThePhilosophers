@@ -1,4 +1,6 @@
-﻿using StoneOfThePhilosophers.UI;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Xna.Framework;
+using StoneOfThePhilosophers.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -26,7 +29,7 @@ namespace StoneOfThePhilosophers.Contents
                 if (!skiped)
                 {
                     skiped = true;
-                    combination = (combination.Item2, combination.Item1);
+                    combination = (combination.element2, combination.element1);
                     goto label;
                 }
                 else
@@ -44,11 +47,16 @@ namespace StoneOfThePhilosophers.Contents
             //    if (attack.IsStatic) { }
             //}
             #region 火
+            //Attacks.Add((StoneElements.Fire, StoneElements.Fire), FireFire);
+            ElementColor.Add(StoneElements.Fire, Color.Red);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Fire), FireFire);
             Names.Add((StoneElements.Fire, StoneElements.Fire), "火符「火神的辉光」");
             #endregion
 
             #region 水
+            ElementColor.Add(StoneElements.Water, Color.Blue);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Water), FireWater);
             Names.Add((StoneElements.Fire, StoneElements.Water), "水火「燃素之雨」");
 
@@ -57,6 +65,8 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 木
+            ElementColor.Add(StoneElements.Wood, Color.Green);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Wood), FireWood);
             Names.Add((StoneElements.Fire, StoneElements.Wood), "木火「森林大火」");
 
@@ -68,6 +78,8 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 金
+            ElementColor.Add(StoneElements.Metal, Color.Yellow);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Metal), FireMetal);
             Names.Add((StoneElements.Fire, StoneElements.Metal), "火金「圣爱尔摩火柱」");
 
@@ -82,6 +94,8 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 土
+            ElementColor.Add(StoneElements.Soil, Color.Orange);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Soil), FireSoil);
             Names.Add((StoneElements.Fire, StoneElements.Soil), "火土「环状熔岩带」");
 
@@ -99,6 +113,8 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 月
+            ElementColor.Add(StoneElements.Lunar, Color.Purple);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Lunar), FireLunar);
             Names.Add((StoneElements.Fire, StoneElements.Lunar), "月火「月之秽火」");
 
@@ -119,6 +135,8 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 日
+            ElementColor.Add(StoneElements.Sun, Color.White);
+
             Attacks.Add((StoneElements.Fire, StoneElements.Sun), FireSun);
             Names.Add((StoneElements.Fire, StoneElements.Sun), "日火「希腊火」");
 
@@ -143,8 +161,9 @@ namespace StoneOfThePhilosophers.Contents
 
             base.Load();
         }
-        public Dictionary<(StoneElements, StoneElements), ElementAttack> Attacks;
-        public Dictionary<(StoneElements, StoneElements), string> Names;
+        public static Dictionary<ElementCombination, ElementAttack> Attacks = new Dictionary<ElementCombination, ElementAttack>();
+        public static Dictionary<ElementCombination, string> Names = new Dictionary<ElementCombination, string>();
+        public static Dictionary<StoneElements, Color> ElementColor = new Dictionary<StoneElements, Color>();
 
         #region 火相关组合
         public static void FireFire(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
@@ -289,6 +308,59 @@ namespace StoneOfThePhilosophers.Contents
 
         }
         #endregion
+    }
+    public struct ElementCombination
+    {
+        public StoneElements element1;
+        public StoneElements element2;
+        public static implicit operator ElementCombination((StoneElements, StoneElements) value)
+        {
+            return new ElementCombination(value);
+        }
+        public static implicit operator (StoneElements, StoneElements)(ElementCombination value)
+        {
+            return (value.element1, value.element2);
+        }
+
+        public ElementCombination(StoneElements _element1, StoneElements _element2)
+        {
+            element1 = _element1;
+            element2 = _element2;
+        }
+        public ElementCombination((StoneElements _element1, StoneElements _element2) value)
+        {
+            element1 = value._element1;
+            element2 = value._element2;
+        }
+        public static bool operator ==(ElementCombination value1, ElementCombination value2)
+        {
+            if (value1.element1 == value2.element1)
+            {
+                return value1.element2 == value2.element2;
+            }
+            else if (value1.element1 == value2.element2) 
+            {
+                return value1.element2 == value2.element1;
+            }
+            return false;
+        }
+
+        public static bool operator !=(ElementCombination value1, ElementCombination value2)
+        {
+            return !(value1 == value2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ElementCombination combination &&
+                   element1 == combination.element1 &&
+                   element2 == combination.element2;
+        }
+
+        public override int GetHashCode()
+        {
+            return element1.GetHashCode() + element2.GetHashCode();
+        }
     }
     public delegate void ElementAttack(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying);
 }
