@@ -11,7 +11,8 @@ namespace StoneOfThePhilosophers
     {
         public static Effect VertexDraw => vertexDraw ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDraw", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         static Effect vertexDraw;
-
+        public static Effect VertexDrawEX => vertexDrawEX ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDrawEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+        static Effect vertexDrawEX;
     }
     public class StoneOfThePhilosophersConfig : ModConfig
     {

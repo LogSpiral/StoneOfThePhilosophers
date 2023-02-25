@@ -1192,9 +1192,109 @@ namespace StoneOfThePhilosophers.Contents
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
         }
+        public static void VertexDrawEX(CustomVertexInfoEX[] vertexs, Texture2D baseTex, Texture2D aniTex, Texture2D heatMap = null, Vector2 uTime = default, bool trailing = false, Matrix? matrix = null, string? pass = null)
+        {
+            Effect effect = StoneOfThePhilosophers.VertexDrawEX;
+            if (effect == null) return;
+            SpriteBatch spriteBatch = Main.spriteBatch;
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            if (trailing)
+            {
+                List<CustomVertexInfoEX> triangleList = new List<CustomVertexInfoEX>();
+                for (int i = 0; i < vertexs.Length - 2; i += 2)
+                {
+                    triangleList.Add(vertexs[i]);
+                    triangleList.Add(vertexs[i + 2]);
+                    triangleList.Add(vertexs[i + 1]);
+
+                    triangleList.Add(vertexs[i + 1]);
+                    triangleList.Add(vertexs[i + 2]);
+                    triangleList.Add(vertexs[i + 3]);
+                }
+                vertexs = triangleList.ToArray();
+            }
+
+            RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
+            var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
+            var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
+            var transform = (matrix ?? Matrix.Identity) * model * Main.GameViewMatrix.TransformationMatrix * projection;
+            effect.Parameters["uTransform"].SetValue(transform);
+            effect.Parameters["uTimeX"].SetValue(uTime.X);
+            effect.Parameters["uTimeY"].SetValue(uTime.Y);
+            Main.graphics.GraphicsDevice.Textures[0] = baseTex;
+            Main.graphics.GraphicsDevice.Textures[1] = aniTex;
+            if (heatMap != null)
+                Main.graphics.GraphicsDevice.Textures[2] = heatMap;
+            Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
+            Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
+            Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicWrap;
+            if (pass != null)
+                effect.CurrentTechnique.Passes[pass].Apply();
+            else
+                effect.CurrentTechnique.Passes[0].Apply();
+            //Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList.ToArray(), 0, triangleList.Count / 3);
+            Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
+            Main.graphics.GraphicsDevice.RasterizerState = originalState;
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+        }
         public static void VertexDraw3DPlanes()
         {
 
+        }
+    }
+    public struct CustomVertexInfoEX : IVertexType
+    {
+        private static VertexDeclaration _vertexDeclaration = new VertexDeclaration(new VertexElement[3]
+        {
+                new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 0),
+                new VertexElement(16, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                new VertexElement(20, VertexElementFormat.Vector3, VertexElementUsage.TextureCoordinate, 0)
+        });
+        /// <summary>
+        /// 使用齐次坐标！！
+        /// </summary>
+        public Vector4 Position;
+        public Color Color;
+        public Vector3 TexCoord;
+
+        public CustomVertexInfoEX(Vector4 position, Color color, Vector3 texCoord)
+        {
+            Position = position;
+            Color = color;
+            TexCoord = texCoord;
+        }
+        public CustomVertexInfoEX(Vector4 position, float alpha, Vector3 texCoord) : this(position, Color.White with { A = (byte)MathHelper.Clamp(255 * alpha, 0, 255) }, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector4 position, Vector3 texCoord) : this(position, Color.White, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector3 position, Color color, Vector3 texCoord) : this(new Vector4(position, 1), color, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector3 position, float alpha, Vector3 texCoord) : this(new Vector4(position, 1), alpha, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector3 position, Vector3 texCoord) : this(new Vector4(position, 1), texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector2 position, Color color, Vector3 texCoord) : this(new Vector4(position, 0, 1), color, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector2 position, float alpha, Vector3 texCoord) : this(new Vector4(position, 0, 1), alpha, texCoord)
+        {
+        }
+        public CustomVertexInfoEX(Vector2 position, Vector3 texCoord) : this(new Vector4(position, 0, 1), texCoord)
+        {
+        }
+        public VertexDeclaration VertexDeclaration
+        {
+            get
+            {
+                return _vertexDeclaration;
+            }
         }
     }
     public struct CustomVertexInfo : IVertexType

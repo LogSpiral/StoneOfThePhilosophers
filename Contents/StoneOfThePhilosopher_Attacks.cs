@@ -46,6 +46,7 @@ namespace StoneOfThePhilosophers.Contents
             //{
             //    if (attack.IsStatic) { }
             //}
+
             #region 火
             //Attacks.Add((StoneElements.Fire, StoneElements.Fire), FireFire);
             ElementColor.Add(StoneElements.Fire, Color.Red);
@@ -135,28 +136,28 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
 
             #region 日
-            ElementColor.Add(StoneElements.Sun, Color.White);
+            ElementColor.Add(StoneElements.Solar, Color.White);
 
-            Attacks.Add((StoneElements.Fire, StoneElements.Sun), FireSun);
-            Names.Add((StoneElements.Fire, StoneElements.Sun), "日火「希腊火」");
+            Attacks.Add((StoneElements.Fire, StoneElements.Solar), FireSolar);
+            Names.Add((StoneElements.Fire, StoneElements.Solar), "日火「希腊火」");
 
-            Attacks.Add((StoneElements.Water, StoneElements.Sun), WaterSun);
-            Names.Add((StoneElements.Water, StoneElements.Sun), "日水「氢化日珥」");
+            Attacks.Add((StoneElements.Water, StoneElements.Solar), WaterSolar);
+            Names.Add((StoneElements.Water, StoneElements.Solar), "日水「氢化日珥」");
 
-            Attacks.Add((StoneElements.Wood, StoneElements.Sun), WoodSun);
-            Names.Add((StoneElements.Wood, StoneElements.Sun), "日木「光合作用」");
+            Attacks.Add((StoneElements.Wood, StoneElements.Solar), WoodSolar);
+            Names.Add((StoneElements.Wood, StoneElements.Solar), "日木「光合作用」");
 
-            Attacks.Add((StoneElements.Metal, StoneElements.Sun), MetalSun);
-            Names.Add((StoneElements.Metal, StoneElements.Sun), "日金「天罚剑」");
+            Attacks.Add((StoneElements.Metal, StoneElements.Solar), MetalSolar);
+            Names.Add((StoneElements.Metal, StoneElements.Solar), "日金「天罚剑」");
 
-            Attacks.Add((StoneElements.Soil, StoneElements.Sun), SoilSun);
-            Names.Add((StoneElements.Soil, StoneElements.Sun), "日土「陨落天星」");
+            Attacks.Add((StoneElements.Soil, StoneElements.Solar), SoilSolar);
+            Names.Add((StoneElements.Soil, StoneElements.Solar), "日土「陨落天星」");
 
-            Attacks.Add((StoneElements.Lunar, StoneElements.Sun), LunarSun);
-            Names.Add((StoneElements.Lunar, StoneElements.Sun), "日月「皇家钻戒」");
+            Attacks.Add((StoneElements.Lunar, StoneElements.Solar), LunarSolar);
+            Names.Add((StoneElements.Lunar, StoneElements.Solar), "日月「皇家钻戒」");
 
-            Attacks.Add((StoneElements.Sun, StoneElements.Sun), SunSun);
-            Names.Add((StoneElements.Sun, StoneElements.Sun), "日符「皇家圣焰」");
+            Attacks.Add((StoneElements.Solar, StoneElements.Solar), SolarSolar);
+            Names.Add((StoneElements.Solar, StoneElements.Solar), "日符「皇家圣焰」");
             #endregion
 
             base.Load();
@@ -278,32 +279,32 @@ namespace StoneOfThePhilosophers.Contents
         #endregion
 
         #region 日相关组合
-        public static void FireSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void FireSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
 
-        public static void WaterSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void WaterSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
-        public static void WoodSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void WoodSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
-        public static void MetalSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void MetalSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
-        public static void SoilSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void SoilSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
-        public static void LunarSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void LunarSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }
-        public static void SunSun(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
+        public static void SolarSolar(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
         {
 
         }

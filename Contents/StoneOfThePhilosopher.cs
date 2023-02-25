@@ -15,6 +15,7 @@ namespace StoneOfThePhilosophers.Contents
 {
     public class StoneOfThePhilosopher : MagicStone
     {
+        public virtual bool Extra => false;
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
             var elementPlr = player.GetModPlayer<ElementPlayer>();
@@ -28,9 +29,9 @@ namespace StoneOfThePhilosophers.Contents
                 {
                     if (ElementUI.Visible)
                         ElementSystem.Instance.elementUI.Close();
-                    else 
+                    else
                     {
-                        ElementUI.IsSeven = !ElementUI.IsSeven;
+                        ElementUI.IsExtra = Extra;
                         ElementSystem.Instance.elementUI.Open();
 
                     }
@@ -64,6 +65,10 @@ namespace StoneOfThePhilosophers.Contents
             if (player.altFunctionUse == 2) mult = 0;
         }
     }
+    public class StoneOfThePhilosopherEX : StoneOfThePhilosopher
+    {
+        public override bool Extra => true;
+    }
     public partial class StoneOfThePhilosopherProj : ModProjectile
     {
         public override string Texture => "StoneOfThePhilosophers/MagicArea_1";
@@ -76,29 +81,30 @@ namespace StoneOfThePhilosophers.Contents
         public ElementPlayer ElementPlr => player.GetModPlayer<ElementPlayer>();
 
         public bool Released => projectile.timeLeft < 12;
-        public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(projectile.ai[0] / 60f, 0, 1);
-        public float Theta => projectile.ai[0] / 60f * MathHelper.TwoPi;
+        public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(projectile.ai[0] / ChargeTime * 2, 0, 1);
+        public float Theta => projectile.ai[0] / 120f * MathHelper.TwoPi;
         public float Alpha
         {
             get
             {
 
-                if (projectile.ai[0] >= 120)
+                if (projectile.ai[0] >= ChargeTime)
                 {
                     return -MathHelper.Pi / 3f;
                 }
-                else if (projectile.ai[0] >= 60)
+                else if (projectile.ai[0] >= ChargeTime / 2)
                 {
-                    return -(projectile.ai[0] - 60) * (projectile.ai[0] - 60) / 3600f * MathHelper.Pi / 3f;
+                    return -(projectile.ai[0] - ChargeTime / 2) * (projectile.ai[0] - ChargeTime / 2) / ChargeTime / ChargeTime * 4 * MathHelper.Pi / 3f;
                 }
                 return 0;
             }
         }
-        public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / 60f) * projectile.velocity.ToRotation();
+        public float ChargeTime => 120f;
+        public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / ChargeTime * 2) * projectile.velocity.ToRotation();
         public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
         public const float dis = 64;
         public int Cycle => 60;
-        public Color MainColor => Color.White;
+        public Color MainColor => new Color(248, 191, 37);//Color.Yellow
         public bool UseMana => (int)projectile.ai[0] % Cycle == 0;
         public override void SetDefaults()
         {
@@ -118,43 +124,25 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Matrix transform =
-            Matrix.CreateScale(2) *
-            Matrix.CreateTranslation(-1, -1, -1) *
-            new Matrix(Size, 0, 0, 0,
-                          0, Size, 0, 0,
-                          0, 0, dis, 0,
-                          0, 0, 0, 1) *
-            Matrix.CreateRotationZ(Theta) *
-            Matrix.CreateRotationY(Alpha) *
-            Matrix.CreateRotationZ(Beta);
-            CustomVertexInfo[] vertexInfos = new CustomVertexInfo[8];
-            for (int n = 0; n < 8; n++)
+            int MagicFieldCount = 1;
+            int vertexCount = 4 * MagicFieldCount;
+            CustomVertexInfoEX[] vertexInfos = new CustomVertexInfoEX[4 * vertexCount];//这里是最基本的顶点们
+            for (int n = 0; n < 4 * vertexCount; n++)
             {
-                var vec = new Vector3(n % 2, n / 2 % 2, 0);
+                var vec = new Vector4(n % 2, n / 2 % 2, 0, 1);
                 vertexInfos[n].TexCoord = new Vector3(vec.X, vec.Y, Light);
-                vertexInfos[n].Color = MainColor;
-                vec = Vector3.Transform(vec, transform);
-                if (n == 3)
-                {
-                    transform =
-                    Matrix.CreateScale(2) *
-                    Matrix.CreateTranslation(-1, -1, -1) *
-                    new Matrix(Size * 1.5f, 0, 0, 0,
-                                         0, Size * 1.5f, 0, 0,
-                                         0, 0, dis * 1.5f, 0,
-                                         0, 0, 0, 1) *
-                    Matrix.CreateRotationZ(-Theta * 1.5f) *
-                    Matrix.CreateRotationY(Alpha) *
-                    Matrix.CreateRotationZ(Beta);
-                }
-                vec += new Vector3(projectile.Center - Main.screenPosition - new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
-                vec.Z = (2000 - vec.Z) / 2000f;
-                vec /= vec.Z;
-                vertexInfos[n].Position = new Vector2(vec.X, vec.Y) + Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f;
+                //vertexInfos[n].Color = (n / 4) switch
+                //{
+                //    0 or 1 => Color.White,
+                //    2 => ElementColor[Element1],
+                //    3 or _ => ElementColor[Element2]
+                //};
+                vertexInfos[n].Color = (n / 4) == 0 ? Color.Red : Color.Cyan;
+                vertexInfos[n].Position = new Vector4(n % 2, n / 2 % 2, 0, 1);
             }
-            CustomVertexInfo[] vertexs = new CustomVertexInfo[12];
-            for (int n = 0; n < 12; n++)
+            vertexCount = 6 * MagicFieldCount;
+            CustomVertexInfoEX[] vertexs = new CustomVertexInfoEX[vertexCount];//三角形会共用顶点对吧，所以我就不得不准备个大一点的数组然后给所有的三角形安排上自己的顶点
+            for (int n = 0; n < vertexCount; n++)
             {
                 int index = (n % 6) switch
                 {
@@ -165,17 +153,73 @@ namespace StoneOfThePhilosophers.Contents
                     4 => 2,
                     5 or _ => 3,
                 };
-                if (n > 5) index += 4;
+                index += n / 4 * 4;
                 vertexs[n] = vertexInfos[index];
             }
-            StoneOfThePhilosophersHelper.VertexDraw(vertexs[0..6],
-                TextureAssets.Projectile[Type].Value,
-                ModContent.Request<Texture2D>("StoneOfThePhilosophers/Style_4").Value,
-                new Vector2(Main.GameUpdateCount * -0.09f, Main.GlobalTimeWrappedHourly * 0.6f));
-            StoneOfThePhilosophersHelper.VertexDraw(vertexs[6..12],
-                ModContent.Request<Texture2D>("StoneOfThePhilosophers/MagicArea_2").Value,
-                ModContent.Request<Texture2D>("StoneOfThePhilosophers/Style_4").Value,
-                new Vector2(Main.GameUpdateCount * -0.15f, Main.GlobalTimeWrappedHourly));
+            float height = 2000f;
+            Vector3 offset = new Vector3(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
+            for (int n = 0; n < MagicFieldCount; n++)
+            {
+
+                string path = n switch
+                {
+                    0 => "UI/ElementPanel",
+                    1 => "MagicArea_2",
+                    2 or 3 or _ => "MagicArea_1"
+                };
+                Vector2 scaler = n switch
+                {
+                    0 => new Vector2(-0.09f, 0.6f),
+                    1 => new Vector2(-0.15f, 1f),
+                    2 or 3 or _ => new Vector2(0.12f, -0.8f)
+                };
+                Matrix translation = n switch
+                {
+                    0 or 1 => Matrix.CreateTranslation(-Vector3.One),
+                    2 or 3 or _ => Matrix.CreateTranslation(-Vector3.One * .5f)
+                };
+                float theta = n switch
+                {
+                    0 => 1,
+                    1 => -1.5f,
+                    2 or 3 or _ => 2f
+                } * Theta;
+                Vector3 scale = n switch
+                {
+                    0 => new Vector3(1, 1, 1f),
+                    1 => 1.5f * Vector3.One,
+                    2 => new Vector3(.5f, .5f, 1.25f),
+                    3 or _ => new Vector3(-.5f, -.5f, 1.25f)
+                };
+                //声明矩阵transform
+                //缩放为原来的两倍
+                //平移至以原点为中心
+                //最重要的缩放矩阵
+                //旋转量一号，这个是法阵旋转动画，去掉了就是静止的3d法阵
+                //旋转量二号，这个是最重要的之一，把朝向你的法阵逐渐转到朝向角色前方
+                //旋转量三号，这个让法阵能跟着鼠标走
+                //平移，确保投影中心正确
+                //投影
+                //平移回去
+                //非常ez啊
+                Matrix transform =
+                Matrix.CreateScale(2) *
+                translation *
+                Matrix.CreateScale(scale * new Vector3(Size, Size, dis)) *
+                Matrix.CreateRotationZ(theta) *
+                Matrix.CreateRotationY(Alpha) *
+                Matrix.CreateRotationZ(Beta) *
+                Matrix.CreateTranslation(new Vector3(projectile.Center, 0) - offset) *
+                new Matrix(height, 0, 0, 0,
+                                0, height, 0, 0,
+                                0, 0, 0, -1,
+                                0, 0, 0, height) *
+                Matrix.CreateTranslation(offset);
+                StoneOfThePhilosophersHelper.VertexDrawEX(vertexs[(6 * n)..(6 * n + 6)],
+                    ModContent.Request<Texture2D>($"StoneOfThePhilosophers/{path}").Value,
+                    ModContent.Request<Texture2D>("StoneOfThePhilosophers/Style_4").Value, null,
+                    new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * scaler, false, transform);
+            }
             return false;
         }
         public override void Kill(int timeLeft)
@@ -207,7 +251,7 @@ namespace StoneOfThePhilosophers.Contents
             player.itemRotation = (float)Math.Atan2(projectile.velocity.Y * dir, projectile.velocity.X * dir);
             if (projectile.timeLeft > 12)
             {
-                if (!player.channel)
+                if (!player.channel && projectile.ai[0] > 300)
                 {
                     projectile.timeLeft = 12;
                 }
@@ -220,14 +264,14 @@ namespace StoneOfThePhilosophers.Contents
                         {
                             projectile.timeLeft = 12;
                         }
-                        if (projectile.ai[0] >= 120)
+                        if (projectile.ai[0] >= 30)
                             ShootProj();
                     }
                 }
             }
             else
             {
-                if (projectile.ai[0] > 60f)
+                if (projectile.ai[0] > 15f)
                 {
                     ShootProj(true);
                 }
