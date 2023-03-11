@@ -9,6 +9,8 @@ using Terraria.DataStructures;
 using Terraria.Audio;
 using Terraria.GameContent;
 using ReLogic.Graphics;
+using System.Runtime.CompilerServices;
+using rail;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -17,6 +19,10 @@ namespace StoneOfThePhilosophers.Contents
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeTopaz);
+            recipe.AddIngredient(ItemID.MeteoriteBar, 20);
+            recipe.AddIngredient(ItemID.Blinkroot, 5);
+            recipe.AddRecipeGroup(StoneOfThePhilosophersSystem.IronLeadOres, 20);
+            recipe.AddRecipeGroup(StoneOfThePhilosophersSystem.GoldPlatinumOres, 10);
             base.AddOtherIngredients(recipe);
         }
         public override void SetStaticDefaults()
@@ -31,11 +37,36 @@ namespace StoneOfThePhilosophers.Contents
             item.damage = 20;
         }
     }
+    public class StoneOfMetalEX : StoneOfMetal
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            AddEXRequire<StoneOfMetal>(recipe, true);
+            recipe.Register();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("真·金之石");
+            Tooltip.SetDefault("控制金元素魔法程度的能力\n金符「银龙」");
+        }
+        public override bool Extra => true;
+        public override void SetDefaults()
+        {
+            base.SetDefaults();
+            item.damage = 50;
+        }
+    }
     public class StoneOfWood : MagicStone
     {
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeEmerald);
+            recipe.AddIngredient(RecipeGroupID.Wood, 50);
+            recipe.AddIngredient(ItemID.JungleGrassSeeds, 5);
+            recipe.AddIngredient(ItemID.Vine, 5);
+            recipe.AddIngredient(ItemID.JungleSpores, 9);
+            recipe.AddIngredient(ItemID.Stinger, 5);
             base.AddOtherIngredients(recipe);
         }
         public override void SetStaticDefaults()
@@ -50,11 +81,39 @@ namespace StoneOfThePhilosophers.Contents
             item.damage = 10;
         }
     }
+    public class StoneOfWoodEX : StoneOfWood
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.Pearlwood, 50);
+            recipe.AddIngredient(ItemID.ToxicFlask);
+            recipe.AddIngredient(ItemID.ChlorophyteBar, 10);
+            AddEXRequire<StoneOfMetal>(recipe);
+            recipe.Register();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("真·木之石");
+            Tooltip.SetDefault("控制木元素魔法程度的能力\n木符「翠绿风暴」");
+        }
+        public override bool Extra => true;
+        public override void SetDefaults()
+        {
+            base.SetDefaults();
+            item.damage = 30;
+        }
+    }
     public class StoneOfWater : MagicStone
     {
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeSapphire);
+            recipe.AddIngredient(ItemID.WaterBolt);
+            //recipe.AddIngredient(ItemID.) //TODO 加入珊瑚礁块的配方，等1.4.4
+            recipe.AddIngredient(ItemID.SharkFin, 5);
+            recipe.AddIngredient(ItemID.Shiverthorn, 5);
+            recipe.AddIngredient(ItemID.WaterBucket);
             base.AddOtherIngredients(recipe);
         }
         public override void SetStaticDefaults()
@@ -70,11 +129,37 @@ namespace StoneOfThePhilosophers.Contents
             item.mana = 5;
         }
     }
+    public class StoneOfWaterEX : StoneOfWater
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.BottomlessBucket);
+            recipe.AddIngredient(ItemID.NeptunesShell);
+            AddEXRequire<StoneOfWater>(recipe);
+            recipe.Register();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("真·水之石");
+            Tooltip.SetDefault("控制水元素魔法程度的能力\n水符「湖葬」");
+        }
+        public override bool Extra => true;
+        public override void SetDefaults()
+        {
+            base.SetDefaults();
+            item.damage = 35;
+        }
+    }
     public class StoneOfFire : MagicStone
     {
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeRuby);
+            recipe.AddIngredient(ItemID.FlowerofFire);
+            recipe.AddIngredient(ItemID.HellstoneBar, 8);
+            recipe.AddIngredient(ItemID.Fireblossom, 5);
+            recipe.AddIngredient(ItemID.LavaBucket);
             base.AddOtherIngredients(recipe);
         }
         public override void SetStaticDefaults()
@@ -90,11 +175,39 @@ namespace StoneOfThePhilosophers.Contents
 
         }
     }
+    public class StoneOfFireEX : StoneOfFire
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddRecipeGroup(StoneOfThePhilosophersSystem.CursedIchorFlame, 20);
+            recipe.AddIngredient(ItemID.LivingFireBlock, 50);
+            recipe.AddIngredient(ItemID.InfernoFork);
+            AddEXRequire<StoneOfFire>(recipe);
+            recipe.Register();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("真·火之石");
+            Tooltip.SetDefault("控制火元素魔法程度的能力\n火符「火神的辉光」");
+        }
+        public override bool Extra => true;
+        public override void SetDefaults()
+        {
+            base.SetDefaults();
+            item.damage = 75;
+        }
+    }
     public class StoneOfEarth : MagicStone
     {
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeAmber);
+            recipe.AddIngredient(ItemID.SandstorminaBottle);
+            recipe.AddIngredient(ItemID.Sandstone, 20);
+            recipe.AddIngredient(ItemID.Cactus, 50);
+            recipe.AddIngredient(ItemID.FossilOre, 5);
+            recipe.AddIngredient(ItemID.Waterleaf, 5);
             base.AddOtherIngredients(recipe);
         }
         public override void SetStaticDefaults()
@@ -105,15 +218,49 @@ namespace StoneOfThePhilosophers.Contents
         public override void SetDefaults()
         {
             item.shoot = ModContent.ProjectileType<StoneOfEarthProj>();
+            item.damage = 25;
+
             base.SetDefaults();
+        }
+    }
+    public class StoneOfEarthEX : StoneOfEarth
+    {
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.DesertFossil, 50);
+            recipe.AddIngredient(ItemID.DjinnLamp);
+            recipe.AddIngredient(ItemID.AncientBattleArmorMaterial, 4);
+            AddEXRequire<StoneOfEarth>(recipe);
+            recipe.Register();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("真·土之石");
+            Tooltip.SetDefault("控制土元素魔法程度的能力\n土符「三石塔之震」");
+        }
+        public override bool Extra => true;
+        public override void SetDefaults()
+        {
+            base.SetDefaults();
+            item.damage = 40;
         }
     }
     public class StoneOfMoon : MagicStone
     {
-        public override void AddOtherIngredients(Recipe recipe)
+        public override void AddRecipes()
         {
-            recipe.AddIngredient(ItemID.LargeAmethyst);
-            recipe.AddIngredient(ItemID.CrystalBall);
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.ManaCrystal, 5);
+            recipe.AddIngredient(ItemID.CrystalShard, 20);
+            recipe.AddIngredient(ItemID.SoulofLight, 20);
+            recipe.AddIngredient(ItemID.SoulofNight, 20);
+            //recipe.AddIngredient(ItemID.moonb, 50);
+            recipe.AddIngredient(ItemID.Moonglow, 6);
+            recipe.AddIngredient(ItemID.MoonStone);
+            recipe.AddIngredient(ItemID.LargeDiamond);
+            recipe.AddTile(TileID.CrystalBall);
+            recipe.Register();
         }
         public override void SetStaticDefaults()
         {
@@ -130,10 +277,19 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfSun : MagicStone
     {
-        public override void AddOtherIngredients(Recipe recipe)
+        public override void AddRecipes()
         {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ItemID.ManaCrystal, 5);
+            recipe.AddIngredient(ItemID.CrystalShard, 20);
+            recipe.AddIngredient(ItemID.SoulofLight, 20);
+            recipe.AddIngredient(ItemID.SoulofNight, 20);
+            recipe.AddIngredient(ItemID.SunplateBlock, 50);
+            recipe.AddIngredient(ItemID.Sunflower, 6);
+            recipe.AddIngredient(ItemID.SunStone);
             recipe.AddIngredient(ItemID.LargeDiamond);
-            recipe.AddIngredient(ItemID.CrystalBall);
+            recipe.AddTile(TileID.CrystalBall);
+            recipe.Register();
         }
         public override void SetStaticDefaults()
         {
@@ -152,26 +308,26 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Yellow;
         public override int Cycle => 48;//48
 
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
             bool flag = dying && projectile.timeLeft % 3 != 0;
             SoundEngine.PlaySound(SoundID.Item69);
             for (int n = 0; n < (flag ? 3 : 1); n++)
-                Projectile.NewProjectile(projectile.GetSource_FromThis(), player.Center + (dying ? projectile.velocity.RotatedByRandom(MathHelper.Pi / 3) : projectile.velocity) * 64, projectile.velocity * 32 * (flag ? 1 : 1), ModContent.ProjectileType<MetalAttack>(), (int)(projectile.damage * Main.rand.NextFloat(1.25f, 0.95f)), projectile.knockBack * 3, projectile.owner, flag ? (Main.rand.Next(4) + 1) : 0);
+                Projectile.NewProjectile(projectile.GetSource_FromThis(), player.Center + (dying ? unit.RotatedByRandom(MathHelper.Pi / 3) : unit) * 64, unit * 32 * (flag ? 1 : 1), ModContent.ProjectileType<MetalAttack>(), (int)(projectile.damage * Main.rand.NextFloat(1.25f, 0.95f)), projectile.knockBack * 3, projectile.owner, flag ? (Main.rand.Next(4) + 1) : 0);
         }
     }
     public class StoneOfWoodProj : MagicArea
     {
         public override Color MainColor => Color.Green;
-        public override int Cycle => 24;//24
+        public override int Cycle => 42;//24
 
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
             SoundEngine.PlaySound(SoundID.Item74);
             int m = Main.rand.Next(5, 9) - (dying ? 3 : 0);
             float randAngle = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12);
             for (int n = 0; n < m; n++)
-                Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(randAngle + MathHelper.Pi / 3 * (n / (m - 1f) - 0.5f)) * 32,
+                Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(randAngle + MathHelper.Pi / 3 * (n / (m - 1f) - 0.5f)) * 32,
                     ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
         }
     }
@@ -179,21 +335,35 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override Color MainColor => Color.Blue;
         public override int Cycle => 6;//6
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
             if (dying)
                 for (int n = -2; n < 3; n += 2)
                 {
                     var rand = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12) * .5f;
-                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n + rand) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n + rand) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
                     //for (int k = 0; k < 3; k++)
                     //    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + (64 + 16 * k) * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n + rand) * (32 + 8 * k) / 3f, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
                 }
             else
-                for (int n = -1; n < 2; n += 2)
+            {
+                if (Extra)
                 {
-                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    for (int n = -1; n < 2; n++)
+                    {
+                        Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 18 * n) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    }
                 }
+                else
+                {
+                    for (int n = -1; n < 2; n += 2)
+                    {
+                        Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n) * 12, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    }
+                }
+
+            }
+
             SoundEngine.PlaySound(SoundID.Item84);
 
         }
@@ -203,12 +373,12 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Red;
         public override int Cycle => 30;//30
 
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
             if (dying && projectile.timeLeft % 2 == 1) return;
             SoundEngine.PlaySound(SoundID.Item74);
 
-            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.TwoPi / 48f * (dying ? 2 : 1)) * 32,
+            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedByRandom(MathHelper.TwoPi / 48f * (dying ? 2 : 1)) * 32,
                 ModContent.ProjectileType<FireAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
@@ -217,16 +387,16 @@ namespace StoneOfThePhilosophers.Contents
         public override Color MainColor => Color.Orange;
         public override int Cycle => 6;
 
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
 
         }
     }
     public class StoneOfMoonProj : MagicArea
     {
-        public override int Cycle => 12;//12
+        public override int Cycle => Main.dayTime ? 18 : 12;//12
         public override Color MainColor => Color.Purple;
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
             float r = Main.rand.Next(-32, 32) * (dying ? 8f : 1f);
             int randX = Main.rand.Next(-256, 256);//Main.rand.Next(-64, 64);
@@ -237,15 +407,15 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfSunProj : MagicArea
     {
         public override Color MainColor => Color.White;
-        public override int Cycle => 90;
+        public override int Cycle => 60;
 
-        public override void ShootProj(bool dying = false)
+        public override void ShootProj(Vector2 unit, bool dying = false)
         {
-            //if (dying && projectile.timeLeft % 3 != 0) return;
-            //SoundEngine.PlaySound(SoundID.Item74);
+            if (dying /*&& projectile.timeLeft % 3 != 0*/) return;
+            SoundEngine.PlaySound(SoundID.Item74);
 
-            //Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * projectile.velocity, projectile.velocity.RotatedByRandom(MathHelper.Pi / 48f) * 2,
-            //    ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
+            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedByRandom(MathHelper.Pi / 48f) * 32,
+                ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
     }
     public class MetalAttack : ModProjectile
@@ -927,7 +1097,7 @@ namespace StoneOfThePhilosophers.Contents
             float point = 0f;
             float factor = projectile.timeLeft / 15f;
             factor = MathHelper.Clamp(factor * factor, 0, 1);
-            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), projectile.Center, projectile.Center + dirVec * factor, 8 * (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f)), ref point))
+            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), projectile.Center, projectile.Center + dirVec * factor, 32 * (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f)), ref point))
             {
                 return true;
             }
@@ -1011,7 +1181,7 @@ namespace StoneOfThePhilosophers.Contents
                 if (n > 11) index += 8;
                 vertexs[n] = vertexInfos[index];
             }
-            StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>("StoneOfThePhilosophers/MagicArea_2").Value, TextureAssets.MagicPixel.Value);
+            StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/MagicArea_2").Value, TextureAssets.MagicPixel.Value);
             #endregion
 
             return false;
@@ -1065,7 +1235,7 @@ namespace StoneOfThePhilosophers.Contents
             Projectile.timeLeft = 180;
             Projectile.DamageType = DamageClass.Magic;
             Projectile.friendly = true;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.penetrate = -1;
             Projectile.aiStyle = -1;
@@ -1081,17 +1251,17 @@ namespace StoneOfThePhilosophers.Contents
                 case 0:
                     {
                         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-                        BlendState state = new BlendState();
-                        state.ColorBlendFunction = BlendFunction.Add;
-                        state.ColorDestinationBlend = Blend.InverseSourceAlpha;
-                        state.AlphaDestinationBlend = Blend.Zero;
-                        state.ColorSourceBlend = Blend.InverseDestinationColor;
-                        state.AlphaSourceBlend = Blend.One;
+                        //BlendState state = new BlendState();
+                        //state.ColorBlendFunction = BlendFunction.Add;
+                        //state.ColorDestinationBlend = Blend.InverseSourceAlpha;
+                        //state.AlphaDestinationBlend = Blend.Zero;
+                        //state.ColorSourceBlend = Blend.InverseDestinationColor;
+                        //state.AlphaSourceBlend = Blend.One;
                         Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, state, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                         //alpha = 1f;
                         //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, 960, 1120), Color.White);
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, Projectile.rotation, new Vector2(16), new Vector2(2.5f, 1.75f) * .25f * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .5f + 1.5f) * 16, 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, Main.rand.NextFloat(), new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);
                         //for (int n = 0; n < 8; n++)
                         //{
                         //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), null, Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) * 0.125f * alpha, Projectile.rotation, new Vector2(16), new Vector2(2f, 1.5f), 0, 0);
@@ -1105,7 +1275,7 @@ namespace StoneOfThePhilosophers.Contents
                         //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), null, Color.Lerp(lightColor, Color.White, .5f) * ((10 - n) * .1f) * alpha * .25f * 10, Projectile.oldRot[n], new Vector2(16), 1f * ((10 - n) * .1f), 0, 0);
                         //}
                         Main.spriteBatch.End();
-                        state.Dispose();
+                        //state.Dispose();
                         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
                         break;
@@ -1180,7 +1350,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             target.AddBuff(24, 300);
             //target.immune[Projectile.owner] = 0;
-            if (style == 0) Projectile.Kill();
+            if (style == 0) { Projectile.Kill(); }
             else
             {
                 target.immune[projectile.owner] = 0;
@@ -1202,6 +1372,34 @@ namespace StoneOfThePhilosophers.Contents
                         }
                         Projectile.oldPos[0] = Projectile.Center;
                         Projectile.oldRot[0] = Projectile.rotation;
+                        projectile.velocity *= .96f;
+                        if (projectile.timeLeft % 15 == 0)
+                        {
+                            foreach (var npc in Main.npc)
+                            {
+                                if (npc.active && !npc.friendly)
+                                {
+                                    var distance = Vector2.Distance(npc.Center, projectile.Center);
+                                    if (distance < 432)
+                                    {
+                                        var fac = Utils.GetLerpValue(432, 0, distance);
+                                        Main.player[projectile.owner].ApplyDamageToNPC(npc, (int)(MathF.Pow(fac, 0.5f) * projectile.damage), 0, projectile.direction, false);
+                                        int count = (int)(fac * 30);
+                                        for (int n = 0; n < count; n++)
+                                        {
+                                            var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                            Dust.NewDustPerfect(npc.Center, MyDustId.Fire, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                        }
+                                    }
+                                }
+                            }
+                            for (int n = 0; n < 30; n++)
+                            {
+                                var unit = (n / 30f * MathHelper.TwoPi).ToRotationVector2();
+                                Dust.NewDustPerfect(projectile.Center + unit * 96, MyDustId.Fire, unit * Main.rand.NextFloat(2, 8), 0, default, Main.rand.NextFloat(1f, 1.5f));
+                            }
+                        }
+
                         break;
                     }
                 case 1:

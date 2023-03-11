@@ -2,6 +2,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.IO;
+using Terraria;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
@@ -13,6 +16,57 @@ namespace StoneOfThePhilosophers
         static Effect vertexDraw;
         public static Effect VertexDrawEX => vertexDrawEX ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDrawEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         static Effect vertexDrawEX;
+    }
+    public class StoneOfThePhilosophersSystem : ModSystem
+    {
+        public const string IronLeadOres = "StoneOfThePhilosophers:IronLeadOres";
+        public const string GoldPlatinumOres = "StoneOfThePhilosophers:GoldPlatinumOres";
+        public const string CobaltPalladiumBars = "StoneOfThePhilosophers:CobaltPalladiumBars";
+
+        public const string MythrilOrichalcumBars = "StoneOfThePhilosophers:MythrilOrichalcumBars";
+        public const string AdamantiteTitaniumBars = "StoneOfThePhilosophers:AdamantiteTitaniumBars";
+        public const string CursedIchorFlame = "StoneOfThePhilosophers:CursedIchorFlame";
+
+
+        public override void AddRecipeGroups()
+        {
+            RecipeGroup group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Ã˙«¶øÛ", new int[]
+            {
+                ItemID.IronOre,
+                ItemID.LeadOre
+            });
+            RecipeGroup.RegisterGroup(IronLeadOres, group);
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Ω≤¨øÛ", new int[]
+            {
+                ItemID.GoldOre,
+                ItemID.PlatinumOre
+            });
+            RecipeGroup.RegisterGroup(GoldPlatinumOres, group);
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Ó‹ÓŸΩ∂ß", new int[]
+            {
+                ItemID.CobaltBar,
+                ItemID.PalladiumBar
+            });
+            RecipeGroup.RegisterGroup(CobaltPalladiumBars, group);
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " √ÿ…ΩÕ≠∂ß", new int[]
+            {
+                ItemID.MythrilBar,
+                ItemID.OrichalcumBar
+            });
+            RecipeGroup.RegisterGroup(MythrilOrichalcumBars, group);
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " æ´Ó—Ω∂ß", new int[]
+            {
+                ItemID.AdamantiteBar,
+                ItemID.TitaniumBar
+            });
+            RecipeGroup.RegisterGroup(AdamantiteTitaniumBars, group);
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " ÷‰ª¡È“∫", new int[]
+            {
+                ItemID.CursedFlame,
+                ItemID.Ichor
+            });
+            RecipeGroup.RegisterGroup(CursedIchorFlame, group);
+        }
     }
     public class StoneOfThePhilosophersConfig : ModConfig
     {
