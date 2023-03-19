@@ -63,7 +63,7 @@ float4 PixelShaderFunction_HeatMap(PSInput input) : COLOR0
 {
 	float4 grayVector = GetGrayVector(input.Texcoord.xy);
 	float4 color = tex2D(uImage2, grayVector.xy);
-	return float4(FinalModify(color, grayVector.x).xyz, color.w * input.Texcoord.z);
+	return float4(FinalModify(color, input.Texcoord.z).xyz, input.Color.w);
 }
 float4 PixelShaderFunction_ColorMap(PSInput input) : COLOR0
 {

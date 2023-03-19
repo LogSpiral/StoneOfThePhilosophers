@@ -1108,7 +1108,7 @@ namespace StoneOfThePhilosophers.Contents
             //if(!Main.gamePaused)
             //Main.NewText(projectile.oldPos[0]);
             if (indexMax == -1) indexMax = projectile.oldPos.Length;
-            Offset += projectile.velocity * 15f;
+            //Offset += projectile.velocity * 15f;
             for (int i = 0; i < indexMax; ++i)
             {
                 if (projectile.oldPos[i] == Vector2.Zero)
