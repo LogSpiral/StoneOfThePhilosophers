@@ -51,7 +51,7 @@ namespace StoneOfThePhilosophers.UI
             int inventoryIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Inventory");
             if (inventoryIndex != -1)
             {
-                layers.Insert(inventoryIndex + 1, new LegacyGameInterfaceLayer("ImproveGame: Structure GUI", () =>
+                layers.Insert(inventoryIndex + 1, new LegacyGameInterfaceLayer("StoneOfThePhilosophers: ElementUI", () =>
                 {
                     if (ElementUI.timer > 0)
                         elementUI.Draw(Main.spriteBatch);
@@ -100,7 +100,7 @@ namespace StoneOfThePhilosophers.UI
             base.Recalculate();
             //panelInfo.destination = GetDimensions().ToRectangle();
         }
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        public override void DrawSelf(SpriteBatch spriteBatch)
         {
             CalculatedStyle dimenstions = GetDimensions();
             var rect = dimenstions.ToRectangle();
@@ -255,7 +255,6 @@ namespace StoneOfThePhilosophers.UI
             }
         }
         #endregion
-
         public float factor;
         //public float factorInActive;
         public int timer = 0;
@@ -267,7 +266,7 @@ namespace StoneOfThePhilosophers.UI
             base.Update(gameTime);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        public override void DrawSelf(SpriteBatch spriteBatch)
         {
             CalculatedStyle dimensions = GetDimensions();
 

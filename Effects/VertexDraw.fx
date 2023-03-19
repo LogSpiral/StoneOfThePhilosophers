@@ -54,20 +54,40 @@ float4 FinalModify(float4 color, float k)
 	return float4(lerp(color.xyz, float3(1, 1, 1), 2 * k - 1), color.w);
 }
 
-float4 PixelShaderFunction_Color(PSInput input) : COLOR0
+float4 PixelShaderFunction_VertexColor(PSInput input) : COLOR0
 {
 	float4 color = input.Color * input.Texcoord.z;
 	return FinalModify(color, Gray(input.Texcoord.xy));
 }
 float4 PixelShaderFunction_HeatMap(PSInput input) : COLOR0
 {
-	float4 color = tex2D(uImage2, float2(GetGrayVector(input.Texcoord.xy).xy));
-	return FinalModify(color, input.Texcoord.z);
+	float4 grayVector = GetGrayVector(input.Texcoord.xy);
+	float4 color = tex2D(uImage2, grayVector.xy);
+	return float4(FinalModify(color, grayVector.x).xyz, color.w * input.Texcoord.z);
 }
 float4 PixelShaderFunction_ColorMap(PSInput input) : COLOR0
 {
 	float4 color = tex2D(uImage2, input.Texcoord.xy) * input.Texcoord.z;
 	return FinalModify(color, Gray(input.Texcoord.xy));
+}
+float4 PixelShaderFunction_OriginColor(PSInput input) : COLOR0
+{
+	return tex2D(uImage0, input.Texcoord.xy) * input.Texcoord.z * input.Color;
+}
+float4 PixelShaderFunction_OriginColorAddVertexColor(PSInput input) : COLOR0
+{
+	float4 color = input.Color * input.Texcoord.z;
+	return tex2D(uImage0, input.Texcoord.xy) * input.Texcoord.z * input.Color + FinalModify(color, Gray(input.Texcoord.xy));
+}
+float4 PixelShaderFunction_OriginColorAddHeatMap(PSInput input) : COLOR0
+{
+	float4 color = tex2D(uImage2, float2(GetGrayVector(input.Texcoord.xy).xy));
+	return tex2D(uImage0, input.Texcoord.xy) * input.Texcoord.z * input.Color + FinalModify(color, input.Texcoord.z);
+}
+float4 PixelShaderFunction_OriginColorAddColorMap(PSInput input) : COLOR0
+{
+	float4 color = tex2D(uImage2, input.Texcoord.xy) * input.Texcoord.z;
+	return tex2D(uImage0, input.Texcoord.xy) * input.Texcoord.z * input.Color + FinalModify(color, Gray(input.Texcoord.xy));
 }
 PSInput VertexShaderFunction(VSInput input)
 {
@@ -81,19 +101,39 @@ PSInput VertexShaderFunction(VSInput input)
 
 technique Technique1
 {
-	pass Color
+	pass VertexColor // 使用采样图，颜色由传入颜色决定，比较单调
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
-		PixelShader = compile ps_2_0 PixelShaderFunction_Color();
+		PixelShader = compile ps_2_0 PixelShaderFunction_VertexColor();
 	}
-	pass HeatMap
+	pass HeatMap // 使用采样图，颜色由两份灰度图的叠加进行hsl插值决定
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 PixelShaderFunction_HeatMap();
 	}
-	pass ColorMap
+	pass ColorMap //使用采样图，颜色由纹理坐标决定
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 PixelShaderFunction_ColorMap();
+	}
+	pass OriginColor // 最简单的模式，单纯的图元变换，颜色乘上传入顶点的
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 PixelShaderFunction_OriginColor();
+	}
+	pass OriginColorAddVertexColor // 原来的图图附加上一层顶点色，我会有用到这个模式的一天吗
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 PixelShaderFunction_OriginColorAddVertexColor();
+	}
+	pass OriginColorAddHeatMap // 原来的图图附加上一层热度色，我会有用到这个模式的一天吗
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 PixelShaderFunction_OriginColorAddHeatMap();
+	}
+	pass OriginColorAddColorMap // 原来的图图附加上一层坐标色，我会有用到这个模式的一天吗
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 PixelShaderFunction_OriginColorAddColorMap();
 	}
 }

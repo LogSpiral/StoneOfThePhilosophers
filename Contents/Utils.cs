@@ -1100,6 +1100,155 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class StoneOfThePhilosophersHelper
     {
+        public static CustomVertexInfo[] TailVertexFromProj(this Projectile projectile, Vector2 Offset = default, Func<float, float> widthFunc = null, Func<float, Color> colorFunc = null, float alpha = 1)
+        {
+            List<CustomVertexInfo> bars = new List<CustomVertexInfo>();
+            int indexMax = -1;
+            for (int n = 0; n < projectile.oldPos.Length; n++) if (projectile.oldPos[n] == Vector2.Zero) { indexMax = n; break; }
+            //if(!Main.gamePaused)
+            //Main.NewText(projectile.oldPos[0]);
+            if (indexMax == -1) indexMax = projectile.oldPos.Length;
+            Offset += projectile.velocity * 15f;
+            for (int i = 0; i < indexMax; ++i)
+            {
+                if (projectile.oldPos[i] == Vector2.Zero)
+                {
+                    break;
+                }
+                var normalDir = i == 0 ? projectile.oldPos[0] - projectile.oldPos[1] : projectile.oldPos[i - 1] - projectile.oldPos[i];
+                normalDir = Vector2.Normalize(new Vector2(-normalDir.Y, normalDir.X));
+                var factor = i / (float)indexMax;
+                var w = 1 - factor;
+                var Width = widthFunc?.Invoke(factor) ?? 30f;
+                var _mainColor = colorFunc?.Invoke(factor) ?? Color.White;
+                bars.Add(new CustomVertexInfo(projectile.oldPos[i] + Offset + normalDir * Width, _mainColor * w, new Vector3((float)Math.Sqrt(factor), 1, alpha)));//w * 
+                bars.Add(new CustomVertexInfo(projectile.oldPos[i] + Offset + normalDir * -Width, _mainColor * w, new Vector3((float)Math.Sqrt(factor), 0, alpha)));//w * 
+            }
+            List<CustomVertexInfo> triangleList = new List<CustomVertexInfo>();
+            if (bars.Count > 2)
+            {
+                //if (VeloTri)
+                //{
+                //    triangleList.Add(bars[0]);
+                //    var vertex = new CustomVertexInfo((bars[0].Position + bars[1].Position) * 0.5f + Vector2.Normalize(projectile.velocity) * 30, _mainColor,
+                //        new Vector3(0, 0.5f, alpha * .8f));
+                //    triangleList.Add(bars[1]);
+                //    triangleList.Add(vertex);
+                //}
+
+                for (int i = 0; i < bars.Count - 2; i += 2)
+                {
+                    triangleList.Add(bars[i]);
+                    triangleList.Add(bars[i + 2]);
+                    triangleList.Add(bars[i + 1]);
+
+                    triangleList.Add(bars[i + 1]);
+                    triangleList.Add(bars[i + 2]);
+                    triangleList.Add(bars[i + 3]);
+                }
+            }
+            return triangleList.ToArray();
+        }
+        public static CustomVertexInfo[] TailVertexFromProj(this Projectile projectile, Vector2 Offset = default, float Width = 30, float alpha = 1, bool VeloTri = false, Color? mainColor = null)
+        {
+            List<CustomVertexInfo> bars = new List<CustomVertexInfo>();
+            int indexMax = -1;
+            for (int n = 0; n < projectile.oldPos.Length; n++) if (projectile.oldPos[n] == Vector2.Zero) { indexMax = n; break; }
+            //if(!Main.gamePaused)
+            //Main.NewText(projectile.oldPos[0]);
+            if (indexMax == -1) indexMax = projectile.oldPos.Length;
+            Offset += projectile.velocity;
+            var _mainColor = (mainColor ?? Color.Purple);
+            for (int i = 0; i < indexMax; ++i)
+            {
+                if (projectile.oldPos[i] == Vector2.Zero)
+                {
+                    break;
+                }
+                var normalDir = i == 0 ? projectile.oldPos[0] - projectile.oldPos[1] : projectile.oldPos[i - 1] - projectile.oldPos[i];
+                normalDir = Vector2.Normalize(new Vector2(-normalDir.Y, normalDir.X));
+                var factor = i / (float)(indexMax == 1 ? indexMax : (indexMax - 1));
+                var w = 1 - factor;
+                bars.Add(new CustomVertexInfo(projectile.oldPos[i] + Offset + normalDir * Width, _mainColor * w, new Vector3((float)Math.Sqrt(factor), 1, w * alpha)));
+                bars.Add(new CustomVertexInfo(projectile.oldPos[i] + Offset + normalDir * -Width, _mainColor * w, new Vector3((float)Math.Sqrt(factor), 0, w * alpha)));
+            }
+            List<CustomVertexInfo> triangleList = new List<CustomVertexInfo>();
+            if (bars.Count > 2)
+            {
+                if (VeloTri)
+                {
+                    triangleList.Add(bars[0]);
+                    var vertex = new CustomVertexInfo((bars[0].Position + bars[1].Position) * 0.5f + Vector2.Normalize(projectile.velocity) * 30, _mainColor,
+                        new Vector3(0, 0.5f, alpha * .8f));
+                    triangleList.Add(bars[1]);
+                    triangleList.Add(vertex);
+                }
+
+                for (int i = 0; i < bars.Count - 2; i += 2)
+                {
+                    triangleList.Add(bars[i]);
+                    triangleList.Add(bars[i + 2]);
+                    triangleList.Add(bars[i + 1]);
+
+                    triangleList.Add(bars[i + 1]);
+                    triangleList.Add(bars[i + 2]);
+                    triangleList.Add(bars[i + 3]);
+                }
+            }
+            return triangleList.ToArray();
+        }
+        //public static void DrawShaderTail(this SpriteBatch spriteBatch, Projectile projectile, Texture2D heatMap, Texture2D aniTex, Texture2D baseTex, float Width = 30, Vector2 Offset = default, float alpha = 1, bool VeloTri = false, bool additive = false, Color? mainColor = null)
+        //{
+        //    var triangleList = projectile.TailVertexFromProj(Offset, Width, alpha, VeloTri, mainColor);
+        //    if (triangleList.Length < 3) return;
+        //    spriteBatch.End();
+        //    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+        //    //RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
+        //    //var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
+        //    //var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
+        //    //IllusionBoundMod.DefaultEffect.Parameters["uTransform"].SetValue(model * Main.GameViewMatrix.TransformationMatrix * projection);
+        //    //IllusionBoundMod.DefaultEffect.Parameters["uTime"].SetValue(-(float)IllusionBoundMod.ModTime * 0.03f);
+        //    //Main.graphics.GraphicsDevice.Textures[0] = heatMap;
+        //    //Main.graphics.GraphicsDevice.Textures[1] = baseTex;
+        //    //Main.graphics.GraphicsDevice.Textures[2] = aniTex;
+        //    //Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+        //    //Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.PointWrap;
+        //    //Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.PointWrap;
+        //    //IllusionBoundMod.DefaultEffect.CurrentTechnique.Passes[0].Apply();
+        //    //Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList, 0, triangleList.Length / 3);
+        //    //Main.graphics.GraphicsDevice.RasterizerState = originalState;
+        //    RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
+        //    var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
+        //    var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
+        //    ShaderSwooshEX.Parameters["uTransform"].SetValue(model * Main.GameViewMatrix.TransformationMatrix * projection);
+        //    ShaderSwooshEX.Parameters["uTime"].SetValue(-(float)CoolerSystem.ModTime * 0.03f);
+
+        //    ShaderSwooshEX.Parameters["uLighter"].SetValue(0);
+        //    //CoolerItemVisualEffect.ShaderSwooshEX.Parameters["uTime"].SetValue(0);//-(float)Main.time * 0.06f
+        //    ShaderSwooshEX.Parameters["checkAir"].SetValue(false);
+        //    ShaderSwooshEX.Parameters["airFactor"].SetValue(1);
+        //    ShaderSwooshEX.Parameters["gather"].SetValue(false);
+        //    ShaderSwooshEX.Parameters["lightShift"].SetValue(0);
+        //    ShaderSwooshEX.Parameters["distortScaler"].SetValue(0);
+        //    ShaderSwooshEX.Parameters["alphaFactor"].SetValue(ConfigurationSwoosh.ConfigSwooshInstance.alphaFactor);
+        //    ShaderSwooshEX.Parameters["heatMapAlpha"].SetValue(ConfigurationSwoosh.ConfigSwooshInstance.alphaFactor == 0);
+
+        //    Main.graphics.GraphicsDevice.Textures[0] = baseTex;
+        //    Main.graphics.GraphicsDevice.Textures[1] = aniTex;
+        //    Main.graphics.GraphicsDevice.Textures[2] = GetWeaponDisplayImage("BaseTex_8");
+        //    Main.graphics.GraphicsDevice.Textures[3] = heatMap;
+
+        //    Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+        //    Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.PointWrap;
+        //    Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.PointWrap;
+        //    Main.graphics.GraphicsDevice.SamplerStates[3] = SamplerState.PointClamp;
+
+        //    ShaderSwooshEX.CurrentTechnique.Passes[mainColor == null ? 2 : 0].Apply();
+        //    Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList, 0, triangleList.Length / 3);
+        //    Main.graphics.GraphicsDevice.RasterizerState = originalState;
+        //    spriteBatch.End();
+        //    spriteBatch.Begin(SpriteSortMode.Immediate, additive ? BlendState.Additive : BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+        //}
         /// <summary>
         /// 缩放修复（这公式自己测的，没有游戏依据）
         /// 将屏幕坐标转换为UI坐标
@@ -1152,14 +1301,32 @@ namespace StoneOfThePhilosophers.Contents
         {
             return MathHelper.Clamp((0.5f - Math.Abs(value - 0.5f)) / whenGetMax, 0, 1);
         }
-
-        public static void VertexDraw(CustomVertexInfo[] vertexs, Texture2D baseTex, Texture2D aniTex, Vector2 uTime = default, bool trailing = false)
+        /// <summary>
+        /// 水滴插值，f(4x)的图像最像水滴，由一个四分之一圆和一段正弦波缝合
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static float WaterDropFactor(this float value)
+        {
+            value = MathHelper.Clamp(value, 0, 1);
+            value *= 4;
+            value -= 1;
+            if (value < 0)
+            {
+                return MathF.Sqrt(1 - value * value);
+            }
+            return (MathF.Cos(MathHelper.Pi / 3 * value) + 1) * .5f;
+        }
+        public static void VertexDraw(CustomVertexInfo[] vertexs, Texture2D baseTex, Texture2D aniTex, Texture2D heatMap = null, Vector2 uTime = default, bool trailing = false, Matrix? matrix = null, string? pass = null, bool autoStart = true, bool autoComplete = true)
         {
             Effect effect = StoneOfThePhilosophers.VertexDraw;
             if (effect == null) return;
             SpriteBatch spriteBatch = Main.spriteBatch;
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            if (autoStart)
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            }
             if (trailing)
             {
                 List<CustomVertexInfo> triangleList = new List<CustomVertexInfo>();
@@ -1179,19 +1346,29 @@ namespace StoneOfThePhilosophers.Contents
             RasterizerState originalState = Main.graphics.GraphicsDevice.RasterizerState;
             var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
             var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
-            effect.Parameters["uTransform"].SetValue(model * Main.GameViewMatrix.TransformationMatrix * projection);
+            effect.Parameters["uTransform"].SetValue((matrix ?? Matrix.Identity) * model * Main.GameViewMatrix.TransformationMatrix * projection);
             effect.Parameters["uTimeX"].SetValue(uTime.X);
             effect.Parameters["uTimeY"].SetValue(uTime.Y);
             Main.graphics.GraphicsDevice.Textures[0] = baseTex;
             Main.graphics.GraphicsDevice.Textures[1] = aniTex;
+            if (heatMap != null)
+                Main.graphics.GraphicsDevice.Textures[2] = heatMap;
             Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
             Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
-            effect.CurrentTechnique.Passes[0].Apply();
+            Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
+            if (pass != null)
+                effect.CurrentTechnique.Passes[pass].Apply();
+            else
+                effect.CurrentTechnique.Passes[0].Apply();
             //Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList.ToArray(), 0, triangleList.Count / 3);
-            Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
+            if (vertexs.Length > 2)
+                Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
             Main.graphics.GraphicsDevice.RasterizerState = originalState;
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            if (autoComplete)
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            }
         }
         /// <summary>
         /// 高阶版本的顶点绘制函数！！
@@ -1246,13 +1423,15 @@ namespace StoneOfThePhilosophers.Contents
                 Main.graphics.GraphicsDevice.Textures[2] = heatMap;
             Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
             Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
-            Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicWrap;
+            Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
             if (pass != null)
                 effect.CurrentTechnique.Passes[pass].Apply();
             else
                 effect.CurrentTechnique.Passes[0].Apply();
             //Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangleList.ToArray(), 0, triangleList.Count / 3);
-            Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
+            if (vertexs.Length > 2)
+
+                Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexs, 0, vertexs.Length / 3);
             Main.graphics.GraphicsDevice.RasterizerState = originalState;
             if (autoComplete)
             {
@@ -1359,6 +1538,7 @@ namespace StoneOfThePhilosophers.Contents
     }
     public abstract class MagicArea : ModProjectile
     {
+        public int attackCounter;
         public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_4";//{StarBound.NPCs.Bosses.BigApe.BigApeTools.ApePath}StrawBerryArea
         public bool Extra { get; set; } = false;
         public Projectile projectile => Projectile;

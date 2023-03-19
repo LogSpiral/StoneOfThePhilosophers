@@ -1,8 +1,15 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using ReLogic.Content;
+using StoneOfThePhilosophers.TestStateBar;
+using StoneOfThePhilosophers.UI;
 using System.ComponentModel;
 using System.IO;
 using Terraria;
+using Terraria.GameContent.UI.ResourceSets;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -12,10 +19,61 @@ namespace StoneOfThePhilosophers
 {
     public class StoneOfThePhilosophers : Mod
     {
-        public static Effect VertexDraw => vertexDraw ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDraw", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+        public static Effect VertexDraw => vertexDraw ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDraw", AssetRequestMode.ImmediateLoad).Value;
         static Effect vertexDraw;
-        public static Effect VertexDrawEX => vertexDrawEX ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDrawEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+        public static Effect VertexDrawEX => vertexDrawEX ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/VertexDrawEX", AssetRequestMode.ImmediateLoad).Value;
         static Effect vertexDrawEX;
+
+        public static Effect HeatMap => heatMap ??= ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/HeatMapEffect", AssetRequestMode.ImmediateLoad).Value;
+        static Effect heatMap;
+    }
+    public class ColorScreenData : ScreenShaderData
+    {
+        public ColorScreenData(string passName) : base(passName)
+        {
+        }
+        public ColorScreenData(Ref<Effect> shader, string passName) : base(shader, passName)
+        {
+
+        }
+        public override void Apply()
+        {
+            Shader.Parameters["mainColor"].SetValue(new Vector4(0, 1, 0, 1));
+
+        }
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+        }
+    }
+    public class ScreenTransformData : ScreenShaderData 
+    {
+        public ScreenTransformData(string passName) : base(passName)
+        {
+        }
+        public ScreenTransformData(Ref<Effect> shader, string passName) : base(shader, passName)
+        {
+
+        }
+        public override void Apply()
+        {
+            float[] m = StoneOfThePhilosophersConfig.instance.Matrix;
+            Matrix matrix = new Matrix
+                (
+                m[0], m[1], m[2], 0,
+                m[3], m[4], m[5], 0,
+                m[6], m[7], m[8], 0,
+                0, 0, 0, 0
+                );
+            Shader.Parameters["TransformMatrix"].SetValue(matrix);
+            //Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value;
+            Shader.Parameters["useHeatMap"].SetValue(true);
+
+        }
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+        }
     }
     public class StoneOfThePhilosophersSystem : ModSystem
     {
@@ -26,8 +84,6 @@ namespace StoneOfThePhilosophers
         public const string MythrilOrichalcumBars = "StoneOfThePhilosophers:MythrilOrichalcumBars";
         public const string AdamantiteTitaniumBars = "StoneOfThePhilosophers:AdamantiteTitaniumBars";
         public const string CursedIchorFlame = "StoneOfThePhilosophers:CursedIchorFlame";
-
-
         public override void AddRecipeGroups()
         {
             RecipeGroup group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Ã˙«¶øÛ", new int[]
@@ -67,6 +123,42 @@ namespace StoneOfThePhilosophers
             });
             RecipeGroup.RegisterGroup(CursedIchorFlame, group);
         }
+        public override void PostSetupContent()
+        {
+            //Main.ResourceSetsManager._sets["EmlementBars"] = new ElementPlayerResourcesDisplaySet("Emlement", "Emlement", "FancyClassic", AssetRequestMode.ImmediateLoad);
+            //Main.MinimapFrameManagerInstance.Options["EmlementBars"] = new ElementPlayerResourcesDisplaySet("Emlement", "Emlement", "FancyClassic", AssetRequestMode.ImmediateLoad);
+        }
+        public override void Load()
+        {
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen"] = 
+                new Filter(new ScreenTransformData(new Ref<Effect>(ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ScreenTransform", AssetRequestMode.ImmediateLoad).Value),
+                "ScreenTransform").UseImage(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value, 1), EffectPriority.Medium);
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen"].Load();
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen2"] = 
+                new Filter(new ColorScreenData(new Ref<Effect>(ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ColorScreen", AssetRequestMode.ImmediateLoad).Value), "ColorScreen"), EffectPriority.Medium);
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen2"].Load();
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen3"] =
+    new Filter(new ColorScreenData(new Ref<Effect>(ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ColorScreen", AssetRequestMode.ImmediateLoad).Value), "Magnifier"), EffectPriority.Medium);
+            Filters.Scene["StoneOfThePhilosophers:WTFScreen3"].Load();
+        }
+        public override void PreUpdateEntities()
+        {
+            ControlScreenShader("StoneOfThePhilosophers:WTFScreen", StoneOfThePhilosophersConfig.instance.UseScreenShader);
+            ControlScreenShader("StoneOfThePhilosophers:WTFScreen2", StoneOfThePhilosophersConfig.instance.UseScreenShader2);
+            ControlScreenShader("StoneOfThePhilosophers:WTFScreen3", StoneOfThePhilosophersConfig.instance.UseScreenShader3);
+
+        }
+        private void ControlScreenShader(string name, bool state)
+        {
+            if (!Filters.Scene[name].IsActive() && state)
+            {
+                Filters.Scene.Activate(name);
+            }
+            if (Filters.Scene[name].IsActive() && !state)
+            {
+                Filters.Scene.Deactivate(name);
+            }
+        }
     }
     public class StoneOfThePhilosophersConfig : ModConfig
     {
@@ -80,5 +172,18 @@ namespace StoneOfThePhilosophers
         public static StoneOfThePhilosophersConfig instance => ModContent.GetInstance<StoneOfThePhilosophersConfig>();
         [JsonIgnore]
         public static bool CombineFaster => instance?.combineFaster ?? false;
+
+        [Label(" π”√∆Ê√Ó¬Àæµ")]
+        public bool UseScreenShader;
+
+        [Label("∆Ê√Ó≤Œ ˝")]
+        //[Range(-10, 10)]
+        public float[] Matrix = new float[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+
+        [Label(" π”√∆Ê√Ó¬Àæµ2")]
+        public bool UseScreenShader2;
+
+        [Label(" π”√∆Ê√Ó¬Àæµ3")]
+        public bool UseScreenShader3;
     }
 }
