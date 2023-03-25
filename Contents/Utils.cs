@@ -12,6 +12,8 @@ using Terraria.GameContent;
 using Terraria.DataStructures;
 using Terraria.UI;
 using UtfUnknown.Core.Probers.MultiByte.Chinese;
+using StoneOfThePhilosophers.UI;
+using Terraria.GameInput;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -1100,6 +1102,7 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class StoneOfThePhilosophersHelper
     {
+        public static (ElementChargePlayer, ElementSkillPlayer) ElementPlayer(this Player player) => (player.GetModPlayer<ElementChargePlayer>(), player.GetModPlayer<ElementSkillPlayer>());
         public static CustomVertexInfo[] TailVertexFromProj(this Projectile projectile, Vector2 Offset = default, Func<float, float> widthFunc = null, Func<float, Color> colorFunc = null, float alpha = 1)
         {
             List<CustomVertexInfo> bars = new List<CustomVertexInfo>();
@@ -1538,6 +1541,7 @@ namespace StoneOfThePhilosophers.Contents
     }
     public abstract class MagicArea : ModProjectile
     {
+        public int specialAttackIndex;
         public int attackCounter;
         public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_4";//{StarBound.NPCs.Bosses.BigApe.BigApeTools.ApePath}StrawBerryArea
         public bool Extra { get; set; } = false;
@@ -1572,7 +1576,7 @@ namespace StoneOfThePhilosophers.Contents
             }
         }
         public float ChargeTime => Extra ? 45 : 75;
-        public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / ChargeTime * 2) * projectile.velocity.ToRotation();
+        public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / ChargeTime * 2) * (specialAttackIndex == 0 ? projectile.velocity.ToRotation() : -MathHelper.PiOver2);
         public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
         public const float dis = 64;
         public virtual int Cycle => 60;
@@ -1828,39 +1832,96 @@ namespace StoneOfThePhilosophers.Contents
             player.itemRotation = (float)Math.Atan2(projectile.velocity.Y * dir, projectile.velocity.X * dir);
             if (projectile.timeLeft > 12)
             {
-                if (!player.channel)
+                if (!(player.channel || (specialAttackIndex > 0 && projectile.ai[0] < 60)))
                 {
                     projectile.timeLeft = 12;
                 }
                 else
                 {
                     projectile.timeLeft = 14;
-                    if (UseMana)
+                    if (specialAttackIndex == 0)
                     {
-                        if (!player.CheckMana(player.inventory[player.selectedItem].mana, true))
+                        if (UseMana)
                         {
-                            projectile.timeLeft = 12;
+                            if (!player.CheckMana(player.inventory[player.selectedItem].mana, true))
+                            {
+                                projectile.timeLeft = 12;
+                            }
+                            if (projectile.ai[0] >= ChargeTime)
+                                ShootProj(projectile.velocity.SafeNormalize(default));
                         }
-                        if (projectile.ai[0] >= ChargeTime)
-                            ShootProj(projectile.velocity.SafeNormalize(default));
+                    }
+                    else
+                    {
+                        SpecialAttack();
                     }
                 }
             }
             else
             {
-                if (projectile.ai[0] > ChargeTime / 2)
+                if (projectile.ai[0] > ChargeTime / 2 && specialAttackIndex == 0)
                 {
                     ShootProj(projectile.velocity.SafeNormalize(default), true);
                 }
             }
         }
+        public virtual void SpecialAttack()
+        {
+
+        }
     }
     public abstract class MagicStone : ModItem
     {
+        public override void HoldStyle(Player player, Rectangle heldItemFrame)
+        {
+            uiTimer--;
+            if (PlayerInput.MouseInfo.MiddleButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && uiTimer <= 0)
+            {
+                if (Extra && Type != ModContent.ItemType<StoneOfThePhilosopher>() && Type != ModContent.ItemType<StoneOfThePhilosopherEX>())
+                {
+                    if (ElementSkillUI.Visible)
+                        ElementSkillSystem.Instance.skillUI.Close();
+                    else
+                    {
+                        ElementSkillSystem.Instance.skillUI.Open();
+                        ElementSkillSystem.Instance.skillUI.itemType = Type;
+                    }
+                }
+                else
+                {
+                    if (ElementUI.Visible)
+                        ElementSystem.Instance.elementUI.Close();
+                    else
+                    {
+                        ElementUI.IsExtra = Extra;
+                        ElementSystem.Instance.elementUI.Open();
+                    }
+                }
+                uiTimer = 15;
+            }
+            base.HoldStyle(player, heldItemFrame);
+        }
+        public int uiTimer;
         public virtual bool Extra => false;
+        public virtual StoneElements Elements => StoneElements.Empty;
+        public override bool AltFunctionUse(Player player)
+        {
+            if (Elements == 0 || !Extra) return false;
+            var (c, s) = player.ElementPlayer();
+            int index = (int)Elements - 1;
+            return c.ElementChargeValue[index] >= s.GetElementCost(index);
+        }
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            (Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, player.whoAmI, 0, 0).ModProjectile as MagicArea).Extra = Extra;
+            var (c, s) = player.ElementPlayer();
+            var area = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, player.whoAmI, 0, 0).ModProjectile as MagicArea;
+            area.Extra = Extra;
+            if (player.altFunctionUse == 2 && Elements != 0 && Extra)
+            {
+                var index = (int)Elements - 1;
+                area.specialAttackIndex = s.skillIndex[index] + 1;
+                c.ElementChargeValue[index] -= s.GetElementCost(index);
+            }
             return false;
         }
         public static void AddEXRequire<T>(Recipe recipe, bool metalStone = false) where T : MagicStone
@@ -1901,7 +1962,7 @@ namespace StoneOfThePhilosophers.Contents
             item.autoReuse = true;
             item.useAnimation = 12;
             item.useTime = 12;
-            item.useStyle = 5;
+            item.useStyle = ItemUseStyleID.Shoot;
             item.channel = true;
             item.value = 150;
             item.knockBack = 4f;

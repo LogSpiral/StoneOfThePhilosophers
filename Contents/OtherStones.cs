@@ -13,6 +13,9 @@ using System.Runtime.CompilerServices;
 using rail;
 using StoneOfThePhilosophers.Contents;
 using Steamworks;
+using static Terraria.ModLoader.PlayerDrawLayer;
+using StoneOfThePhilosophers.UI;
+using ReLogic.Utilities;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -20,6 +23,7 @@ namespace StoneOfThePhilosophers.Contents
     {
         /// <summary>
         /// 和那边的枚举类型对应，当然，你得把Empty踢开
+        /// 最大值100，最小0
         /// </summary>
         public float[] ElementChargeValue = new float[7];
         public override void ResetEffects()
@@ -35,6 +39,7 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfMetal : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Metal;
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeTopaz);
@@ -78,6 +83,8 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfWood : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Wood;
+
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeEmerald);
@@ -108,7 +115,7 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.Pearlwood, 50);
             recipe.AddIngredient(ItemID.ToxicFlask);
             recipe.AddIngredient(ItemID.ChlorophyteBar, 10);
-            AddEXRequire<StoneOfMetal>(recipe);
+            AddEXRequire<StoneOfWood>(recipe);
             recipe.Register();
         }
         public override void SetStaticDefaults()
@@ -125,6 +132,8 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfWater : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Water;
+
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeSapphire);
@@ -172,6 +181,8 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfFire : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Fire;
+
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeRuby);
@@ -219,6 +230,8 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfEarth : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Soil;
+
         public override void AddOtherIngredients(Recipe recipe)
         {
             recipe.AddIngredient(ItemID.LargeAmber);
@@ -267,6 +280,10 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfMoon : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Lunar;
+
+        public override bool Extra => true;
+
         public override void AddRecipes()
         {
             Recipe recipe = CreateRecipe();
@@ -296,6 +313,10 @@ namespace StoneOfThePhilosophers.Contents
     }
     public class StoneOfSun : MagicStone
     {
+        public override StoneElements Elements => StoneElements.Solar;
+
+        public override bool Extra => true;
+
         public override void AddRecipes()
         {
             Recipe recipe = CreateRecipe();
@@ -326,8 +347,11 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfMetalProj : MagicArea
     {
         public override Color MainColor => Color.Yellow;
-        public override int Cycle => 48;//48
-
+        public override int Cycle => Extra ? 27 : 36;//48
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             attackCounter++;
@@ -340,8 +364,11 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfWoodProj : MagicArea
     {
         public override Color MainColor => Color.Green;
-        public override int Cycle => 42;//24
-
+        public override int Cycle => Extra ? 18 : 24;//24
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             if (dying && projectile.timeLeft % 2 == 1) return;
@@ -364,6 +391,10 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override Color MainColor => Color.Blue;
         public override int Cycle => 6;//6
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             attackCounter++;
@@ -402,7 +433,10 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override Color MainColor => Color.Red;
         public override int Cycle => 30;//30
-
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             if (dying && projectile.timeLeft % 2 == 1) return;
@@ -426,32 +460,86 @@ namespace StoneOfThePhilosophers.Contents
     public class StoneOfEarthProj : MagicArea
     {
         public override Color MainColor => Color.Orange;
-        public override int Cycle => 6;
-
+        public override int Cycle => 48;
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
+            if (dying && projectile.timeLeft % 2 == 1) return;
+            SoundEngine.PlaySound(SoundID.Item69);
             attackCounter++;
+            if (attackCounter % 5 == 0 && Extra)
+            {
+                for (int n = 0; n < 3; n++)
+                {
+                    var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy((n - 1) * MathHelper.Pi / 12) * 32,
+ModContent.ProjectileType<EarthAttack>(), (int)(projectile.damage * 1.25f), projectile.knockBack, projectile.owner, 0, 2);
+                    (proj.ModProjectile as EarthAttack).SetDefaultStorm();
+                    proj.Center = projectile.Center + 64 * unit;
+                }
 
+            }
+            else
+            {
+                for (int n = 0; n < 4; n++)
+                    Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedByRandom(MathHelper.TwoPi / 24f * (dying ? 2 : 1)) * 32,
+        ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBack, projectile.owner).frame = Main.rand.Next(1, 5);
+            }
         }
     }
     public class StoneOfMoonProj : MagicArea
     {
         public override int Cycle => Main.dayTime ? 18 : 12;//12
         public override Color MainColor => Color.Purple;
+        public override void SpecialAttack()
+        {
+            if (projectile.ai[0] > 30 && projectile.ai[0] < 55 && (int)projectile.ai[0] % 5 == 0)
+            {
+                float factor = Utils.GetLerpValue(30, 55, projectile.ai[0]);
+                for (int n = 0; n < 30 * factor; n++)
+                {
+                    var unit = Main.rand.NextVector2Unit();
+                    Dust.NewDustPerfect(player.Center + ((1 - factor / 2) * 64 + Main.rand.Next(-4, 4)) * unit, 278, -unit * 8 * (1 - factor), 0, Color.White, Main.rand.NextFloat(1, 2f) * (1 - factor)).noGravity = true;
+                }
+            }
+            if (projectile.ai[0] == 55)
+            {
+                player.AddBuff(ModContent.BuffType<BlessingFromLunarGod>(), 450);
+                var r = Main.rand.NextFloat();
+                for (int n = 0; n < 60; n++)
+                {
+                    var unit = Main.rand.NextVector2Unit() * new Vector2(8, 4);
+                    unit = unit.RotatedBy(r);
+                    Dust.NewDustPerfect(player.Center, 278, unit, 0, Color.White, Main.rand.NextFloat(1, 2f)).noGravity = true;
+                }
+            }
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             attackCounter++;
             float r = Main.rand.Next(-32, 32) * (dying ? 8f : 1f);
             int randX = Main.rand.Next(-256, 256);//Main.rand.Next(-64, 64);
             var v = new Vector2(randX, -Main.rand.Next(280, 560));
-            Projectile.NewProjectile(projectile.GetSource_FromThis(), Main.MouseWorld + new Vector2(r, 0) - v, default, ModContent.ProjectileType<MoonAttack>(), projectile.damage, projectile.knockBack, projectile.owner, v.ToRotation(), v.Length() * 2);
+            var flag = player.HasBuff<BlessingFromLunarGod>();
+            var center = Main.MouseWorld + new Vector2(r, 0);
+            if (flag && (!dying || Main.rand.NextBool(4)) && player.GetZenithTarget(Main.MouseWorld, 1024f, out var index))
+            {
+                center = Main.npc[index].Center + Main.npc[index].velocity * 4;
+            }
+            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), center - v, default, ModContent.ProjectileType<MoonAttack>(), flag ? (int)(projectile.damage * 5 / 4) : projectile.damage, projectile.knockBack, projectile.owner, v.ToRotation(), v.Length() * 2);
+            (proj.ModProjectile as MoonAttack).boost = flag;
         }
     }
     public class StoneOfSunProj : MagicArea
     {
         public override Color MainColor => Color.White;
         public override int Cycle => 60;
-
+        public override void SpecialAttack()
+        {
+            base.SpecialAttack();
+        }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             if (dying && projectile.timeLeft % 3 != 0) return;
@@ -477,7 +565,7 @@ namespace StoneOfThePhilosophers.Contents
         public int TargetIndex = -1;
         public override void SetDefaults()
         {
-            Projectile.width = Projectile.height = 16;
+            Projectile.width = Projectile.height = 32;
             Projectile.timeLeft = 180;
             Projectile.DamageType = DamageClass.Magic;
             Projectile.friendly = true;
@@ -496,9 +584,9 @@ namespace StoneOfThePhilosophers.Contents
         {
             float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha, Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White * ((10 - n) * .1f) * alpha, Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
             return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
@@ -518,7 +606,12 @@ namespace StoneOfThePhilosophers.Contents
             {
                 Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
             }
-            if (Main.rand.NextBool(3)) TargetIndex = target.whoAmI;
+            if ((Main.rand.NextBool(3) || Projectile.penetrate == 1) && Projectile.ai[0] != 0)
+            {
+                Projectile.penetrate = 2;
+                TargetIndex = target.whoAmI;
+                offset = Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, target.width * 2 / 3, target.height * 2 / 3)) - new Vector2(target.width, target.height) / 3;
+            }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -543,6 +636,7 @@ namespace StoneOfThePhilosophers.Contents
             }
             return base.OnTileCollide(oldVelocity);
         }
+        public Vector2 offset;
         public override void AI()
         {
 
@@ -564,16 +658,19 @@ namespace StoneOfThePhilosophers.Contents
                 if (target.active)
                 {
                     Projectile.velocity = default;
-                    Projectile.Center = target.Center;
+                    Projectile.Center = target.Center + offset;
                     if (Projectile.timeLeft % 30 == 0)
                     {
-                        var damage = Extra ? 20 : 5;
+                        var damage = Extra ? 60 : 20;
+                        damage = (int)(damage * Main.rand.NextFloat(0.85f, 0.15f));
                         Main.player[Projectile.owner].ApplyDamageToNPC(target, damage, 0, 0, false);
                         if (!target.friendly && target.active && target.CanBeChasedBy())
                         {
                             Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
                         }
                     }
+                    Projectile.oldPos[0] = Projectile.Center + offset;
+
                     Projectile.friendly = false;
                 }
                 else
@@ -739,7 +836,7 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.immune[Projectile.owner] = 2;
+            target.immune[Projectile.owner] = 0;
             for (int n = 0; n < 6 - Projectile.penetrate; n++)
             {
                 for (int k = 0; k < 7; k++)
@@ -769,13 +866,12 @@ namespace StoneOfThePhilosophers.Contents
             Projectile.oldRot[0] = Projectile.rotation;
         }
     }
-
     public class FireAttack : ModProjectile
     {
         //BezierCurve<FloatVector2, Vector2> bezierCurve;
         Projectile projectile => Projectile;
         /// <summary>
-        /// 0为火球 1真火球 2大爆炸 3小爆炸 4凤凰
+        /// 0为火球 1真火球 2大爆炸 3小爆炸 4凤凰 5追踪真火 6火之领域
         /// </summary>
         int style => (int)projectile.ai[0];
         public override void SetDefaults()
@@ -816,6 +912,7 @@ namespace StoneOfThePhilosophers.Contents
                         break;
                     }
                 case 1:
+                case 5:
                     {
                         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
                         Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
@@ -1048,7 +1145,7 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (style == 0 || style == 1)
+            if (style == 0 || style == 1 || style == 5)
             {
                 Projectile.timeLeft = 15;
                 Projectile.friendly = false;
@@ -1122,7 +1219,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             target.AddBuff(24, 300);
             //target.immune[Projectile.owner] = 0;
-            if (style == 0 || style == 1)
+            if (style == 0 || style == 1 || style == 5)
             {
                 Projectile.timeLeft = 15;
                 Projectile.friendly = false;
@@ -1207,6 +1304,7 @@ namespace StoneOfThePhilosophers.Contents
                 case 0:
                 case 1:
                 case 4:
+                case 5:
                     {
                         Projectile.rotation = Projectile.velocity.ToRotation();
                         Dust.NewDustPerfect(projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White, 1f).noGravity = true;
@@ -1227,7 +1325,7 @@ namespace StoneOfThePhilosophers.Contents
                                 for (int n = 0; n < 5; n++)
                                 {
                                     var unit = (MathHelper.TwoPi / 6 * n + projectile.rotation + Main.rand.NextFloat()).ToRotationVector2();
-                                    var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center, unit * 32, projectile.type, projectile.damage / 2, 8, projectile.owner, 1);
+                                    var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center, unit * 32, projectile.type, projectile.damage / 2, 8, projectile.owner, 5);
                                     proj.rotation = MathHelper.TwoPi / 6 * n + projectile.rotation;
                                 }
                                 for (int num431 = 4; num431 < 31; num431++)
@@ -1245,6 +1343,25 @@ namespace StoneOfThePhilosophers.Contents
 
                                 }
                                 SoundEngine.PlaySound(SoundID.Item62);
+                            }
+                        }
+                        if (style == 5)
+                        {
+                            NPC target = null;
+                            float maxDistance = 256f;
+                            foreach (var npc in Main.npc)
+                            {
+                                if (!npc.CanBeChasedBy() || npc.friendly) continue;
+                                var currentDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                                if (currentDistance < maxDistance)
+                                {
+                                    maxDistance = currentDistance;
+                                    target = npc;
+                                }
+                            }
+                            if (target != null)
+                            {
+                                Projectile.velocity = Vector2.Lerp(Projectile.velocity, (target.Center - Projectile.Center).SafeNormalize(default) * 32, Utils.GetLerpValue(32, 256, maxDistance, true) * 0.25f);
                             }
                         }
                         break;
@@ -1287,6 +1404,15 @@ namespace StoneOfThePhilosophers.Contents
         public override void SetDefaults()
         {
             base.SetDefaults();
+            Projectile.width = 24;
+            Projectile.height = 24;
+            Projectile.aiStyle = -1;
+            Projectile.friendly = true;
+            Projectile.magic = true;
+            Projectile.tileCollide = true;
+            Projectile.penetrate = -1;
+            Projectile.timeLeft = 60;
+            Projectile.ignoreWater = true;
         }
         public override void SetStaticDefaults()
         {
@@ -1294,7 +1420,109 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            switch ((int)Projectile.ai[1])
+            {
+                case 0:
+                    {
+                        float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+                        for (int n = 9; n > -1; n--)
+                            Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "Piece").Value, Projectile.oldPos[n] - Main.screenPosition,
+                                new Rectangle((int)(16 * Projectile.frame), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                        break;
+                    }
+                case 1:
+                    {
+                        break;
+                    }
+                case 2:
+                    {
+                        float num287 = 300f;
+                        float num288 = Projectile.ai[0];
+                        float num289 = MathHelper.Clamp(num288 / 30f, 0f, 1f);
+                        if (num288 > num287 - 60f)
+                            num289 = MathHelper.Lerp(1f, 0f, (num288 - (num287 - 60f)) / 60f);
+
+                        float num290 = 0.2f;
+                        Vector2 top2 = Projectile.Top;
+                        Vector2 bottom = Projectile.Bottom;
+                        Vector2.Lerp(top2, bottom, 0.5f);
+                        Vector2 vector44 = new Vector2(0f, bottom.Y - top2.Y);
+                        vector44.X = vector44.Y * num290;
+                        new Vector2(top2.X - vector44.X / 2f, top2.Y);
+                        Texture2D value108 = TextureAssets.Projectile[Projectile.type].Value;
+                        Rectangle rectangle19 = value108.Frame();
+                        Vector2 origin19 = rectangle19.Size() / 2f;
+                        float num291 = -(float)Math.PI / 20f * num288 * (float)((!(Projectile.velocity.X > 0f)) ? 1 : (-1));
+                        SpriteEffects effects3 = (Projectile.velocity.X > 0f) ? SpriteEffects.FlipVertically : SpriteEffects.None;
+                        bool flag31 = Projectile.velocity.X > 0f;
+                        Vector2 spinningpoint5 = Vector2.UnitY.RotatedBy(num288 * 0.14f);
+                        float num292 = 0f;
+                        float num293 = 5.01f + num288 / 150f * -0.9f;
+                        if (num293 < 4.11f)
+                            num293 = 4.11f;
+
+                        Color value109 = new Color(160, 140, 100, 127);
+                        Color color69 = new Color(140, 160, 255, 127);
+                        float num294 = num288 % 60f;
+                        if (num294 < 30f)
+                            color69 *= Utils.GetLerpValue(22f, 30f, num294, clamped: true);
+                        else
+                            color69 *= Utils.GetLerpValue(38f, 30f, num294, clamped: true);
+
+                        bool flag32 = color69 != Color.Transparent;
+                        for (float num295 = (int)bottom.Y; num295 > (float)(int)top2.Y; num295 -= num293)
+                        {
+                            num292 += num293;
+                            float num296 = num292 / vector44.Y;
+                            float num297 = num292 * ((float)Math.PI * 2f) / -20f;
+                            if (flag31)
+                                num297 *= -1f;
+
+                            float num298 = num296 - 0.35f;
+                            Vector2 position19 = spinningpoint5.RotatedBy(num297);
+                            Vector2 value110 = new Vector2(0f, num296 + 1f);
+                            value110.X = value110.Y * num290;
+                            Color color70 = Color.Lerp(Color.Transparent, value109, num296 * 2f);
+                            if (num296 > 0.5f)
+                                color70 = Color.Lerp(Color.Transparent, value109, 2f - num296 * 2f);
+
+                            color70.A = (byte)((float)(int)color70.A * 0.5f);
+                            color70 *= num289;
+                            position19 *= value110 * 100f;
+                            position19.Y = 0f;
+                            position19.X = 0f;
+                            position19 += new Vector2(bottom.X, num295) - Main.screenPosition;
+                            if (flag32)
+                            {
+                                Color color71 = Color.Lerp(Color.Transparent, color69, num296 * 2f);
+                                if (num296 > 0.5f)
+                                    color71 = Color.Lerp(Color.Transparent, color69, 2f - num296 * 2f);
+
+                                color71.A = (byte)((float)(int)color71.A * 0.5f);
+                                color71 *= num289;
+                                Main.EntitySpriteDraw(value108, position19, rectangle19, color71, num291 + num297, origin19, (1f + num298) * 0.8f, effects3, 0);
+                            }
+
+                            Main.EntitySpriteDraw(value108, position19, rectangle19, color70, num291 + num297, origin19, 1f + num298, effects3, 0);
+                        }
+                        break;
+                    }
+            }
+            return false;
+        }
+        public void SetDefaultStorm()
+        {
+            Projectile.width = 60;
+            Projectile.height = 210;
+            Projectile.aiStyle = -1;
+            Projectile.friendly = true;
+            Projectile.magic = true;
+            Projectile.tileCollide = false;
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.timeLeft = 60;
+            Projectile.localNPCHitCooldown = -1;
+            Projectile.ignoreWater = true;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
@@ -1306,11 +1534,131 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void AI()
         {
-            base.AI();
+            switch ((int)Projectile.ai[1])
+            {
+                case 0:
+                    {
+                        Projectile.velocity += new Vector2(0, 0.2f);
+                        Projectile.rotation++;
+                        for (int n = 9; n > 0; n--)
+                        {
+                            Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                            Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+                        }
+                        Projectile.oldPos[0] = Projectile.Center;
+                        Projectile.oldRot[0] = Projectile.rotation;
+                        break;
+                    }
+                case 1:
+                    {
+                        break;
+                    }
+                case 2:
+                    {
+                        float num = 300f;
+                        if (Projectile.soundDelay == 0)
+                        {
+                            Projectile.soundDelay = -1;
+                            Projectile.localAI[1] = SoundEngine.PlayTrackedSound(SoundID.DD2_BookStaffTwisterLoop, Projectile.Center).ToFloat();
+                        }
+
+                        ActiveSound activeSound = SoundEngine.GetActiveSound(SlotId.FromFloat(Projectile.localAI[1]));
+                        if (activeSound != null)
+                        {
+                            activeSound.Position = Projectile.Center;
+                            activeSound.Volume = 1f - Math.Max(Projectile.ai[0] - (num - 15f), 0f) / 15f;
+                        }
+                        else
+                        {
+                            Projectile.localAI[1] = SlotId.Invalid.ToFloat();
+                        }
+
+                        if (Projectile.localAI[0] >= 16f && Projectile.ai[0] < num - 15f)
+                            Projectile.ai[0] = num - 15f;
+
+                        Projectile.ai[0] += 1f;
+                        if (Projectile.ai[0] >= num)
+                            Projectile.Kill();
+
+                        Vector2 top = Projectile.Top;
+                        Vector2 bottom = Projectile.Bottom;
+                        Vector2 value = Vector2.Lerp(top, bottom, 0.5f);
+                        Vector2 value2 = new Vector2(0f, bottom.Y - top.Y);
+                        value2.X = value2.Y * 0.2f;
+
+                        if (Projectile.ai[0] < num - 30f)
+                        {
+                            for (int j = 0; j < 1; j++)
+                            {
+                                float value3 = -1f;
+                                float value4 = 0.9f;
+                                float amount = Main.rand.NextFloat();
+                                Vector2 value5 = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(value3, value4, amount));
+                                value5.X *= MathHelper.Lerp(2.2f, 0.6f, amount);
+                                value5.X *= -1f;
+                                Vector2 value6 = new Vector2(6f, 10f);
+                                Vector2 position2 = value + value2 * value5 * 0.5f + value6;
+                                Dust dust = Main.dust[Dust.NewDust(position2, 0, 0, DustID.ApprenticeStorm)];
+                                dust.position = position2;
+                                dust.fadeIn = 1.3f;
+                                dust.scale = 0.87f;
+                                dust.alpha = 211;
+                                if (value5.X > -1.2f)
+                                    dust.velocity.X = 1f + Main.rand.NextFloat();
+
+                                dust.noGravity = true;
+                                dust.velocity.Y = Main.rand.NextFloat() * -0.5f - 1.3f;
+                                dust.velocity.X += Projectile.velocity.X * 2.1f;
+                                dust.noLight = true;
+                            }
+                        }
+
+                        Vector2 position3 = Projectile.Bottom + new Vector2(-25f, -25f);
+                        for (int k = 0; k < 4; k++)
+                        {
+                            Dust dust2 = Dust.NewDustDirect(position3, 50, 25, DustID.Smoke, Projectile.velocity.X, -2f, 100);
+                            dust2.fadeIn = 1.1f;
+                            dust2.noGravity = true;
+                        }
+
+                        for (int l = 0; l < 1; l++)
+                        {
+                            if (Main.rand.NextBool(5))
+                            {
+                                Gore gore = Gore.NewGoreDirect(Projectile.TopLeft + Main.rand.NextVector2Square(0f, 1f) * Projectile.Size, new Vector2(Projectile.velocity.X * 1.5f, (0f - Main.rand.NextFloat()) * 16f), Utils.SelectRandom(Main.rand, 1007, 1008, 1008));
+                                gore.timeLeft = 60;
+                                gore.alpha = 50;
+                                gore.velocity.X += Projectile.velocity.X;
+                            }
+                        }
+
+                        for (int m = 0; m < 1; m++)
+                        {
+                            if (Main.rand.NextBool(7))
+                            {
+                                Gore gore2 = Gore.NewGoreDirect(Projectile.TopLeft + Main.rand.NextVector2Square(0f, 1f) * Projectile.Size, new Vector2(Projectile.velocity.X * 1.5f, (0f - Main.rand.NextFloat()) * 16f), Utils.SelectRandom(Main.rand, 1007, 1008, 1008));
+                                gore2.timeLeft = 0;
+                                gore2.alpha = 80;
+                            }
+                        }
+
+                        for (int n = 0; n < 1; n++)
+                        {
+                            if (Main.rand.NextBool(7))
+                            {
+                                Gore gore3 = Gore.NewGoreDirect(Projectile.TopLeft + Main.rand.NextVector2Square(0f, 1f) * Projectile.Size, new Vector2(Projectile.velocity.X * 1.5f, (0f - Main.rand.NextFloat()) * 16f), Utils.SelectRandom(Main.rand, 1007, 1008, 1008));
+                                gore3.timeLeft = 0;
+                                gore3.alpha = 80;
+                            }
+                        }
+                        break;
+                    }
+            }
         }
     }
     public class MoonAttack : ModProjectile
     {
+        public bool boost = false;
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
             for (int n = 0; n < 15; n++)
@@ -1332,7 +1680,7 @@ namespace StoneOfThePhilosophers.Contents
             float point = 0f;
             float factor = projectile.timeLeft / 15f;
             factor = MathHelper.Clamp(factor * factor, 0, 1);
-            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), projectile.Center, projectile.Center + dirVec * factor, 32 * (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f)), ref point))
+            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), projectile.Center, projectile.Center + dirVec * factor, (boost ? 2 : 1) * 32 * (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f)), ref point))
             {
                 return true;
             }
@@ -1345,17 +1693,19 @@ namespace StoneOfThePhilosophers.Contents
         {
             SpriteBatch spriteBatch = Main.spriteBatch;
             var factor = 0.125f * MathHelper.SmoothStep(0, 1, (45 - projectile.timeLeft) / 15f);
-
-            spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f - Main.screenPosition, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f, factor * 1.25f), 0, 0);
-            spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f - Main.screenPosition, null, Color.White with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f, factor * .625f), 0, 0);
+            var origin = boost ? new Vector2(128) : new Vector2(16, 48);
+            var scaler = boost ? new Vector2(0.125f, 0.375f) : new Vector2(1, 0.75f);
+            var texture = boost ? ModContent.Request<Texture2D>(Texture + "_Ultra").Value : TextureAssets.Projectile[Type].Value;
+            spriteBatch.Draw(texture, projectile.Center + dirVec * 0.5f - Main.screenPosition, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], origin, scaler * new Vector2(projectile.ai[1] / 32f, factor * 1.25f), 0, 0);
+            spriteBatch.Draw(texture, projectile.Center + dirVec * 0.5f - Main.screenPosition, null, Color.White with { A = 0 } * factor, projectile.ai[0], origin, scaler * new Vector2(projectile.ai[1] / 32f, factor * .625f), 0, 0);
 
             if (projectile.timeLeft < 30)
             {
                 float fac = (30 - projectile.timeLeft) / 15f;
                 fac = MathHelper.Clamp(fac * fac, 0, 1);
                 factor = (float)Math.Sin(MathHelper.Pi * Math.Sqrt(1 - projectile.timeLeft / 30f));
-                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 12f, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * 1.25f), 0, 0);
-                spriteBatch.Draw(TextureAssets.Projectile[Type].Value, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 8f, null, Color.White with { A = 0 } * factor, projectile.ai[0], new Vector2(16, 48), new Vector2(projectile.ai[1] / 32f * fac, factor * .625f), 0, 0);
+                spriteBatch.Draw(texture, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 12f, null, Color.Purple with { A = 0 } * factor, projectile.ai[0], origin, scaler * new Vector2(projectile.ai[1] / 32f * fac, factor * 1.25f), 0, 0);
+                spriteBatch.Draw(texture, projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 8f, null, Color.White with { A = 0 } * factor, projectile.ai[0], origin, scaler * new Vector2(projectile.ai[1] / 32f * fac, factor * .625f), 0, 0);
             }
             var randSize = factor * Main.rand.NextFloat(0.5f);
             #region 法阵
@@ -1363,8 +1713,8 @@ namespace StoneOfThePhilosophers.Contents
                 Matrix.CreateScale(2) *
                 Matrix.CreateTranslation(-1, -1, -1) *
                 new Matrix(projectile.ai[1] * .5f, 0, 0, 0,
-                                                0, 48 * (1 + factor + randSize), 0, 0,
-                                                0, 0, 48 * (1 + factor + randSize), 0,
+                                                0, (boost ? 64 : 48) * (1 + factor + randSize), 0, 0,
+                                                0, 0, (boost ? 64 : 48) * (1 + factor + randSize), 0,
                                                 0, 0, 0, 1) *
                 Matrix.CreateRotationX(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi / 2f) *
                 Matrix.CreateRotationZ(projectile.ai[0]);
@@ -1416,7 +1766,7 @@ namespace StoneOfThePhilosophers.Contents
                 if (n > 11) index += 8;
                 vertexs[n] = vertexInfos[index];
             }
-            StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/MagicArea_2").Value, TextureAssets.MagicPixel.Value);
+            StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>($"StoneOfThePhilosophers/Images/MagicArea_{(boost ? 5 : 2)}").Value, TextureAssets.MagicPixel.Value);
             #endregion
 
             return false;
@@ -1493,10 +1843,20 @@ namespace StoneOfThePhilosophers.Contents
                         //state.ColorSourceBlend = Blend.InverseDestinationColor;
                         //state.AlphaSourceBlend = Blend.One;
                         Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                         //alpha = 1f;
                         //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, 960, 1120), Color.White);
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, Main.rand.NextFloat(), new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);
+                        #region Shader
+                        float r = Main.rand.NextFloat();
+                        Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_6").Value;
+                        Main.instance.GraphicsDevice.Textures[2] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value;
+                        Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
+                        Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(projectile.velocity.SafeNormalize(default).RotatedBy(-r + MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly * 0.05f);
+                        StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+
+                        #endregion
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
                         //for (int n = 0; n < 8; n++)
                         //{
                         //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), null, Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) * 0.125f * alpha, Projectile.rotation, new Vector2(16), new Vector2(2f, 1.5f), 0, 0);
@@ -1774,6 +2134,50 @@ namespace StoneOfThePhilosophers.Contents
             //    SoundEngine.PlaySound(SoundID.Item62);
             //}
             base.AI();
+        }
+    }
+    public class TidalErosion : ModBuff
+    {
+        public override void Update(NPC npc, ref int buffIndex)
+        {
+        }
+        public override void Update(Player player, ref int buffIndex)
+        {
+            Main.NewText("好湿好湿(x\n你知道吗，原版实现npc防御修改的方式是在最终造成伤害的地方改");
+            player.statDefense -= 5;
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("潮蚀");
+            Description.SetDefault("欸，这个debuff明明是给npc的，你是怎么得到的呢\n不要问为什么是恋恋，因为恋恋无处不在");
+        }
+    }
+    public class TidalErosionGBNPC : GlobalNPC
+    {
+        public override bool StrikeNPC(NPC npc, ref double damage, int defense, ref float knockback, int hitDirection, ref bool crit)
+        {
+            if (npc.HasBuff<TidalErosion>()) damage += 10;
+            return base.StrikeNPC(npc, ref damage, defense, ref knockback, hitDirection, ref crit);
+        }
+    }
+    public class BlessingFromLunarGod : ModBuff
+    {
+        public override void Update(Player player, ref int buffIndex)
+        {
+            for (int l = 0; l < Player.MaxBuffs; l++)
+            {
+                int num24 = player.buffType[l];
+                if (Main.debuff[num24] && player.buffTime[l] > 0 && (num24 < 0 || !BuffID.Sets.NurseCannotRemoveDebuff[num24]))
+                {
+                    player.DelBuff(l);
+                    l = -1;
+                }
+            }
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("月神的祝福");
+            Description.SetDefault("免疫几乎所有Debuff");
         }
     }
 }

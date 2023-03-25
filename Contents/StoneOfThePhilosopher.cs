@@ -18,25 +18,25 @@ namespace StoneOfThePhilosophers.Contents
         //public virtual bool Extra => false;
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
-            var elementPlr = player.GetModPlayer<ElementPlayer>();
+            //var elementPlr = player.GetModPlayer<ElementPlayer>();
 
-            if (player.itemAnimation == player.itemAnimationMax)
-            {
-                if (player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0)
-                {
-                }
-                else
-                {
-                    if (ElementUI.Visible)
-                        ElementSystem.Instance.elementUI.Close();
-                    else
-                    {
-                        ElementUI.IsExtra = Extra;
-                        ElementSystem.Instance.elementUI.Open();
+            //if (player.itemAnimation == player.itemAnimationMax)
+            //{
+            //    if (player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0)
+            //    {
+            //    }
+            //    else
+            //    {
+            //        if (ElementUI.Visible)
+            //            ElementSystem.Instance.elementUI.Close();
+            //        else
+            //        {
+            //            ElementUI.IsExtra = Extra;
+            //            ElementSystem.Instance.elementUI.Open();
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
         }
         public override bool AltFunctionUse(Player player) => true;
         public override void AddRecipes()

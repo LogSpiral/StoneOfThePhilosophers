@@ -102,7 +102,7 @@ namespace StoneOfThePhilosophers.UI
             }
             for (int n = 0; n < 19; n++)
             {
-                spriteBatch.Draw(ElementPanelMiddleBorder.Value, topLeft + offset + offsetUnit * n + new Vector2(24,-12), new Rectangle(0, 0, (int)(12f * factor2 + 1), 24), Color.White * factor1 * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
+                spriteBatch.Draw(ElementPanelMiddleBorder.Value, topLeft + offset + offsetUnit * n + new Vector2(24, -12), new Rectangle(0, 0, (int)(12f * factor2 + 1), 24), Color.White * factor1 * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
             }
             #endregion
 
@@ -112,6 +112,9 @@ namespace StoneOfThePhilosophers.UI
             if (flag)
             {
                 spriteBatch.Draw(ElementPanelContent.Value, topLeft, null, color * factor1, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
+                for (int n = 0; n < 3; n++)
+                    spriteBatch.Draw(ElementPanelContent.Value, topLeft + Main.rand.NextVector2Unit() * elementBarValue * 4, null, Color.White with { A = 0 } * .25f * factor1 * elementBarValue, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
+
             }
             spriteBatch.Draw(ElementPanelBorder.Value, topLeft, null, Color.White * factor1, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
             #endregion
@@ -123,7 +126,7 @@ namespace StoneOfThePhilosophers.UI
             elementBarProgress = MathHelper.Lerp(elementBarProgress, active ? 1 : 0, 0.1f);
             if (elementBarProgress < 0.001f) elementBarProgress = 0;
             if (elementBarProgress > 0.999f) elementBarProgress = 1;
-            if (IsMouseHovering) 
+            if (IsMouseHovering)
             {
                 Main.instance.MouseText((elementBarValue * 100).ToString("0.0") + "%");
 

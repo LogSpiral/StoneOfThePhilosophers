@@ -1,66 +1,62 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using ReLogic.Content;
+using StoneOfThePhilosophers.Contents;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Terraria;
-using Terraria.UI;
-using Terraria.ModLoader;
-using StoneOfThePhilosophers.Contents;
-using ReLogic.Content;
-using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader.IO;
-using Microsoft.Xna.Framework.Input;
-using ReLogic.Graphics;
-using Terraria.GameContent;
+using Terraria.ModLoader;
+using Terraria.UI;
+using Terraria.Audio;
+using Terraria;
+using Terraria.ID;
 
 namespace StoneOfThePhilosophers.UI
 {
-    public class ElementSystem : ModSystem
+    public class ElementSkillSystem : ModSystem
     {
-        public ElementUI elementUI;
-        public UserInterface elementInterface;
-        public static ElementSystem Instance;
+        public ElementSkillUI skillUI;
+        public UserInterface SkillInterface;
+        public static ElementSkillSystem Instance;
         public override void Load()
         {
-            elementUI = new ElementUI();
-            elementInterface = new UserInterface();
-            elementUI.Activate();
-            elementInterface.SetState(elementUI);
+            skillUI = new ElementSkillUI();
+            SkillInterface = new UserInterface();
+            skillUI.Activate();
+            SkillInterface.SetState(skillUI);
             Instance = this;
             base.Load();
         }
         public override void Unload()
         {
-            elementUI = null;
-            elementInterface = null;
+            skillUI = null;
+            SkillInterface = null;
             Instance = null;
             base.Unload();
         }
         public override void UpdateUI(GameTime gameTime)
         {
-            if (ElementUI.Visible || ElementUI.timer > 0)
-                elementInterface?.Update(gameTime);
+            if (ElementSkillUI.Visible || ElementSkillUI.timer > 0)
+                SkillInterface?.Update(gameTime);
         }
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int inventoryIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Inventory");
             if (inventoryIndex != -1)
             {
-                layers.Insert(inventoryIndex + 1, new LegacyGameInterfaceLayer("StoneOfThePhilosophers: ElementUI", () =>
+                layers.Insert(inventoryIndex + 1, new LegacyGameInterfaceLayer("StoneOfThePhilosophers: ElementSkillUI", () =>
                 {
-                    if (ElementUI.timer > 0)
-                        elementUI.Draw(Main.spriteBatch);
+                    if (ElementSkillUI.timer > 0)
+                        skillUI.Draw(Main.spriteBatch);
                     return true;
                 }, InterfaceScaleType.UI));
             }
         }
     }
-    public class ElementPanel : UIElement
+    public class ElementSkillPanel : UIElement
     {
         /// <summary>
         /// 是否可拖动
@@ -70,19 +66,18 @@ namespace StoneOfThePhilosophers.UI
         public Vector2 Offset;
         public float border;
         public bool CalculateBorder;
-        public ElementButton lastButton;
+        public ElementSkillButton lastButton;
         /// <summary>
         /// <br>元素按钮</br>
         /// <br>为什么是list呢？难道你还打算以后整点别的？</br>
         /// </summary>
-        public List<ElementButton> Buttons;
+        public List<ElementSkillButton> Buttons;
         /// <summary>
         /// <br>动画插值</br>
         /// <br>决定ui的大小和透明度之类</br>
         /// </summary>
         public float factor;
-        public ElementCombination combinationBuffer;
-        public ElementPanel(float border = 3, bool CalculateBorder = true)
+        public ElementSkillPanel(float border = 3, bool CalculateBorder = true)
         {
             SetPadding(10f);
             this.border = border;
@@ -114,19 +109,11 @@ namespace StoneOfThePhilosophers.UI
             RasterizerState rasterizerState = graphicDevice.RasterizerState;
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
-            //spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/ElementPanel").Value, rect, Color.White);
-            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/ElementPanel").Value;
-            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White, MathHelper.Pi, new Vector2(118), 1f * factor, 0, 0);
-            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .5f, Main.GlobalTimeWrappedHourly, new Vector2(118), 1.5f * factor, 0, 0);
-            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .75f, -Main.GlobalTimeWrappedHourly * 2, new Vector2(118), 1.25f * factor, 0, 0);
 
-            //foreach (var button in Buttons)
-            //{
-
-            //    spriteBatch.Draw(panelText, button.GetDimensions().Center(), null, Color.White, Main.GlobalTimeWrappedHourly * .5f, new Vector2(118), .5f * factor, 0, 0);
-            //}
-            //var elemplr = Main.LocalPlayer.GetModPlayer<ElementPlayer>();
-            //spriteBatch.DrawString(FontAssets.MouseText.Value, (elemplr.element1, elemplr.element2).ToString(), Main.LocalPlayer.Center - Main.screenPosition - new Vector2(0, -24), Color.Yellow);
+            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
+            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White, MathHelper.Pi, new Vector2(256), .5f * factor, 0, 0);
+            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .5f, Main.GlobalTimeWrappedHourly, new Vector2(256), .75f * factor, 0, 0);
+            //spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .75f, -Main.GlobalTimeWrappedHourly * 2, new Vector2(256), .625f * factor, 0, 0);
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
@@ -165,16 +152,6 @@ namespace StoneOfThePhilosophers.UI
                 //panelInfo.mainColor = KeepOrigin ? CoolerUIPanel.BackgroundDefaultUnselectedColor : Color.White;
 
             }
-            if (lastButton != null)
-            {
-                if (lastButton.timer == 15 && StoneOfThePhilosophersConfig.CombineFaster && ElementUI.Visible)
-                {
-                    var elementPlr = Main.LocalPlayer.GetModPlayer<ElementPlayer>();
-                    elementPlr.element1 = combinationBuffer.element1;
-                    elementPlr.element2 = combinationBuffer.element2;
-                    ElementSystem.Instance.elementUI.Close();
-                }
-            }
             if (Dragging)
             {
                 Left.Set(Main.mouseX - Offset.X, 0f);
@@ -185,40 +162,38 @@ namespace StoneOfThePhilosophers.UI
         }
         public void SetUpElementList()
         {
-            var elementPlr = Main.LocalPlayer.GetModPlayer<ElementPlayer>();
+            var elementSkillPlr = Main.LocalPlayer.GetModPlayer<ElementSkillPlayer>();
             Buttons.Clear();
             Elements.Clear();
             lastButton = null;
-            int max = ElementUI.IsExtra ? 7 : 5;
+            var type = Main.LocalPlayer.HeldItem.type;
+            if (type == ModContent.ItemType<StoneOfFireEX>()) type = 0;
+            if (type == ModContent.ItemType<StoneOfWaterEX>()) type = 1;
+            if (type == ModContent.ItemType<StoneOfWoodEX>()) type = 2;
+            if (type == ModContent.ItemType<StoneOfMetalEX>()) type = 3;
+            if (type == ModContent.ItemType<StoneOfEarthEX>()) type = 4;
+            if (type == ModContent.ItemType<StoneOfMoon>()) type = 5;
+            if (type == ModContent.ItemType<StoneOfSun>()) type = 6;
+            int max = ElementSkillPlayer.skillCounts[type];
             for (int n = 0; n < max; n++)
             {
-                var button = new ElementButton(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Element" + n));
+                int index = n;
+                var button = new ElementSkillButton(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Element" + type), ElementSkillPlayer.skillName[type, index]);
                 button.SetSize(40, 40);
                 button.OnMouseOver += (_, _) =>
                 {
-                    if (button.Active && combinationBuffer.element2 == 0)
-                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                 };
                 var element = (StoneElements)(n + 1);
                 button.OnClick += (_, _) =>
                 {
-                    if (button.Active && combinationBuffer.element2 == 0)
-                    {
-                        if (combinationBuffer.element1 == 0)
-                        {
-                            combinationBuffer.element1 = element;
-                        }
-                        else if (combinationBuffer.element2 == 0)
-                        {
-                            combinationBuffer.element2 = element;
-                            lastButton = button;
-                        }
-                        //Main.NewText((element,(int)element));
-                        button.Active = false;
-                        SoundEngine.PlaySound(SoundID.Unlock);
-                    }
+                    SoundEngine.PlaySound(SoundID.Unlock);
+                    //elementSkillPlr.skillIndex[type] = index;
+                    elementSkillPlr.skillIndex[type] = index;
+
+                    ElementSkillSystem.Instance.skillUI.Close();
                 };
-                Vector2 target = (-MathHelper.PiOver2 + MathHelper.TwoPi * (0.6f + 1f / max * n)).ToRotationVector2() * 118;
+                Vector2 target = (-MathHelper.TwoPi * (1f / max * n)).ToRotationVector2() * (max - 1) * 64;
                 button.Left.Set(target.X - 20, .5f);
                 button.Top.Set(target.Y - 20, .5f);
 
@@ -229,11 +204,11 @@ namespace StoneOfThePhilosophers.UI
         }
         public event ElementEvent OnDrag;
     }
-    public class ElementButton : UIElement
+    public class ElementSkillButton : UIElement
     {
         public bool Active = true;
         public Asset<Texture2D> Texture { get; private set; }
-        public ElementButton(Asset<Texture2D> texture)
+        public ElementSkillButton(Asset<Texture2D> texture, string spellName)
         {
             if (texture is not null)
             {
@@ -241,8 +216,9 @@ namespace StoneOfThePhilosophers.UI
                 Width.Set(Texture.Width(), 0f);
                 Height.Set(Texture.Height(), 0f);
             }
+            SpellName = spellName;
         }
-
+        public string SpellName;
         #region 各种设置方法
 
         public void SetImage(Asset<Texture2D> texture, bool changeSize = false)
@@ -263,45 +239,14 @@ namespace StoneOfThePhilosophers.UI
         {
             if (!Active && timer < 15) timer++;
             timer2 = MathHelper.Lerp(timer2, (Active && IsMouseHovering) ? 1f : 0f, 0.1f);
+            if (IsMouseHovering)
+                Main.instance.MouseText(SpellName);
             base.Update(gameTime);
         }
 
         public override void DrawSelf(SpriteBatch spriteBatch)
         {
             CalculatedStyle dimensions = GetDimensions();
-
-            //var mainColor = IsMouseHovering ? ColorActive : ColorInactive;
-            //if (DrawColor is not null)
-            //{
-            //    mainColor = DrawColor.Invoke();
-            //}
-            //currentColor = Color.Lerp(currentColor, mainColor, 0.05f);
-            ////drawcoolertex
-            //if (currentStyleTex != null)
-            //{
-            //    //var rect = dimensions.ToRectangle();
-            //    //rect = rect.OffsetSize((int)dimensions.Width / 2, (int)(-dimensions.Height / 4));
-            //    //rect.Offset(0, (int)(dimensions.Height / 8));
-            //    //DrawCoolerTextBox_Combine(spriteBatch, currentStyleTex, rect, currentColor);
-            //    var rect = dimensions.ToRectangle().OffsetSize(8, 8);
-            //    rect.Offset(-4, -4);
-            //    var info = new CoolerPanelInfo();
-            //    info.configTexStyle = currentStyle;
-            //    info.destination = rect;
-            //    info.scaler = 1f;
-            //    info.origin = default;
-            //    info.glowShakingStrength = IsMouseHovering ? .25f : 0f;
-            //    info.glowHueOffsetRange = .1f;
-            //    info.glowEffectColor = currentColor;
-            //    info.backgroundColor = Color.White;
-            //    info.DrawCoolerPanel(spriteBatch);
-            //}
-            //else
-            //{
-            //    spriteBatch.Draw(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/CategoryPanel").Value, dimensions.Center(), null, currentColor, 0f, new Vector2(22), 1f, SpriteEffects.None, 0f);
-            //    if (IsMouseHovering)
-            //        spriteBatch.Draw(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/CategoryPanelBorder").Value, dimensions.Center(), null, currentColor, 0f, new Vector2(22), 1f, SpriteEffects.None, 0f);
-            //}
             Vector2 selfCen = dimensions.Center();
             Vector2 parentCen = Parent?.GetDimensions().Center() ?? selfCen;
             Vector2 normalVec = selfCen - parentCen;
@@ -330,8 +275,8 @@ namespace StoneOfThePhilosophers.UI
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
 
-            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/ElementPanel").Value;
-            spriteBatch.Draw(panelText, result, null, Color.White * scaler2, Main.GlobalTimeWrappedHourly * .5f, new Vector2(118), .5f * scaler2 * (1f + .5f * timer2), 0, 0);
+            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
+            spriteBatch.Draw(panelText, result, null, Color.White * scaler2, Main.GlobalTimeWrappedHourly * .5f, new Vector2(256), .25f * scaler2 * (1f + .5f * timer2), 0, 0);
             //spriteBatch.Draw(panelText, result, null, Color.White * scaler2 * .5f, -Main.GlobalTimeWrappedHourly, new Vector2(118), .35f * scaler2 * (1f + .5f * timer2), 0, 0);
 
             spriteBatch.End();
@@ -351,77 +296,80 @@ namespace StoneOfThePhilosophers.UI
 
         }
     }
-    public enum StoneElements
+    public class ElementSkillPlayer : ModPlayer
     {
-        Empty,
-        Fire,
-        Water,
-        Wood,
-        Metal,
-        Soil,
-        Lunar,
-        Solar
-    }
-    //public enum CombinedElements
-    //{
-    //    FireFire = 0,
-    //    FireWater = 1,
-    //    FireWood = 2,
-    //    FireMetal = 3,
-    //    FireSoil = 4,
-    //    FireLunar = 5,
-    //    FireSun = 6,
-    //    WaterWater = 11,
-    //    WaterWood = 12,
-    //    WaterMetal = 13,
-    //    WaterSoil = 14,
-    //    WaterLunar = 15,
-    //    WaterSun = 16,
-    //    WoodWood = 22,
-    //    WoodMetal = 23,
-    //    WoodSoil = 24,
-    //    WoodLunar = 25,
-    //    WoodSun = 26,
-    //    MetalMetal = 33,
-    //    MetalSoil = 34,
-    //    MetalLunar = 35,
-    //    MetalSun = 36,
-    //    SoilSoil = 44,
-    //    SoilLunar = 45,
-    //    SoilSun = 46,
-    //    LunarLunar = 55,
-    //    LunarSun = 56,
-    //    SunSun = 66
-    //}
-    public class ElementPlayer : ModPlayer
-    {
-        public StoneElements element1;
-        public StoneElements element2;
-        public ElementCombination ElementCombination => (element1, element2);
-        //public CombinedElements CombinedElement
-        //{
-        //    get
-        //    {
-        //        int a = (int)element1;
-        //        int b = (int)element2;
-        //        if (a > b) Utils.Swap(ref a, ref b);
-        //        return (CombinedElements)(a * 10 + b);
-        //    }
-        //}
-        public override void SaveData(TagCompound tag)
+        /// <summary>
+        /// 输入元素下标，输出技能下标
+        /// </summary>
+        public int[] skillIndex = new int[7];
+        /// <summary>
+        /// 符卡名，快乐打表
+        /// </summary>
+        public static string[,] skillName = new string[7, 3];
+        /// <summary>
+        /// 元素消耗打表
+        /// </summary>
+        public static float[,] skillCost = new float[7, 3];
+        /// <summary>
+        /// 方便访问，仅此而已
+        /// </summary>
+        public float[,] SkillCost => skillCost;
+        public static int[] skillCounts = new int[] { 1, 2, 3, 1, 2, 1, 1 };
+        public override void Load()
         {
-            tag.Add("element1", (byte)element1);
-            tag.Add("element2", (byte)element2);
-
+            for (int n = 0; n < 7; n++)
+            {
+                string ElementName = n switch
+                {
+                    0 => "焱火",
+                    1 => "淼水",
+                    2 => "森木",
+                    3 => "鑫金",
+                    4 => "垚土",
+                    5 => "寒月",
+                    6 or _ => "炎日"
+                };
+                for (int i = 0; i < skillCounts[n]; i++)
+                {
+                    string SpellName = n switch
+                    {
+                        0 => "灼炎炼狱",
+                        1 => i switch { 0 => "穿石之流", 1 or _ => "潮汐领域" },
+                        2 => i switch { 0 => "叶绿射线", 1 => "巨木之晶", 2 or _ => "愈伤组织" },
+                        3 => "钢铁洪流",
+                        4 => i switch { 0 => "大地之柱", 1 or _ => "山崩地裂" },
+                        5 => "月影降临",
+                        6 or _ => "歌未竟，东方白"
+                    };
+                    int SpellCost = n switch
+                    {
+                        0 => 0,
+                        1 => i switch { 0 => 1, 1 or _ => 2 },
+                        2 => i switch { 0 => 1, 1 => 3, 2 or _ => 5 },
+                        3 => 1,
+                        4 => i switch { 0 => 1, 1 or _ => 4 },
+                        5 => 1,
+                        6 or _ => 1
+                    };
+                    skillName[n, i] = $"{ElementName}「{SpellName}」";
+                    skillCost[n, i] = SpellCost * 20;
+                }
+            }
         }
-        public override void LoadData(TagCompound tag)
-        {
-            element1 = (StoneElements)tag.GetByte("element1");
-            element2 = (StoneElements)tag.GetByte("element2");
-            base.LoadData(tag);
-        }
+        /// <summary>
+        /// 输入元素下标，也就是(int){StoneElements} - 1
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public float GetElementCost(int index) => SkillCost[index, skillIndex[index]];
+        /// <summary>
+        /// 输入元素枚举 似乎用不到的样子
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public float GetElementCost(StoneElements element) => element == 0 ? 0 : GetElementCost((int)element - 1);
     }
-    public class ElementUI : UIState
+    public class ElementSkillUI : UIState
     {
         public static bool Visible { get; private set; }
         public static int timer;
@@ -434,7 +382,6 @@ namespace StoneOfThePhilosophers.UI
             BasePanel.Left.Set(Offset.X - 420, 0f);
             BasePanel.Top.Set(Offset.Y - 128, 0f);
             BasePanel.Recalculate();
-            BasePanel.combinationBuffer = default;//Main.LocalPlayer.GetModPlayer<ElementPlayer>().ElementCombination;
         }
         public void Close()
         {
@@ -443,10 +390,12 @@ namespace StoneOfThePhilosophers.UI
             SoundEngine.PlaySound(SoundID.MenuClose);
 
         }
-        public bool CacheSetupElements; // 缓存，在下一帧Setup
-        public static bool IsExtra;
-        public ElementPanel BasePanel;
-
+        public bool CacheSetupElements;
+        public ElementSkillPanel BasePanel;
+        /// <summary>
+        /// 记录手持物品类型，变了就自动关闭
+        /// </summary>
+        public int itemType;
         public override void Update(GameTime gameTime)
         {
             if (CacheSetupElements)
@@ -457,8 +406,7 @@ namespace StoneOfThePhilosophers.UI
             timer += Visible ? 1 : -1;
             timer = (int)MathHelper.Clamp(timer, 0, 15);
             BasePanel.factor = MathHelper.SmoothStep(0, 1, timer / 15f);
-            var type = Main.LocalPlayer.HeldItem.type;
-            if (type != ModContent.ItemType<StoneOfThePhilosopher>() && type != ModContent.ItemType<StoneOfThePhilosopherEX>() && Visible) Close();
+            if (Main.LocalPlayer.HeldItem.type != itemType && Visible) Close();
             base.Update(gameTime);
         }
         //一个底板 一堆按钮 右键切换开关状态 默认水火符 
@@ -469,7 +417,7 @@ namespace StoneOfThePhilosophers.UI
             #endregion
 
             #region 面板初始化
-            BasePanel = new ElementPanel()
+            BasePanel = new ElementSkillPanel()
             {
                 Top = StyleDimension.FromPixels(256f),
                 HAlign = 0.2f
