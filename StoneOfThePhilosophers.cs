@@ -83,8 +83,8 @@ namespace StoneOfThePhilosophers
             //    );
             var vec = (Main.MouseScreen - Main.ScreenSize.ToVector2() / 2);
             var scaler = 1 - 1 / (1 + vec.Length() / 64f);
-            scaler *= 0.75f;
-            var (c, s) = MathF.SinCos(MathHelper.Pi - vec.ToRotation() + MathHelper.PiOver2); //Main.GlobalTimeWrappedHourly
+            scaler *= MathHelper.Pi / 4;
+            var (s, c) = MathF.SinCos(-vec.ToRotation()); //Main.GlobalTimeWrappedHourly
             var (c2, s2) = MathF.SinCos(scaler);
             //var (c, s) = MathF.SinCos(Main.GlobalTimeWrappedHourly); //Main.GlobalTimeWrappedHourly
             //var (c2, s2) = MathF.SinCos(MathHelper.Pi / 3);

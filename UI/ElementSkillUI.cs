@@ -343,7 +343,7 @@ namespace StoneOfThePhilosophers.UI
                     };
                     int SpellCost = n switch
                     {
-                        0 => 0,
+                        0 => 3,
                         1 => i switch { 0 => 1, 1 or _ => 2 },
                         2 => i switch { 0 => 1, 1 => 3, 2 or _ => 5 },
                         3 => 1,

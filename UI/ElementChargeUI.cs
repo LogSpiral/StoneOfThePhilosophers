@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 using static System.Net.Mime.MediaTypeNames;
@@ -97,8 +98,38 @@ namespace StoneOfThePhilosophers.UI
             {
                 if (flag)
                 {
-                    spriteBatch.Draw(ElementPanelFill.Value, topLeft + offset + new Vector2(18, -12) + offsetUnit * n, new Rectangle(0, 0, (int)((n == count - 1 ? (elementBarValue * 19 % 1) : 1) * 12f * factor2 + 1), 12), color * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
+                    var _color = Color.Lerp(color, Color.White, 0.25f - 0.25f * MathF.Cos(elementBarValue * Main.GlobalTimeWrappedHourly * 8));
+                    spriteBatch.Draw(ElementPanelFill.Value, topLeft + offset + new Vector2(18, -12) + offsetUnit * n, new Rectangle(0, 0, (int)((n == count - 1 ? (elementBarValue * 19 % 1) : 1) * 12f * factor2 + 1), 12), _color * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
                 }
+            }
+            var (c, s) = Main.LocalPlayer.ElementPlayer();
+            float l = s.GetElementCost((int)CurrentElement - 1) / 5;
+            if (count >= l)
+            {
+                //CustomVertexInfo[] customVertexInfos = new CustomVertexInfo[count];
+                //Vector2 unit = new Vector2(12, 48 * (s.GetElementCost((int)CurrentElement - 1) / 20f));
+                //Vector2 center = topLeft + offset + Main.screenPosition;
+                //for (int n = 0; n < 4; n++)
+                //{
+                //    int i = n / 2;
+                //    int j = n % 2;
+                //    customVertexInfos[i] = new CustomVertexInfo(center + unit * new Vector2(i, j), Color.White, new Vector3(i, j, 0.5f));
+                //}
+                //var baseTex = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_6").Value;
+                //var aniTex = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value;
+                //var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0));
+                //spriteBatch.End();
+                //spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
+                //StoneOfThePhilosophersHelper.VertexDraw(customVertexInfos, baseTex, aniTex, null, new Vector2(Main.GlobalTimeWrappedHourly * 0.05f, 0), true, model * Main.UIScaleMatrix * Matrix.Invert(model * Main.GameViewMatrix.TransformationMatrix), null, false, false);
+                //spriteBatch.End();
+                //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
+                var drawCen = topLeft + offsetUnit * MathHelper.Clamp(elementBarValue * 19 + 1, 0, 20) + new Vector2(-6, 16);// - (l - 1f) * 24
+                var scaler = MathHelper.SmoothStep(0, 1, elementBarProgress * elementBarProgress);
+                var _color = Color.Lerp(color, Color.White, 0.25f - 0.25f * MathF.Cos(elementBarValue * Main.GlobalTimeWrappedHourly * 16)) * scaler;
+
+                spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value, drawCen, null, _color with { A = 0 } * factor1, MathHelper.PiOver2, new Vector2(256, 0), new Vector2(l * 12 * scaler, 24) / new Vector2(256), 0, 0);
+                //spriteBatch.Draw(TextureAssets.MagicPixel.Value, drawCen, new Rectangle(0, 0, 1, 1), Color.Red, 0, new Vector2(.5f), 4f, 0, 0);
+
             }
             for (int n = 0; n < 19; n++)
             {

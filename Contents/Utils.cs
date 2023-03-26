@@ -1541,10 +1541,14 @@ namespace StoneOfThePhilosophers.Contents
     }
     public abstract class MagicArea : ModProjectile
     {
+        /// <summary>
+        /// 0让给正常攻击了，需要减一以对应那边的下标
+        /// </summary>
         public int specialAttackIndex;
         public int attackCounter;
         public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_4";//{StarBound.NPCs.Bosses.BigApe.BigApeTools.ApePath}StrawBerryArea
         public bool Extra { get; set; } = false;
+        public virtual StoneElements Elements => StoneElements.Empty;
         public Projectile projectile => Projectile;
         public Player player => Main.player[projectile.owner];
         public bool Released => projectile.timeLeft < 12;
@@ -1853,7 +1857,7 @@ namespace StoneOfThePhilosophers.Contents
                     }
                     else
                     {
-                        SpecialAttack();
+                        SpecialAttack(StoneOfThePhilosopherProj.ElementColor[Elements], (int)projectile.ai[0] == 55);
                     }
                 }
             }
@@ -1865,13 +1869,38 @@ namespace StoneOfThePhilosophers.Contents
                 }
             }
         }
-        public virtual void SpecialAttack()
+        public virtual void SpecialAttack(Color dustColor, bool trigger)
         {
-
+            dustColor = Color.Lerp(Color.White, dustColor, 0.5f);
+            if (projectile.ai[0] > 30 && projectile.ai[0] < 55 && (int)projectile.ai[0] % 5 == 0)
+            {
+                float factor = Utils.GetLerpValue(30, 55, projectile.ai[0]);
+                for (int n = 0; n < 30 * factor; n++)
+                {
+                    var unit = Main.rand.NextVector2Unit();
+                    Dust.NewDustPerfect(player.Center + ((1 - factor / 2) * 64 + Main.rand.Next(-4, 4)) * unit, 278, -unit * 8 * (1 - factor), 0, dustColor, Main.rand.NextFloat(1, 2f) * (1 - factor)).noGravity = true;
+                }
+            }
+            if (trigger)
+            {
+                var r = Main.rand.NextFloat();
+                for (int n = 0; n < 60; n++)
+                {
+                    var unit = Main.rand.NextVector2Unit() * new Vector2(8, 4);
+                    unit = unit.RotatedBy(r);
+                    Dust.NewDustPerfect(player.Center, 278, unit, 0, dustColor, Main.rand.NextFloat(1, 2f)).noGravity = true;
+                }
+            }
         }
     }
     public abstract class MagicStone : ModItem
     {
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            var tooltip = new TooltipLine(Mod, "OpenUI", "使用鼠标中键以开启配置ui");
+            tooltips.Add(tooltip);
+            base.ModifyTooltips(tooltips);
+        }
         public override void HoldStyle(Player player, Rectangle heldItemFrame)
         {
             uiTimer--;
