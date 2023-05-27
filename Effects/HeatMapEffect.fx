@@ -81,7 +81,6 @@ sampler uImage1 : register(s1); //偏移灰度图
 sampler uImage2 : register(s2); //采样/着色图
 float4x4 uTransform;
 float2 uTime;
-
 struct PSInput
 {
 	float4 Pos : SV_POSITION;
@@ -127,14 +126,16 @@ float4 FinalModify(float4 color, float k)
 }
 float4 PixelShaderFunction_HeatMap(PSInput input) : COLOR0
 {
-	float4 color = tex2D(uImage2, float2(Gray(input.Texcoord.xy), 1));
-	return float4(color.xyz, input.Color.w * tex2D(uImage0, input.Texcoord.xy).w);
+	float2 texcoord = mul(float4(input.Texcoord.xy, 0, 1), uTransform);
+	float4 color = tex2D(uImage2, float2(Gray(texcoord), 1));
+	return float4(color.xyz, input.Color.w * tex2D(uImage0, texcoord).w);
 }
 float4 PixelShaderFunction_HeatMap2(PSInput input) : COLOR0
 {
-	float4 grayVector = GetGrayVector(input.Texcoord.xy);
+	float2 texcoord = mul(float4(input.Texcoord.xy, 0, 1), uTransform);
+	float4 grayVector = GetGrayVector(texcoord);
 	float4 color = tex2D(uImage2, float2(GetGrayValue(grayVector.xyz), 1));
-	return float4(FinalModify(color, grayVector.x).xyz, input.Color.w * tex2D(uImage0, input.Texcoord.xy).w);
+	return float4(FinalModify(color, grayVector.x).xyz, input.Color.w * tex2D(uImage0, texcoord).w);
 }
 technique Technique1
 {

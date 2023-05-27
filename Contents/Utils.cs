@@ -927,6 +927,31 @@ namespace StoneOfThePhilosophers.Contents
     }
     public static class VirtualDreamFactorMethods
     {
+        public static Vector2 RectangleCollision(Vector2 Position, Vector2 Velocity, int Width, int Height, Rectangle rectangle, bool fallThrough = false, bool fall2 = false, int gravDir = 1)
+        {
+            Vector2 result = Velocity;
+            Vector2 nextPosition = Position + Velocity;
+            Vector2 position = Position;
+            if (position.X + Width < rectangle.X && nextPosition.X + Width > rectangle.X)
+            {
+                result.X = rectangle.X - nextPosition.X - Width;
+                result.X -= 2;
+            }
+            if (position.X > rectangle.X + rectangle.Width && nextPosition.X < rectangle.X + rectangle.Width)
+            {
+                result.X = rectangle.X + rectangle.Width - nextPosition.X;
+                result.X += 2;
+            }
+            if (position.Y + Height < rectangle.Y && nextPosition.Y + Height > rectangle.Y)
+            {
+                result.Y = 0;
+            }
+            if (position.Y > rectangle.Y + rectangle.Height && nextPosition.Y < rectangle.Y + rectangle.Height)
+            {
+                result.Y = 0;
+            }
+            return result;
+        }
 
         public static T Sum<T, TValue>(T[] values) where T : IVector<T, TValue>
         {
@@ -1949,7 +1974,7 @@ namespace StoneOfThePhilosophers.Contents
             {
                 var index = (int)Elements - 1;
                 area.specialAttackIndex = s.skillIndex[index] + 1;
-                c.ElementChargeValue[index] -= s.GetElementCost(index);
+                //c.ElementChargeValue[index] -= s.GetElementCost(index);
             }
             return false;
         }

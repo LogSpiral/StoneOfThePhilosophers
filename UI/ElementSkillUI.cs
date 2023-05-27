@@ -13,6 +13,7 @@ using Terraria.UI;
 using Terraria.Audio;
 using Terraria;
 using Terraria.ID;
+using Terraria.DataStructures;
 
 namespace StoneOfThePhilosophers.UI
 {
@@ -335,15 +336,15 @@ namespace StoneOfThePhilosophers.UI
                     {
                         0 => "灼炎炼狱",
                         1 => i switch { 0 => "穿石之流", 1 or _ => "潮汐领域" },
-                        2 => i switch { 0 => "叶绿射线", 1 => "巨木之晶", 2 or _ => "愈伤组织" },
+                        2 => i switch { 0 => "常青藤鞭", 1 => "巨木之晶", 2 or _ => "愈伤组织" },
                         3 => "钢铁洪流",
                         4 => i switch { 0 => "大地之柱", 1 or _ => "山崩地裂" },
                         5 => "月影降临",
-                        6 or _ => "歌未竟，东方白"
+                        6 or _ => "歌未竟"
                     };
                     int SpellCost = n switch
                     {
-                        0 => 3,
+                        0 => 1,
                         1 => i switch { 0 => 1, 1 or _ => 2 },
                         2 => i switch { 0 => 1, 1 => 3, 2 or _ => 5 },
                         3 => 1,
@@ -368,6 +369,15 @@ namespace StoneOfThePhilosophers.UI
         /// <param name="element"></param>
         /// <returns></returns>
         public float GetElementCost(StoneElements element) => element == 0 ? 0 : GetElementCost((int)element - 1);
+
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
+        {
+            //Main.spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/StarSky_1").Value, default, null, Color.White, 0, default, 1f, 0, 0);
+            //Main.spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/StarSky_1").Value, new Rectangle(0, 0, 1920, 1017), Color.White);
+            //Main.NewText(Main.screenTarget.Size());
+            //drawInfo = default;
+            base.ModifyDrawInfo(ref drawInfo);
+        }
     }
     public class ElementSkillUI : UIState
     {

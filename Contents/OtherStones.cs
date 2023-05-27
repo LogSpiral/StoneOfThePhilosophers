@@ -16,6 +16,8 @@ using Steamworks;
 using static Terraria.ModLoader.PlayerDrawLayer;
 using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
+using CoolerItemVisualEffect;
+using static Terraria.Localization.NetworkText;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -32,10 +34,27 @@ namespace StoneOfThePhilosophers.Contents
             {
                 ElementChargeValue[n] = MathHelper.Clamp(ElementChargeValue[n], 0, 100);
             }
-
+            EarthQuaking = false;
+            foreach (var proj in Main.projectile)
+            {
+                if (proj.active && proj.type == ModContent.ProjectileType<EarthSpecialAttack>() && proj.ai[1] == 1)
+                {
+                    EarthQuaking = true;
+                    break;
+                }
+            }
             base.ResetEffects();
         }
-        public static float Devider => 500f;
+        public static float Devider => 200f;
+        public static bool EarthQuaking;
+        public float strengthOfShake;
+        public override void ModifyScreenPosition()
+        {
+            strengthOfShake *= 0.8f;
+            if (strengthOfShake < 0.025f) strengthOfShake = 0;
+            Main.screenPosition += Main.rand.NextVector2Unit() * strengthOfShake * 48;
+            base.ModifyScreenPosition();
+        }
     }
     public class StoneOfMetal : MagicStone
     {
@@ -250,7 +269,7 @@ namespace StoneOfThePhilosophers.Contents
         public override void SetDefaults()
         {
             item.shoot = ModContent.ProjectileType<StoneOfEarthProj>();
-            item.damage = 20;
+            item.damage = 30;
 
             base.SetDefaults();
         }
@@ -275,7 +294,7 @@ namespace StoneOfThePhilosophers.Contents
         public override void SetDefaults()
         {
             base.SetDefaults();
-            item.damage = 60;
+            item.damage = 80;
         }
     }
     public class StoneOfMoon : MagicStone
@@ -348,10 +367,19 @@ namespace StoneOfThePhilosophers.Contents
     {
         public override StoneElements Elements => StoneElements.Metal;
         public override Color MainColor => Color.Yellow;
-        public override int Cycle => Extra ? 27 : 36;//48
+        public override int Cycle => Extra ? 18 : 27;//48
         public override void SpecialAttack(Color dustColor, bool trigger)
         {
-            base.SpecialAttack(dustColor, trigger);
+            if ((int)projectile.ai[0] == 1)
+            {
+                var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), player.Center, default, ModContent.ProjectileType<MetalAttack>(), (int)(projectile.damage * Main.rand.NextFloat(1.5f, 2.5f)), projectile.knockBack * 3, projectile.owner, 0, 2);
+                proj.timeLeft = 120;
+                proj.width = proj.height = 120;
+                proj.Center = player.Center;
+                proj.penetrate = -1;
+                proj.rotation = MathHelper.TwoPi;
+                proj.usesLocalNPCImmunity = false;
+            }
         }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
@@ -374,11 +402,23 @@ namespace StoneOfThePhilosophers.Contents
                 case 1:
                     {
                         //叶绿射线
+                        if (trigger)
+                        {
+                            player.AddBuff(ModContent.BuffType<WoodUltra>(), 450);
+                        }
                         break;
                     }
                 case 2:
                     {
                         //巨木之晶
+                        if (trigger)
+                        {
+                            for (int n = 0; n < 3; n++)
+                            {
+                                var npc = NPC.NewNPCDirect(projectile.GetNPCSource_FromThis(), player.Center, ModContent.NPCType<WoodCrystal>(), 0, player.whoAmI, n);
+                                npc.defense = player.statDefense;
+                            }
+                        }
                         break;
                     }
                 case 3:
@@ -411,46 +451,99 @@ namespace StoneOfThePhilosophers.Contents
     ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
                 proj.penetrate = Extra ? 3 : 2;
                 proj.tileCollide = Extra && Main.rand.NextBool(2);
+                proj.frameCounter = Extra ? 1 : 0;
             }
+            if (Extra && player.HasBuff<WoodUltra>() && player.GetZenithTarget(Main.MouseWorld, 512, out int index))
+            {
 
+                NPC npc = Main.npc[index];
+                for (int n = 0; n < 3; n++)
+                {
+                    int x = Main.rand.Next(-64, 64);
+                    var num22 = (float)Main.rand.Next(10, 80) * 0.001f;
+                    var num21 = -x * 0.003f;
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center + new Vector2(x, 64), new Vector2(0, -8), ModContent.ProjectileType<WoodAttackUltra>(), projectile.damage, projectile.knockBack, projectile.owner, num21, num22);
+                }
+            }
         }
     }
     public class StoneOfWaterProj : MagicArea
     {
         public override StoneElements Elements => StoneElements.Water;
         public override Color MainColor => Color.Blue;
-        public override int Cycle => 6;//6
+        public override int Cycle => player.HasBuff<WaterUltra>() ? 4 : 6;//6
         public override void SpecialAttack(Color dustColor, bool trigger)
         {
+            switch (specialAttackIndex)
+            {
+                case 1:
+                    {
+                        //穿石之流
+                        if (trigger)
+                        {
+                            player.AddBuff(ModContent.BuffType<WaterUltra>(), 450);
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        //潮汐领域
+                        if (trigger)
+                        {
+                            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), Main.MouseWorld, default, ModContent.ProjectileType<WaterAttack>(), Projectile.damage / 3, projectile.knockBack, projectile.owner, 0, 2);
+                            proj.timeLeft = 600;
+                            proj.tileCollide = false;
+                            proj.width = proj.height = 320;
+                            proj.Center = Main.MouseWorld;
+                            proj.penetrate = -1;
+                            proj.usesLocalNPCImmunity = true;
+                            proj.localNPCHitCooldown = 20;
+                            proj.extraUpdates = 0;
+                        }
+                        break;
+                    }
+            }
+
             base.SpecialAttack(dustColor, trigger);
         }
         public override void ShootProj(Vector2 unit, bool dying = false)
         {
             attackCounter++;
+            var flag = player.HasBuff<WaterUltra>();
+
             if (dying)
                 for (int n = -2; n < 3; n += 2)
                 {
                     var rand = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12) * .5f;
-                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n + rand) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n * (flag ? .5f : 1f) + rand) * (flag ? Main.rand.Next(12, 24) : 16), ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack * (flag ? 2 : 1), projectile.owner, flag ? 0 : Main.rand.Next(5), flag ? 1 : 0);
                     //for (int k = 0; k < 3; k++)
                     //    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + (64 + 16 * k) * projectile.velocity, projectile.velocity.RotatedBy(MathHelper.Pi / 12 * n + rand) * (32 + 8 * k) / 3f, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
                 }
             else
             {
-                if (Extra)
+                if (flag)
                 {
-                    for (int n = -1; n < 2; n++)
-                    {
-                        Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 18 * n) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
-                    }
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit * Main.rand.Next(12, 24), ModContent.ProjectileType<WaterAttack>(), projectile.damage * 3 / 2, projectile.knockBack * 2, projectile.owner, 0, 1);
+
                 }
                 else
                 {
-                    for (int n = -1; n < 2; n += 2)
+                    if (Extra)
                     {
-                        Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n) * 12, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                        for (int n = -1; n < 2; n++)
+                        {
+                            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 18 * n) * 16, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                        }
+                    }
+                    else
+                    {
+                        for (int n = -1; n < 2; n += 2)
+                        {
+                            Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedBy(MathHelper.Pi / 12 * n) * 12, ModContent.ProjectileType<WaterAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(5));
+                        }
                     }
                 }
+
 
             }
 
@@ -504,6 +597,32 @@ namespace StoneOfThePhilosophers.Contents
         public override int Cycle => Extra ? 24 : 36;
         public override void SpecialAttack(Color dustColor, bool trigger)
         {
+            if (trigger)
+            {
+                var proj = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), player.Center, default, ModContent.ProjectileType<EarthSpecialAttack>(), 0, 0, Projectile.owner, 0, specialAttackIndex - 1);
+                if (specialAttackIndex == 2)
+                {
+                    proj.timeLeft = 1200;
+                    proj.friendly = false;
+                    proj.damage = Projectile.damage;
+                }
+                else
+                {
+                    int k = 0;
+                    Point mouseCen = Main.MouseWorld.ToTileCoordinates();
+                    while (k < 64)
+                    {
+                        var tile = Main.tile[mouseCen + new Point(0, k)];
+                        if (tile.HasTile && Main.tileSolid[tile.TileType])
+                        {
+                            break;
+                        }
+                        k++;
+                    }
+                    proj.Center = (mouseCen + new Point(0, k)).ToVector2() * 16 + new Vector2(0, 4);
+                }
+
+            }
             base.SpecialAttack(dustColor, trigger);
         }
         public override void ShootProj(Vector2 unit, bool dying = false)
@@ -572,6 +691,18 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         public override int Cycle => 60;
         public override void SpecialAttack(Color dustColor, bool trigger)
         {
+            if (trigger)
+            {
+                var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), Main.MouseWorld, default, ModContent.ProjectileType<SunAttack>(), Projectile.damage / 3, projectile.knockBack, projectile.owner, 3);
+                proj.timeLeft = 1200;
+                proj.tileCollide = false;
+                proj.width = proj.height = 320;
+                proj.Center = player.Center + new Vector2(0, 256);
+                proj.penetrate = -1;
+                proj.usesLocalNPCImmunity = true;
+                proj.localNPCHitCooldown = 20;
+                proj.extraUpdates = 0;
+            }
             base.SpecialAttack(dustColor, trigger);
         }
         public override void ShootProj(Vector2 unit, bool dying = false)
@@ -616,68 +747,164 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-            for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
-            for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+            if (Projectile.ai[1] == 2)
+            {
+                float alpha = (Projectile.timeLeft / 120f).SmoothSymmetricFactor(1 / 12f);
+                float size = Utils.GetLerpValue(120, 80, Projectile.timeLeft, true);
+                for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0, 0);
+                for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0, 0);
+            }
+            else
+            {
+                float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+                for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
+                    Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+            }
+
             return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
-                target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f);
-            for (int n = 0; n < 5 - Projectile.penetrate; n++)
+            if (Projectile.ai[1] == 2)
             {
-                if (Projectile.ai[0] == 0 && Main.rand.NextBool(2))
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage * 3 / 4, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, Projectile.ai[1]);
-                for (int k = 0; k < 5; k++)
+                if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
+                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f);
+                for (int n = 0; n < 2; n++)
                 {
-                    Dust.NewDustPerfect(target.Center, Extra ? DustID.Silver : DustID.Copper, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
+                    if (!Main.rand.NextBool(3))
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage * 3 / 4, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, 1);
+                    for (int k = 0; k < 5; k++)
+                    {
+                        Dust.NewDustPerfect(target.Center, DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
+                    }
+                }
+                if (!target.friendly && target.active && target.CanBeChasedBy())
+                {
+                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
                 }
             }
-            if (!target.friendly && target.active && target.CanBeChasedBy())
+            else
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
-            }
-            if ((Main.rand.NextBool(3) || Projectile.penetrate == 1) && Projectile.ai[0] != 0)
-            {
-                Projectile.penetrate = 2;
-                TargetIndex = target.whoAmI;
-                offset = Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, target.width * 2 / 3, target.height * 2 / 3)) - new Vector2(target.width, target.height) / 3;
+                if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
+                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f) * .25f;
+                for (int n = 0; n < 5 - Projectile.penetrate; n++)
+                {
+                    if (Projectile.ai[0] == 0 && Main.rand.NextBool(2))
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * .5f + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage * 3 / 4, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, Projectile.ai[1]);
+                    for (int k = 0; k < 5; k++)
+                    {
+                        Dust.NewDustPerfect(target.Center, Extra ? DustID.Silver : DustID.Copper, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
+                    }
+                }
+                if (!target.friendly && target.active && target.CanBeChasedBy())
+                {
+                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+                }
+                if ((Main.rand.NextBool(3) || Projectile.penetrate == 1) && Projectile.ai[0] != 0)
+                {
+                    Projectile.penetrate = 2;
+                    TargetIndex = target.whoAmI;
+                    offset = Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, target.width * 2 / 3, target.height * 2 / 3)) - new Vector2(target.width, target.height) / 3;
+                }
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
+            if (Projectile.ai[1] == 2)
+                return Projectile.timeLeft <= 75 && targetHitbox.Intersects(Utils.CenteredRectangle(projHitbox.Center(), projHitbox.Size() * 3));
             if (Projectile.ai[0] == 0)
                 return targetHitbox.Intersects(Utils.CenteredRectangle(projHitbox.Center(), projHitbox.Size() * 3));
             return base.Colliding(projHitbox, targetHitbox);
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            var vec = Projectile.velocity;
-            if (vec.X == oldVelocity.X) vec.X = -vec.X;
-            if (vec.Y == oldVelocity.Y) vec.Y = -vec.Y;
-
-            if (Projectile.ai[0] == 0)
-                for (int n = 0; n < Projectile.penetrate; n++)
-                {
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, -vec + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, Projectile.ai[1]);
-                }
-            for (int k = 0; k < 30; k++)
+            if (Projectile.ai[1] == 2)
             {
-                Dust.NewDustPerfect(Projectile.Center + oldVelocity, Extra ? DustID.Silver : DustID.Copper, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity, 0, default, Main.rand.NextFloat(1, 2));
+                if (Projectile.timeLeft > 45) return false;
+
             }
+            else
+            {
+                var vec = Projectile.velocity;
+                if (vec.X == oldVelocity.X) vec.X = -vec.X;
+                if (vec.Y == oldVelocity.Y) vec.Y = -vec.Y;
+
+                if (Projectile.ai[0] == 0)
+                {
+                    for (int n = 0; n < Projectile.penetrate; n++)
+                    {
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, -vec + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, Projectile.ai[1]);
+                    }
+                    for (int k = 0; k < 30; k++)
+                    {
+                        Dust.NewDustPerfect(Projectile.Center + oldVelocity + Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, 32), Extra ? DustID.Silver : DustID.Copper, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity * .2f, 0, default, Main.rand.NextFloat(1, 2));
+                    }
+                }
+
+                for (int k = 0; k < 30; k++)
+                {
+                    Dust.NewDustPerfect(Projectile.Center + oldVelocity, Extra ? DustID.Silver : DustID.Copper, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity, 0, default, Main.rand.NextFloat(1, 2));
+                }
+            }
+
             return base.OnTileCollide(oldVelocity);
         }
         public Vector2 offset;
+        public override void Kill(int timeLeft)
+        {
+            if (Projectile.ai[1] != 2) return;
+            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().strengthOfShake += 2;
+            var vec = Projectile.velocity * .25f;
+            //if (vec.X == oldVelocity.X) vec.X = -vec.X;
+            //if (vec.Y == oldVelocity.Y) vec.Y = -vec.Y;
+            //vec.X *= -1;
+
+            for (int n = 0; n < 16; n++)
+            {
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, Main.rand.NextFloat(0, 128)), -vec + Main.rand.NextVector2Unit() * Main.rand.Next(4, 8), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, Main.rand.Next(4) + 1, 1);
+            }
+            for (int n = 0; n < 6; n++)
+            {
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, Main.rand.NextFloat(0, 128)), -vec + Main.rand.NextVector2Unit() * Main.rand.Next(24, 32), Type, Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner, 0, 1);
+            }
+            for (int k = 0; k < 60; k++)
+            {
+                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity + Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, Main.rand.NextFloat(0, 128)), DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
+            }
+            base.Kill(timeLeft);
+        }
         public override void AI()
         {
-
-            if (TargetIndex == -1)
+            if (Projectile.ai[1] == 2)
             {
-                if (Projectile.ai[0] > 0) Projectile.velocity += new Vector2(0, 0.4f);
-                Projectile.rotation++;
+                if (Projectile.timeLeft > 60)
+                {
+                    Projectile.Center = Main.player[Projectile.owner].Center + new Vector2(0, MathHelper.SmoothStep(-64, -256, Utils.GetLerpValue(120, 60, Projectile.timeLeft, true)));
+                    if (Projectile.timeLeft % 2 == 0)
+                    {
+                        var runit = Main.rand.NextVector2Unit();
+                        var gore = Gore.NewGorePerfect(Projectile.Center + runit * 320, -runit * 16, ModContent.GoreType<MetalPiece>(), Main.rand.NextFloat(1, 2f) * 4);
+                        gore.Frame = new SpriteFrame(4, 1);
+                        gore.Frame.CurrentColumn = (byte)Main.rand.Next(4);
+                        gore.timeLeft = 15;
+                    }
+                    Projectile.velocity = default;
+                }
+                else
+                {
+                    if (Projectile.timeLeft == 60)
+                    {
+                        Projectile.velocity = Main.MouseWorld - Projectile.Center;
+                    }
+                    if (Projectile.timeLeft >= 40)
+                        Projectile.velocity = Projectile.velocity.SafeNormalize(default) * MathHelper.SmoothStep(0.01f, 64, Utils.GetLerpValue(60, 40, Projectile.timeLeft, true));
+                    if (Projectile.timeLeft == 30) Projectile.Kill();
+                }
+                Projectile.rotation += Projectile.rotation * 0.02f;
                 for (int n = 9; n > 0; n--)
                 {
                     Projectile.oldPos[n] = Projectile.oldPos[n - 1];
@@ -688,36 +915,72 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             }
             else
             {
-                var target = Main.npc[TargetIndex];
-                if (target.active)
+                if (TargetIndex == -1)
                 {
-                    Projectile.velocity = default;
-                    Projectile.Center = target.Center + offset;
-                    if (Projectile.timeLeft % 30 == 0)
+                    if (Projectile.ai[0] > 0) Projectile.velocity += new Vector2(0, 0.4f);
+                    Projectile.rotation++;
+                    for (int n = 9; n > 0; n--)
                     {
-                        var damage = Extra ? 60 : 20;
-                        damage = (int)(damage * Main.rand.NextFloat(0.85f, 0.15f));
-                        Main.player[Projectile.owner].ApplyDamageToNPC(target, damage, 0, 0, false);
-                        if (!target.friendly && target.active && target.CanBeChasedBy())
-                        {
-                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
-                        }
+                        Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                        Projectile.oldRot[n] = Projectile.oldRot[n - 1];
                     }
-                    Projectile.oldPos[0] = Projectile.Center + offset;
-
-                    Projectile.friendly = false;
+                    Projectile.oldPos[0] = Projectile.Center;
+                    Projectile.oldRot[0] = Projectile.rotation;
                 }
                 else
                 {
-                    Projectile.Kill();
+                    var target = Main.npc[TargetIndex];
+                    if (target.active)
+                    {
+                        Projectile.velocity = default;
+                        Projectile.Center = target.Center + offset;
+                        if (Projectile.timeLeft % 30 == 0)
+                        {
+                            var damage = Extra ? 60 : 20;
+                            damage = (int)(damage * Main.rand.NextFloat(0.85f, 0.15f));
+                            Main.player[Projectile.owner].ApplyDamageToNPC(target, damage, 0, 0, false);
+                            if (!target.friendly && target.active && target.CanBeChasedBy())
+                            {
+                                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+                            }
+                        }
+                        Projectile.oldPos[0] = Projectile.Center + offset;
+
+                        Projectile.friendly = false;
+                    }
+                    else
+                    {
+                        Projectile.Kill();
+                    }
                 }
             }
+
+
 
             base.AI();
         }
     }
+    public class MetalPiece : ModGore
+    {
+        public override void OnSpawn(Gore gore, IEntitySource source)
+        {
+            base.OnSpawn(gore, source);
+        }
+        public override Color? GetAlpha(Gore gore, Color lightColor)
+        {
+            return base.GetAlpha(gore, lightColor);
+        }
+        public override bool Update(Gore gore)
+        {
+            gore.alpha = (int)MathHelper.Lerp(255, 5, Utils.GetLerpValue(0, 15, gore.timeLeft, true));
+            //gore.timeLeft--;
+            //gore.position += gore.position;
+            return base.Update(gore);
+        }
+    }
     public class WoodAttack : ModProjectile
     {
+        bool Extra => Projectile.frameCounter != 0;
         public override void SetDefaults()
         {
             Projectile.width = Projectile.height = 8;
@@ -741,7 +1004,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
 
             for (int n = 9; n > -1; n--)
                 for (int m = 0; m < 5; m++)
-                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), Extra ? 16 : 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
             return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
@@ -753,7 +1016,8 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                     Dust.NewDustPerfect(target.Center, DustID.TerraBlade, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
                 }
             }
-            target.AddBuff(BuffID.Poisoned, 360);
+            if (Extra && Main.rand.NextBool(3)) target.AddBuff(BuffID.Venom, 120);
+            else target.AddBuff(BuffID.Poisoned, 360);
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
                 Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[2] += damage / ElementChargePlayer.Devider;
@@ -770,7 +1034,8 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         public override void AI()
         {
             NPC target = null;
-            float maxDistance = 256f;
+            float maxDistance = Extra ? 256 : 128;
+            float maxDistanceCopy = maxDistance;
             foreach (var npc in Main.npc)
             {
                 if (!npc.CanBeChasedBy() || npc.friendly) continue;
@@ -784,7 +1049,8 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             if (target != null)
             {
                 //var fac = MathF.Cos(Main.GameUpdateCount * MathHelper.Pi / 7.5f) * .5f + .5f;
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, (target.Center - Projectile.Center).SafeNormalize(default) * Projectile.ai[1], Utils.GetLerpValue(32, 256, maxDistance, true) * 0.25f);
+                float factor = Projectile.frameCounter == 2 ? Terraria.Utils.GetLerpValue(180, 150, Projectile.timeLeft, true) : 1;
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, (target.Center - Projectile.Center).SafeNormalize(default) * Projectile.ai[1] * factor, Utils.GetLerpValue(maxDistanceCopy / 8, maxDistanceCopy, maxDistance, true) * (Extra ? 0.25f : 0.125f) * factor);
                 //Projectile.velocity = Projectile.velocity.SafeNormalize(default) * Projectile.ai[1];
                 if (Main.GameUpdateCount % 3 == 0)
                 {
@@ -808,8 +1074,193 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             Projectile.oldRot[0] = Projectile.rotation;
         }
     }
+    public class WoodAttackUltra : ModProjectile
+    {
+        Projectile projectile => Projectile;
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("粒子触手");
+        }
+        public override string Texture => base.Texture.Replace("Ultra", "");
+        public override void SetDefaults()
+        {
+            projectile.scale = 1f;
+            projectile.friendly = true;
+            projectile.melee = true;
+            projectile.ignoreWater = true;
+            projectile.timeLeft = 300;
+            projectile.tileCollide = false;
+            projectile.penetrate = -1;
+            projectile.light = 0.5f;
+            projectile.aiStyle = -1;
+            projectile.alpha = 255;
+            projectile.width = 40;
+            projectile.height = 40;
+            projectile.MaxUpdates = 3;
+        }
+        public override void AI()
+        {
+            Vector2 center10 = projectile.Center;
+            projectile.scale = 1f - projectile.localAI[0];
+            projectile.width = (int)(20f * projectile.scale);
+            projectile.height = projectile.width;
+            projectile.position.X = center10.X - (float)(projectile.width / 2);
+            projectile.position.Y = center10.Y - (float)(projectile.height / 2);
+            if ((double)projectile.localAI[0] < 0.1)
+            {
+                projectile.localAI[0] += 0.01f;
+            }
+            else
+            {
+                projectile.localAI[0] += 0.025f;
+            }
+            if (projectile.localAI[0] >= 0.95f)
+            {
+                projectile.Kill();
+            }
+            projectile.velocity.X = projectile.velocity.X + projectile.ai[0] * 1.5f;
+            projectile.velocity.Y = projectile.velocity.Y + projectile.ai[1] * 1.5f;
+            if (projectile.velocity.Length() > 16f)
+            {
+                projectile.velocity.Normalize();
+                projectile.velocity *= 16f;
+            }
+            if (projectile.timeLeft % 10 == 0 && Main.rand.NextBool(2))
+            {
+                var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.0001f,
+ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack, projectile.owner, Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
+                proj.penetrate = 1;
+                proj.tileCollide = false;
+                proj.frameCounter = 2;
+            }
+            projectile.ai[0] *= 1.05f;
+            projectile.ai[1] *= 1.05f;
+            if (projectile.scale < 1f)
+            {
+                int num892 = 0;
+                while ((float)num892 < projectile.scale * 10f)
+                {
+                    int num893 = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, MyDustId.GreenFXPowder, projectile.velocity.X, projectile.velocity.Y, 0, Color.White, 1.1f);
+                    Main.dust[num893].position = (Main.dust[num893].position + projectile.Center) / 2f;
+                    Main.dust[num893].noGravity = true;
+                    Dust dust3 = Main.dust[num893];
+                    dust3.velocity *= 0.1f;
+                    dust3 = Main.dust[num893];
+                    dust3.velocity -= projectile.velocity * (1.3f - projectile.scale);
+                    Main.dust[num893].fadeIn = (float)(100 + projectile.owner);
+                    dust3 = Main.dust[num893];
+                    //dust3.scale += projectile.scale * 0.75f;
+                    int num3 = num892;
+                    num892 = num3 + 1;
+                }
+                return;
+            }
+        }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            //if (target.CanBeChasedBy())
+            //{
+            //    var unit = (projectile.Center - target.Center).SafeNormalize(default);
+            //    target.velocity += (Vector2.Dot(unit, target.velocity) / target.velocity.LengthSquared() - 1) * unit * -1;
+            //}
+            if (!target.friendly && target.active && target.CanBeChasedBy())
+            {
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+            }
+            target.immune[projectile.owner] = 5;
+
+        }
+    }
+    public class WoodCrystal : ModNPC
+    {
+        public override void SetDefaults()
+        {
+            NPC.width = NPC.height = 60;
+            NPC.HitSound = SoundID.Item27;
+            NPC.lifeMax = 500;
+            NPC.noTileCollide = true;
+            NPC.friendly = true;
+            base.SetDefaults();
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("巨木之晶");
+            base.SetStaticDefaults();
+        }
+        Player Player => Main.player[(int)NPC.ai[0]];
+        public override void AI()
+        {
+            NPC.ai[2]++;
+            NPC.Center = Player.Center + (NPC.ai[2] / 60f * MathHelper.TwoPi + MathHelper.TwoPi / 3 * NPC.ai[1]).ToRotationVector2() * 80;
+
+            Rectangle hitbox = NPC.Hitbox;
+            for (int i = 0; i < 200; i++)
+            {
+                NPC nPC = Main.npc[i];
+                if (nPC.active && !nPC.friendly && nPC.damage > 0)
+                {
+                    Rectangle npcRect = nPC.Hitbox;
+                    int specialHitSetter = 1;
+                    float damageMultiplier = 1;
+
+                    NPC.GetMeleeCollisionData(hitbox, i, ref specialHitSetter, ref damageMultiplier, ref npcRect);
+                    bool? modCanHit = NPCLoader.CanHitNPC(Main.npc[i], NPC);
+                    if (modCanHit.HasValue && !modCanHit.Value)
+                        continue;
+                    if (hitbox.Intersects(npcRect) && ((modCanHit == true) || !NPCID.Sets.Skeletons[nPC.type]) && nPC.type != NPCID.Gnome)
+                    {
+                        OnHitByNPC(nPC);
+                    }
+                }
+            }
+
+            base.AI();
+        }
+        public void OnHitByNPC(NPC target)
+        {
+            if (!target.CanBeChasedBy()) return;
+            target.velocity += (target.Center - Player.Center).SafeNormalize(default) * 4 * (target.knockBackResist * 0.67f + 0.33f);
+            for (int n = 0; n < 30; n++)
+                Dust.NewDustPerfect(target.Center, MyDustId.GreenFXPowder, (Main.rand.NextFloat(0, MathHelper.TwoPi)).ToRotationVector2() * Main.rand.NextFloat(4, 8)).noGravity = true;//MathHelper.TwoPi / 30 * n
+            Player.ApplyDamageToNPC(target, (int)(target.damage * Main.rand.NextFloat(0.85f, 1.15f) * .5f), 0, 1, Main.rand.NextBool(10));
+        }
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            var r = NPC.ai[2] / 60f * MathHelper.TwoPi + MathHelper.TwoPi / 3 * NPC.ai[1] + MathHelper.Pi;
+            var scaler = .25f + 0.25f * MathF.Cos(Main.GlobalTimeWrappedHourly * 4);
+            spriteBatch.Draw(TextureAssets.Npc[Type].Value, NPC.Center - screenPos, null, Color.White with { A = 204 }, r, new Vector2(15), 1, 0, 0);
+            spriteBatch.Draw(TextureAssets.Npc[Type].Value, NPC.Center + Main.rand.NextVector2Unit() * scaler * 4 - screenPos, null, Color.White with { A = 0 } * .5f, r, new Vector2(15), 1 + scaler, 0, 0);
+            for (int n = 1; n < 4; n++)
+            {
+                spriteBatch.Draw(TextureAssets.Npc[Type].Value, NPC.Center - screenPos + r.ToRotationVector2() * 80 - (r - n / 30f * MathHelper.TwoPi).ToRotationVector2() * 80, null, Color.White with { A = 0 } * (1 - 0.25f * n), r - n / 30f * MathHelper.TwoPi, new Vector2(15), 1f * (1 - 0.25f * n), 0, 0);
+
+            }
+            return false;
+        }
+        public override void HitEffect(int hitDirection, double damage)
+        {
+            base.HitEffect(hitDirection, damage);
+        }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            base.OnHitNPC(target, damage, knockback, crit);
+        }
+        public override bool? CanBeHitByProjectile(Projectile projectile)
+        {
+            return base.CanBeHitByProjectile(projectile);
+        }
+        public override void OnHitByProjectile(Projectile projectile, int damage, float knockback, bool crit)
+        {
+            projectile.Kill();
+            base.OnHitByProjectile(projectile, damage, knockback, crit);
+        }
+    }
     public class WaterAttack : ModProjectile
     {
+        public override bool? CanCutTiles()
+        {
+            return (int)Projectile.ai[1] != 2;
+        }
         public override void SetDefaults()
         {
             Projectile.width = Projectile.height = 8;
@@ -830,74 +1281,263 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-            for (int n = 9; n > -1; n--)
+            switch ((int)Projectile.ai[1])
             {
-                for (int m = 0; m < 4; m++)
-                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0, 0);
+                case 0:
+                    {
+                        float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+                        for (int n = 9; n > -1; n--)
+                        {
+                            for (int m = 0; m < 4; m++)
+                                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0, 0);
 
+                        }
+                        break;
+                    }
+                case 1:
+                    {
+                        float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
+                        var tex = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/WaterAttackUltra").Value;
+                        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
+                        for (int n = 0; n < 4; n++)
+                        {
+                            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        }
+                        for (int n = 0; n < 4; n++)
+                        {
+                            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        }
+                        for (int n = 9; n > -1; n--)
+                        {
+                            Main.EntitySpriteDraw(tex, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0, 0);
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        float alpha = (Projectile.timeLeft / 600f).SmoothSymmetricFactor(1 / 12f);
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        #region Shader
+                        float r = Main.GlobalTimeWrappedHourly * 2f;
+                        Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/MagicArea_4").Value;
+                        Main.instance.GraphicsDevice.Textures[2] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_1").Value;
+                        Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
+                        Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(Projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                        var matrix =
+                            Matrix.CreateTranslation(-0.5f, -0.5f, 0) *
+                            Matrix.CreateScale(1, 1.5f, 1) *
+
+                            Matrix.CreateRotationZ(-2 * r) *
+                            Matrix.CreateTranslation(0.5f, 0.5f, 0);
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(matrix);
+                        StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+
+                        #endregion
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[ModContent.ProjectileType<SunAttack>()].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(16f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
+
+                        matrix =
+                            Matrix.CreateTranslation(-0.5f, -0.5f, 0) *
+                            Matrix.CreateScale(1, 1.5f, 1) *
+
+                            Matrix.CreateRotationZ(r) *
+                            Matrix.CreateTranslation(0.5f, 0.5f, 0);
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(matrix);
+                        StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+
+
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[ModContent.ProjectileType<SunAttack>()].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(20f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        break;
+                    }
             }
+
             return false;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            for (int k = 0; k < 7; k++)
+            switch ((int)Projectile.ai[1])
             {
-                Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
-            }
-            for (int k = 0; k < 7; k++)
-            {
-                Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
-            }
-            if (Projectile.alpha == 0 && !Main.rand.NextBool(4))
-            {
+                case 0:
+                case 1:
+                    {
+                        for (int k = 0; k < 7; k++)
+                        {
+                            Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + oldVelocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                        }
+                        for (int k = 0; k < 7; k++)
+                        {
+                            Dust.NewDustPerfect(Projectile.Center + oldVelocity * .5f, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                        }
+                        if ((int)Projectile.ai[1] == 1)
+                        {
+                            if (Projectile.alpha < 3 && !Main.rand.NextBool(5))
+                            {
+                                Projectile.alpha++;
+                                if (Projectile.velocity.X != oldVelocity.X) Projectile.velocity.X = -oldVelocity.X;
+                                if (Projectile.velocity.Y != oldVelocity.Y) Projectile.velocity.Y = -oldVelocity.Y;
+                            }
+                            else
+                            {
+                                if (Projectile.timeLeft > 3)
+                                {
+                                    Projectile.timeLeft = 3;
+                                    Projectile.velocity = oldVelocity;
+                                }
 
-                Projectile.alpha = 1;
-                if (Projectile.velocity.X != oldVelocity.X) Projectile.velocity.X = -oldVelocity.X;
-                if (Projectile.velocity.Y != oldVelocity.Y) Projectile.velocity.Y = -oldVelocity.Y;
-            }
-            else
-            {
-                if (Projectile.timeLeft > 3)
-                {
-                    Projectile.timeLeft = 3;
-                    Projectile.velocity = oldVelocity;
-                }
+                            }
+                        }
+                        else
+                        {
+                            if (Projectile.alpha == 0 && !Main.rand.NextBool(4))
+                            {
 
+                                Projectile.alpha = 1;
+                                if (Projectile.velocity.X != oldVelocity.X) Projectile.velocity.X = -oldVelocity.X;
+                                if (Projectile.velocity.Y != oldVelocity.Y) Projectile.velocity.Y = -oldVelocity.Y;
+                            }
+                            else
+                            {
+                                if (Projectile.timeLeft > 3)
+                                {
+                                    Projectile.timeLeft = 3;
+                                    Projectile.velocity = oldVelocity;
+                                }
+
+                            }
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        break;
+                    }
             }
+
 
             return false;
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.immune[Projectile.owner] = 0;
-            for (int n = 0; n < 6 - Projectile.penetrate; n++)
+            switch ((int)Projectile.ai[1])
             {
-                for (int k = 0; k < 7; k++)
-                {
-                    Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
-                }
-                for (int k = 0; k < 7; k++)
-                {
-                    Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
-                }
-            }
-            if (!target.friendly && target.active && target.CanBeChasedBy())
-            {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += damage / ElementChargePlayer.Devider;
+                case 0:
+                case 1:
+                    {
+                        target.immune[Projectile.owner] = 0;
+                        for (int n = 0; n < 6 - Projectile.penetrate; n++)
+                        {
+                            for (int k = 0; k < 7; k++)
+                            {
+                                Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity / 8f, 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                            }
+                            for (int k = 0; k < 7; k++)
+                            {
+                                Dust.NewDustPerfect(target.Center, DustID.BlueTorch, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4), 0, default, Main.rand.NextFloat(0.5f, 1.5f));
+                            }
+                        }
+                        if (!target.friendly && target.active && target.CanBeChasedBy())
+                        {
+                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += damage / ElementChargePlayer.Devider;
+                        }
+                        if ((int)Projectile.ai[1] == 1)
+                        {
+                            var projectile = Projectile;
+                            foreach (var npc in Main.npc)
+                            {
+                                if (npc.active && !npc.friendly)
+                                {
+                                    var distance = Vector2.Distance(npc.Center, projectile.Center);
+                                    if (distance < 80)
+                                    {
+                                        var fac = Utils.GetLerpValue(80, 0, distance);
+                                        var _damage = (int)(MathF.Pow(fac, 0.5f) * projectile.damage * 3 / 4);
+                                        int count = (int)(fac * 10);
+                                        for (int n = 0; n < count; n++)
+                                        {
+                                            var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                            Dust.NewDustPerfect(npc.Center, MyDustId.Water, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                        }
+                                        if (npc.CanBeChasedBy())
+                                        {
+                                            Main.player[projectile.owner].ApplyDamageToNPC(npc, _damage, 0, projectile.direction, false);
+                                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += _damage / ElementChargePlayer.Devider;
+                                        }
+                                    }
+                                }
+                            }
+                            if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
+                                target.velocity += Projectile.velocity * (crit ? .6f : .2f) * .25f;
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        break;
+                    }
             }
             base.OnHitNPC(target, damage, knockback, crit);
         }
         public override void AI()
         {
-            Projectile.rotation = Projectile.velocity.ToRotation();
-            for (int n = 9; n > 0; n--)
+            switch ((int)Projectile.ai[1])
             {
-                Projectile.oldPos[n] = Projectile.oldPos[n - 1];
-                Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+                case 0:
+                case 1:
+                    {
+                        Projectile.rotation = Projectile.velocity.ToRotation();
+                        for (int n = 9; n > 0; n--)
+                        {
+                            Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                            Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+                        }
+                        Projectile.oldPos[0] = Projectile.Center;
+                        Projectile.oldRot[0] = Projectile.rotation;
+                        break;
+                    }
+                case 2:
+                    {
+                        Projectile.Center = Main.player[Projectile.owner].Center;
+                        var projectile = Projectile;
+                        if (projectile.timeLeft % 15 == 0)
+                        {
+                            foreach (var npc in Main.npc)
+                            {
+                                if (npc.active && !npc.friendly)
+                                {
+                                    var distance = Vector2.Distance(npc.Center, projectile.Center);
+                                    if (distance < 320)
+                                    {
+                                        var fac = Utils.GetLerpValue(320, 0, distance);
+                                        var damage = (int)(MathF.Pow(fac, 0.5f) * projectile.damage / 4);
+                                        int count = (int)(fac * 30);
+                                        for (int n = 0; n < count; n++)
+                                        {
+                                            var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                            Dust.NewDustPerfect(npc.Center, MyDustId.Water, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                        }
+                                        if (npc.CanBeChasedBy() || npc.type == NPCID.TargetDummy)
+                                        {
+                                            Main.player[projectile.owner].ApplyDamageToNPC(npc, damage, 0, projectile.direction, false);
+                                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += damage / ElementChargePlayer.Devider;
+                                        }
+                                        npc.AddBuff(ModContent.BuffType<TidalErosion>(), 600);
+                                        //OnHitNPC(npc, damage, 0, false);
+                                    }
+                                }
+                            }
+                            for (int n = 0; n < 30; n++)
+                            {
+                                var unit = (n / 30f * MathHelper.TwoPi).ToRotationVector2();
+                                Dust.NewDustPerfect(projectile.Center + unit * 96, MyDustId.Water, unit * Main.rand.NextFloat(2, 8), 0, default, Main.rand.NextFloat(1f, 1.5f));
+                            }
+                        }
+                        break;
+                    }
             }
-            Projectile.oldPos[0] = Projectile.Center;
-            Projectile.oldRot[0] = Projectile.rotation;
+
         }
     }
     public class FireAttack : ModProjectile
@@ -1028,6 +1668,8 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
                         Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
                         StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
+
                         StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
 
                         #endregion
@@ -1271,6 +1913,10 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             //        }
             //}
         }
+        public override bool? CanCutTiles()
+        {
+            return style != 6;
+        }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
             target.AddBuff(24, 300);
@@ -1455,7 +2101,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                                         if (npc.CanBeChasedBy() || npc.type == NPCID.TargetDummy)
                                         {
                                             Main.player[projectile.owner].ApplyDamageToNPC(npc, damage, 0, projectile.direction, false);
-                                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[6] += damage / ElementChargePlayer.Devider;
+                                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[0] += damage / ElementChargePlayer.Devider;
                                         }
                                         npc.AddBuff(BuffID.Daybreak, 30);
                                         //OnHitNPC(npc, damage, 0, false);
@@ -1624,6 +2270,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
+            //target.immune[Projectile.owner] = 3;
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
                 Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[4] += damage / ElementChargePlayer.Devider;
@@ -1649,7 +2296,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         if (Projectile.timeLeft % 2 == 0 && Main.rand.NextBool(3))
                         {
                             var unit = Projectile.velocity.RotatedByRandom(0.1f);
-                            Projectile.NewProjectileDirect(Projectile.GetProjectileSource_FromThis(), Projectile.Center, unit, Type, Projectile.damage / 3, Projectile.knockBack, Projectile.owner, 0, 1).tileCollide = false;
+                            Projectile.NewProjectileDirect(Projectile.GetProjectileSource_FromThis(), Projectile.Center, unit, Type, Projectile.damage * 2 / 3, Projectile.knockBack, Projectile.owner, 0, 1).tileCollide = false;
                             for (int n = 0; n < 5; n++)
                             {
                                 var dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Unit() * 4, MyDustId.BrownDirt, unit * .125f + Main.rand.NextVector2Unit() * 4, 0, Color.White with { A = (byte)Main.rand.Next(0, 255) } * Main.rand.NextFloat(0, 1), Main.rand.NextFloat(1.5f, 3f) * .5f);
@@ -1781,6 +2428,174 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             }
         }
     }
+    public class EarthSpecialAttack : ModProjectile
+    {
+        public override string Texture => base.Texture.Replace("EarthSpecialAttack", "EarthAttack");
+        public bool EarthQuake => Projectile.ai[1] != 0;
+        public override bool PreDraw(ref Color lightColor)
+        {
+            if (!EarthQuake)
+            {
+                var cen = Projectile.Center - Main.screenPosition;
+                var factor1 = ((float)Projectile.timeLeft).SymmetricalFactor(300, 30);
+                //factor1 = MathHelper.SmoothStep(0, 1, factor1);
+                factor1 *= factor1;
+                var factor2 = ((float)Projectile.timeLeft - 15).SymmetricalFactor(285, 30);
+                factor2 *= factor2;
+                //factor2 = MathHelper.SmoothStep(0, 1, factor2);
+                if (ElementChargePlayer.EarthQuaking)
+                {
+                    float fac3 = Projectile.timeLeft;
+                    fac3 %= 30;
+                    fac3 /= 30f;
+                    fac3 = MathHelper.SmoothStep(0, 1, fac3);
+                    var color = lightColor with { A = 127 } * fac3;
+                    var scaler = 1.5f - fac3 * .5f;
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/crystal_reflection").Value, cen, null, color, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1) * scaler, 0, 0);
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/big_crystal_a").Value, cen - new Vector2(16, 0), null, color, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0, 0);
+                    Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/big_crystal_b").Value, cen + new Vector2(16, 0), null, color, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0, 0);
+                }
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/crystal_reflection").Value, cen, null, lightColor, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1), 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/big_crystal_a").Value, cen - new Vector2(16, 0), null, lightColor, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Contents/big_crystal_b").Value, cen + new Vector2(16, 0), null, lightColor, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
+
+                //var spb = Main.spriteBatch;
+                //    Rectangle rectangle = Utils.CenteredRectangle(Projectile.Center + new Vector2(0, -80), new Vector2(64, 160));
+                //for (int i = -100; i < 100; i += 64)
+                //{
+
+                //    for (int j = -100; j < 100; j += 64)
+                //    {
+                //        spb.DrawString(FontAssets.MouseText.Value, VirtualDreamFactorMethods.RectangleCollision(Projectile.Center + new Vector2(i, j), new Vector2(10, 0), 32, 32, rectangle).ToString(), cen + new Vector2(i, j), Color.Red,0,default,0.75f,0,0);
+                //        //spb.DrawString(FontAssets.MouseText.Value, new Vector2(1, 0).ToString(), cen + new Vector2(i, j) - new Vector2(0,16), Color.White);
+
+                //    }
+                //}
+            }
+            return false;
+        }
+        public override void AI()
+        {
+            if (EarthQuake)
+            {
+                if (Projectile.timeLeft % 20 == 0)
+                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().strengthOfShake += 1f;
+
+                if (Projectile.timeLeft % 30 == 0)
+                {
+
+                    foreach (var npc in Main.npc)
+                    {
+                        if (npc.CanBeChasedBy() && !npc.friendly && npc.active && Math.Abs(npc.velocity.Y) < 0.01f)
+                        {
+                            bool flag = false;
+                            int k = -1;
+                            while (k < 5)
+                            {
+                                var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
+                                if (tile.HasTile && (Main.tileSolid[tile.type] || Main.tileSolidTop[tile.type]))
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                                k++;
+                            }
+
+                            if (flag)
+                            {
+                                var fac = 1;
+                                var damage = (int)(Projectile.damage * Main.rand.NextFloat(0.85f, 1.15f));
+                                int count = (int)(fac * 30);
+                                for (int n = 0; n < count; n++)
+                                {
+                                    var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                    Dust.NewDustPerfect(npc.Bottom, MyDustId.BrownDirt, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                }
+                                Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction, false);
+                                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[4] += damage / ElementChargePlayer.Devider;
+                            }
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                if (Projectile.timeLeft < 570 && Projectile.timeLeft > 30)
+                {
+                    Rectangle rectangle = Utils.CenteredRectangle(Projectile.Center + new Vector2(0, -80), new Vector2(64, 160));
+                    foreach (var npc in Main.npc)
+                    {
+                        if (npc.active && !npc.friendly && npc.CanBeChasedBy() && !npc.boss && Vector2.Distance(npc.Center, Projectile.Center) < 200)
+                        {
+                            npc.velocity = VirtualDreamFactorMethods.RectangleCollision(npc.position, npc.velocity, npc.width, npc.height, rectangle);
+                        }
+                    }
+                    //var plr = Main.player[Projectile.owner];
+                    //plr.velocity = VirtualDreamFactorMethods.RectangleCollision(plr.position, plr.velocity, plr.width, plr.height, rectangle);
+                    //Main.NewText(VirtualDreamFactorMethods.RectangleCollision(Main.MouseWorld, new Vector2(-1, 0), 32, 32, rectangle));
+                    if (ElementChargePlayer.EarthQuaking && Projectile.timeLeft % 30 == 0)
+                    {
+                        foreach (var npc in Main.npc)
+                        {
+                            if (npc.CanBeChasedBy() && !npc.friendly && npc.active && Vector2.Distance(npc.Center, Projectile.Center) < 240 && Math.Abs(npc.velocity.Y) < 0.01f)
+                            {
+                                bool flag = false;
+                                int k = -1;
+                                while (k < 5)
+                                {
+                                    var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
+                                    if (tile.HasTile && (Main.tileSolid[tile.type] || Main.tileSolidTop[tile.type]))
+                                    {
+                                        flag = true;
+                                        break;
+                                    }
+                                    k++;
+                                }
+
+                                if (flag)
+                                {
+                                    var fac = 1;
+                                    var damage = (int)(Projectile.damage * .5f * Main.rand.NextFloat(0.85f, 1.15f));
+                                    int count = (int)(fac * 15);
+                                    for (int n = 0; n < count; n++)
+                                    {
+                                        var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                        Dust.NewDustPerfect(npc.Bottom, MyDustId.BrownDirt, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                    }
+                                    Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction, false);
+                                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[4] += damage / ElementChargePlayer.Devider;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            base.AI();
+        }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            base.OnHitNPC(target, damage, knockback, crit);
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("土元素之柱/地震");
+            base.SetStaticDefaults();
+        }
+        public override void SetDefaults()
+        {
+            Projectile.timeLeft = 600;
+            Projectile.width = 1;
+            Projectile.height = 1;
+            Projectile.aiStyle = -1;
+            Projectile.friendly = true;
+            Projectile.magic = true;
+            Projectile.tileCollide = true;
+            Projectile.penetrate = -1;
+            Projectile.ignoreWater = true;
+            base.SetDefaults();
+        }
+    }
     public class MoonAttack : ModProjectile
     {
         public bool boost = false;
@@ -1794,6 +2609,11 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             {
                 Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[5] += damage / ElementChargePlayer.Devider;
             }
+        }
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            overWiresUI.Add(index);
+            projectile.hide = true;
         }
         public Projectile projectile => Projectile;
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -1897,6 +2717,14 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>($"StoneOfThePhilosophers/Images/MagicArea_{(boost ? 5 : 2)}").Value, TextureAssets.MagicPixel.Value);
             #endregion
 
+            //var vector = Main.screenTarget.Size();
+            //Main.spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/StarSky_0").Value, new Rectangle(0, 0, (int)vector.X, (int)vector.Y), Color.White);
+            //var borderColor = Color.Cyan * .5f;
+            //int width = 4;
+            //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, width, (int)vector.Y), borderColor);
+            //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)vector.X - width, 0, width, (int)vector.Y), borderColor);
+            //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, (int)vector.X, width), borderColor);
+            //Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, (int)vector.Y- width, (int)vector.X, width), borderColor);
             return false;
         }
         public override bool ShouldUpdatePosition()
@@ -1940,7 +2768,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
     {
         Projectile projectile => Projectile;
         /// <summary>
-        /// 0为火球 1大爆炸 2小爆炸
+        /// 0为火球 1大爆炸 2小爆炸 3大太阳
         /// </summary>
         int style => (int)projectile.ai[0];
         public override void SetDefaults()
@@ -1957,6 +2785,10 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         public override void SetStaticDefaults()
         {
             base.SetStaticDefaults();
+        }
+        public override bool? CanCutTiles()
+        {
+            return style != 3;
         }
         public override bool PreDraw(ref Color lightColor)
         {
@@ -1978,13 +2810,16 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         #region Shader
                         float r = Main.rand.NextFloat();
                         Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_6").Value;
-                        Main.instance.GraphicsDevice.Textures[2] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value;
+                        Main.instance.GraphicsDevice.Textures[2] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value;
                         Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
                         Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
                         StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
                         StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
 
                         #endregion
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r + MathHelper.PiOver2, new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+
                         Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
                         //for (int n = 0; n < 8; n++)
                         //{
@@ -2026,7 +2861,14 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         //    ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value,
                         //    new Vector2(-Main.GlobalTimeWrappedHourly * 2, 0), false, null,
                         //    "HeatMap");
-                        StoneOfThePhilosophersHelper.VertexDraw(projectile.TailVertexFromProj(default, t => MathF.Pow(t, 1.5f).WaterDropFactor() * 16, t => Color.White * MathF.Pow(t, 2f).WaterDropFactor() * 2 * alpha, .5f),
+                        var vertexs = projectile.TailVertexFromProj(default, t => 16, t => Color.White * MathF.Pow(t, 2f).WaterDropFactor() * 2 * alpha, .5f);//MathF.Pow(t, 1.5f).WaterDropFactor() * 
+                        StoneOfThePhilosophersHelper.VertexDraw(vertexs,
+                            ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
+                            ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
+                            ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value,
+                            new Vector2(-Main.GlobalTimeWrappedHourly * 2, 0), false, null,
+                            "HeatMap", true, true);//default, 30, .5f, true, Color.Yellow
+                        StoneOfThePhilosophersHelper.VertexDraw(vertexs,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value,
@@ -2036,12 +2878,35 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         var starLight = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/StarLight").Value;
                         spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 3) * .5f, 0, 0);
-                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 1) * .5f, 0, 0);
-                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 3) * .25f, 0, 0);
-                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 1) * .25f, 0, 0);
+                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 5) * .5f, 0, 0);
+                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 2) * .5f, 0, 0);
+                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 5) * .25f, 0, 0);
+                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 2) * .25f, 0, 0);
                         spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        break;
+                    }
+                case 3:
+                    {
+                        float alpha = (Projectile.timeLeft / 1200f).SmoothSymmetricFactor(1 / 12f);
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        #region Shader
+                        float r = Main.rand.NextFloat();
+                        Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_6").Value;
+                        Main.instance.GraphicsDevice.Textures[2] = ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value;
+                        Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
+                        Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                        StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
+                        StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+
+                        #endregion
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r + MathHelper.PiOver2, new Vector2(16), new Vector2(16f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(16f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                         break;
                     }
             }
@@ -2188,7 +3053,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                             if (projectile.timeLeft % 15 == 0 && projectile.timeLeft != 0)
                             {
                                 var unit = (projectile.timeLeft / 120f * MathHelper.TwoPi).ToRotationVector2();
-                                var proj = Projectile.NewProjectileDirect(projectile.GetProjectileSource_FromThis(), projectile.Center + unit * 96, unit * 16, Type, Projectile.damage / 4, projectile.knockBack * .5f, projectile.owner, 2);
+                                var proj = Projectile.NewProjectileDirect(projectile.GetProjectileSource_FromThis(), projectile.Center + unit * 96, unit * 32, Type, Projectile.damage / 2, projectile.knockBack * .5f, projectile.owner, 2);
                                 proj.penetrate = 3;
                             }
                         }
@@ -2215,7 +3080,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                         else if (projectile.timeLeft < 150 && projectile.timeLeft > 15)
                         {
                             NPC target = null;
-                            float MaxDistance = 512f;
+                            float MaxDistance = 1024f;
                             foreach (var npc in Main.npc)
                             {
                                 if (!npc.friendly && npc.active && npc.CanBeChasedBy())
@@ -2230,8 +3095,8 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                             }
                             if (target != null)
                             {
-                                Vector2 targetVec = (target.Center - projectile.Center);
-                                projectile.velocity = Vector2.Lerp(projectile.velocity, targetVec, 0.005f);
+                                Vector2 targetVec = (target.Center - projectile.Center).SafeNormalize(default) * 32;
+                                projectile.velocity = Vector2.Lerp(projectile.velocity, targetVec, MathF.Pow(Utils.GetLerpValue(1024, 32, MaxDistance, true), 0.5f) * 0.2f);
                                 projectile.timeLeft = 30;
                             }
                         }
@@ -2240,6 +3105,93 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                             projectile.friendly = false;
                         }
                         projectile.rotation = projectile.velocity.ToRotation();
+                        break;
+                    }
+                case 3:
+                    {
+                        projectile.Center = Main.player[projectile.owner].Center - new Vector2(0, 256);
+                        for (int n = 9; n > 0; n--)
+                        {
+                            Projectile.oldPos[n] = Projectile.oldPos[n - 1];
+                            Projectile.oldRot[n] = Projectile.oldRot[n - 1];
+                        }
+                        float alpha = (Projectile.timeLeft / 1200f).SmoothSymmetricFactor(1 / 12f);
+
+                        for (int n = 0; n < 16; n++)
+                            Lighting.AddLight(projectile.Center + (MathHelper.TwoPi / 16 * n).ToRotationVector2() * 320 * alpha, new Vector3(1, 0.95f, 0.85f) * 2 * alpha);
+                        Projectile.oldPos[0] = Projectile.Center;
+                        Projectile.oldRot[0] = Projectile.rotation;
+                        if (projectile.timeLeft % 15 == 0)
+                        {
+                            foreach (var npc in Main.npc)
+                            {
+                                if (npc.active && !npc.friendly)
+                                {
+                                    var distance = Vector2.Distance(npc.Center, projectile.Center);
+                                    if (distance < 432)
+                                    {
+                                        var fac = Utils.GetLerpValue(432, 0, distance);
+                                        var damage = (int)(MathF.Pow(fac, 0.5f) * projectile.damage / 4);
+                                        int count = (int)(fac * 30);
+                                        for (int n = 0; n < count; n++)
+                                        {
+                                            var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
+                                            Dust.NewDustPerfect(npc.Center, MyDustId.Fire, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
+                                        }
+                                        if (npc.CanBeChasedBy() || npc.type == NPCID.TargetDummy)
+                                        {
+                                            Main.player[projectile.owner].ApplyDamageToNPC(npc, damage, 0, projectile.direction, false);
+                                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[6] += damage / ElementChargePlayer.Devider;
+                                        }
+                                        npc.AddBuff(BuffID.Daybreak, 30);
+                                        //OnHitNPC(npc, damage, 0, false);
+                                    }
+                                }
+                            }
+
+                        }
+                        if (projectile.timeLeft % 30 == 0)
+                        {
+                            SoundEngine.PlaySound(SoundID.Item74);
+
+                            if (projectile.timeLeft % 180 == 0)
+                            {
+                                var rand = Main.rand.NextFloat();
+                                for (int n = 0; n < 8; n++)
+                                {
+                                    var unit = (n / 8f * MathHelper.TwoPi + rand).ToRotationVector2();
+                                    var proj = Projectile.NewProjectileDirect(projectile.GetProjectileSource_FromThis(), projectile.Center + unit * 192, unit * 24, Type, Projectile.damage / 2, projectile.knockBack * .5f, projectile.owner, 2);
+                                    proj.penetrate = 3;
+
+                                }
+
+                            }
+                            else
+                            {
+                                var _unit = (projectile.timeLeft / 120f * MathHelper.TwoPi).ToRotationVector2();
+                                NPC target = null;
+                                float MaxDistance = 1024;
+                                foreach (var npc in Main.npc)
+                                {
+                                    if (npc.CanBeChasedBy() && npc.active && !npc.friendly)
+                                    {
+                                        float distance = Vector2.Distance(npc.Center, projectile.Center);
+                                        if (distance < MaxDistance)
+                                        {
+                                            MaxDistance = distance;
+                                            target = npc;
+                                        }
+                                    }
+                                }
+                                if (target != null)
+                                {
+                                    _unit = (target.Center - projectile.Center).SafeNormalize(default).RotatedBy(MathHelper.Pi * 2 / 3);
+                                }
+                                var proj = Projectile.NewProjectileDirect(projectile.GetProjectileSource_FromThis(), projectile.Center + _unit * 96, _unit * 32, Type, Projectile.damage / 2, projectile.knockBack * .5f, projectile.owner, 2);
+                                proj.penetrate = 3;
+                            }
+
+                        }
                         break;
                     }
             }
@@ -2269,6 +3221,9 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
     {
         public override void Update(NPC npc, ref int buffIndex)
         {
+            for (int n = 0; n < 3; n++)
+                Dust.NewDustPerfect(npc.Center, MyDustId.Water).velocity *= 2;
+
         }
         public override void Update(Player player, ref int buffIndex)
         {
@@ -2285,7 +3240,14 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
     {
         public override bool StrikeNPC(NPC npc, ref double damage, int defense, ref float knockback, int hitDirection, ref bool crit)
         {
-            if (npc.HasBuff<TidalErosion>()) damage += 10;
+            if (npc.HasBuff<TidalErosion>())
+            {
+                damage += 10;
+                for (int n = 0; n < 10; n++)
+                {
+                    Dust.NewDustPerfect(npc.Center, MyDustId.Water).velocity *= 6;
+                }
+            }
             return base.StrikeNPC(npc, ref damage, defense, ref knockback, hitDirection, ref crit);
         }
     }
@@ -2307,6 +3269,28 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         {
             DisplayName.SetDefault("月神的祝福");
             Description.SetDefault("免疫几乎所有Debuff");
+        }
+    }
+    public class WaterUltra : ModBuff
+    {
+        public override void Update(Player player, ref int buffIndex)
+        {
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("穿石之流");
+            Description.SetDefault("不要再欺负小石辣————(");
+        }
+    }
+    public class WoodUltra : ModBuff
+    {
+        public override void Update(Player player, ref int buffIndex)
+        {
+        }
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("常青藤鞭");
+            Description.SetDefault("不要再欺负小石辣————(");
         }
     }
     public class Reincarnation : ModBuff
