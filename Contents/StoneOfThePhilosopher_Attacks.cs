@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -40,6 +41,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void Load()
         {
+            if (Main.netMode == NetmodeID.Server) return;
+
             //var type = GetType();
             //var methods = type.GetMethods();
             //foreach (var attack in methods) 

@@ -1974,7 +1974,7 @@ namespace StoneOfThePhilosophers.Contents
             {
                 var index = (int)Elements - 1;
                 area.specialAttackIndex = s.skillIndex[index] + 1;
-                //c.ElementChargeValue[index] -= s.GetElementCost(index);
+                c.ElementChargeValue[index] -= s.GetElementCost(index);
             }
             return false;
         }

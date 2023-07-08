@@ -2471,6 +2471,18 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
 
                 //    }
                 //}
+                var effect = ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ShaderSwooshEffectEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+                if (effect != null) 
+                {
+                    var paras = effect.Parameters;
+                    int count = 0;
+                    foreach (var para in paras) 
+                    {
+                        
+                        Main.spriteBatch.DrawString(FontAssets.MouseText.Value, para.Name + " | " + para.ParameterType.ToString() + " | " + para.ParameterClass.ToString(), new Vector2(400, 300 + count * 20), Color.White);
+                        count++;
+                    }
+                }
             }
             return false;
         }
