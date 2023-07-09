@@ -57,6 +57,8 @@ namespace StoneOfThePhilosophers.TestStateBar
             private set;
         }
 
+        public string DisplayedName => "这是一个一个新血条啊啊啊";
+
         public ElementPlayerResourcesDisplaySet(string nameKey, string configKey, string resourceFolderName, AssetRequestMode mode)
         {
             NameKey = nameKey;

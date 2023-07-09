@@ -83,8 +83,8 @@ namespace StoneOfThePhilosophers.UI
             SetPadding(10f);
             this.border = border;
             this.CalculateBorder = CalculateBorder;
-            OnMouseDown += DragStart;
-            OnMouseUp += DragEnd;
+            OnLeftMouseDown += DragStart;
+            OnLeftMouseUp += DragEnd;
             Buttons = new();
         }
         public override void OnActivate()
@@ -186,7 +186,7 @@ namespace StoneOfThePhilosophers.UI
                     SoundEngine.PlaySound(SoundID.MenuTick);
                 };
                 var element = (StoneElements)(n + 1);
-                button.OnClick += (_, _) =>
+                button.OnLeftClick += (_, _) =>
                 {
                     SoundEngine.PlaySound(SoundID.Unlock);
                     //elementSkillPlr.skillIndex[type] = index;

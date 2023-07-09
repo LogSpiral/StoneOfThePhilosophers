@@ -45,8 +45,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("贤者之石");
-            Tooltip.SetDefault("使用元素魔法程度的能力。\n五耀「贤者之石」");
+            // DisplayName.SetDefault("贤者之石");
+            // Tooltip.SetDefault("使用元素魔法程度的能力。\n五耀「贤者之石」");
         }
         public override void SetDefaults()
         {
@@ -70,8 +70,8 @@ namespace StoneOfThePhilosophers.Contents
         public override bool Extra => true;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·贤者之石");
-            Tooltip.SetDefault("掌握元素魔法程度的能力。\n七耀「贤者之石」");
+            // DisplayName.SetDefault("真·贤者之石");
+            // Tooltip.SetDefault("掌握元素魔法程度的能力。\n七耀「贤者之石」");
         }
     }
     public partial class StoneOfThePhilosopherProj : ModProjectile

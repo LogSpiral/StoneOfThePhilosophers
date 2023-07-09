@@ -70,8 +70,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("金之石");
-            Tooltip.SetDefault("使用金元素魔法程度的能力\n金符「金属疲劳」");
+            // DisplayName.SetDefault("金之石");
+            // Tooltip.SetDefault("使用金元素魔法程度的能力\n金符「金属疲劳」");
         }
         public override void SetDefaults()
         {
@@ -90,8 +90,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·金之石");
-            Tooltip.SetDefault("控制金元素魔法程度的能力\n金符「银龙」");
+            // DisplayName.SetDefault("真·金之石");
+            // Tooltip.SetDefault("控制金元素魔法程度的能力\n金符「银龙」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -116,8 +116,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("木之石");
-            Tooltip.SetDefault("使用木元素魔法程度的能力\n木符「风灵的角笛」");
+            // DisplayName.SetDefault("木之石");
+            // Tooltip.SetDefault("使用木元素魔法程度的能力\n木符「风灵的角笛」");
         }
         public override void SetDefaults()
         {
@@ -139,8 +139,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·木之石");
-            Tooltip.SetDefault("控制木元素魔法程度的能力\n木符「翠绿风暴」");
+            // DisplayName.SetDefault("真·木之石");
+            // Tooltip.SetDefault("控制木元素魔法程度的能力\n木符「翠绿风暴」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -165,8 +165,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("水之石");
-            Tooltip.SetDefault("使用水元素魔法程度的能力\n水符「水精公主」");
+            // DisplayName.SetDefault("水之石");
+            // Tooltip.SetDefault("使用水元素魔法程度的能力\n水符「水精公主」");
         }
         public override void SetDefaults()
         {
@@ -188,8 +188,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·水之石");
-            Tooltip.SetDefault("控制水元素魔法程度的能力\n水符「湖葬」");
+            // DisplayName.SetDefault("真·水之石");
+            // Tooltip.SetDefault("控制水元素魔法程度的能力\n水符「湖葬」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -213,8 +213,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("火之石");
-            Tooltip.SetDefault("使用火元素魔法程度的能力\n火符「火神之光」");
+            // DisplayName.SetDefault("火之石");
+            // Tooltip.SetDefault("使用火元素魔法程度的能力\n火符「火神之光」");
         }
         public override void SetDefaults()
         {
@@ -237,8 +237,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·火之石");
-            Tooltip.SetDefault("控制火元素魔法程度的能力\n火符「火神的辉光」");
+            // DisplayName.SetDefault("真·火之石");
+            // Tooltip.SetDefault("控制火元素魔法程度的能力\n火符「火神的辉光」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -263,8 +263,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("土之石");
-            Tooltip.SetDefault("使用土元素魔法程度的能力\n土符「慵懒三石塔」");
+            // DisplayName.SetDefault("土之石");
+            // Tooltip.SetDefault("使用土元素魔法程度的能力\n土符「慵懒三石塔」");
         }
         public override void SetDefaults()
         {
@@ -287,8 +287,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("真·土之石");
-            Tooltip.SetDefault("控制土元素魔法程度的能力\n土符「三石塔之震」");
+            // DisplayName.SetDefault("真·土之石");
+            // Tooltip.SetDefault("控制土元素魔法程度的能力\n土符「三石塔之震」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -319,8 +319,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("月之石");
-            Tooltip.SetDefault("使用月元素魔法程度的能力\n月符「沉静的月神」");
+            // DisplayName.SetDefault("月之石");
+            // Tooltip.SetDefault("使用月元素魔法程度的能力\n月符「沉静的月神」");
         }
         public override void SetDefaults()
         {
@@ -352,8 +352,8 @@ namespace StoneOfThePhilosophers.Contents
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("日之石");
-            Tooltip.SetDefault("使用日元素魔法程度的能力\n日符「皇家圣焰」");
+            // DisplayName.SetDefault("日之石");
+            // Tooltip.SetDefault("使用日元素魔法程度的能力\n日符「皇家圣焰」");
         }
         public override void SetDefaults()
         {
@@ -767,7 +767,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
 
             return false;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Projectile.ai[1] == 2)
             {
@@ -1007,7 +1007,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                     Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), Extra ? 16 : 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
             return false;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             for (int n = 0; n < 4 - Projectile.penetrate; n++)
             {
@@ -1079,14 +1079,14 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
         Projectile projectile => Projectile;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("粒子触手");
+            // DisplayName.SetDefault("粒子触手");
         }
         public override string Texture => base.Texture.Replace("Ultra", "");
         public override void SetDefaults()
         {
             projectile.scale = 1f;
             projectile.friendly = true;
-            projectile.melee = true;
+            projectile.DamageType = DamageClass.Melee;
             projectile.ignoreWater = true;
             projectile.timeLeft = 300;
             projectile.tileCollide = false;
@@ -1156,7 +1156,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                 return;
             }
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             //if (target.CanBeChasedBy())
             //{
@@ -1184,7 +1184,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("巨木之晶");
+            // DisplayName.SetDefault("巨木之晶");
             base.SetStaticDefaults();
         }
         Player Player => Main.player[(int)NPC.ai[0]];
@@ -1237,11 +1237,11 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             return false;
         }
-        public override void HitEffect(int hitDirection, double damage)
+        public override void HitEffect(NPC.HitInfo hit)
         {
             base.HitEffect(hitDirection, damage);
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit)
         {
             base.OnHitNPC(target, damage, knockback, crit);
         }
@@ -1249,7 +1249,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         {
             return base.CanBeHitByProjectile(projectile);
         }
-        public override void OnHitByProjectile(Projectile projectile, int damage, float knockback, bool crit)
+        public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
             projectile.Kill();
             base.OnHitByProjectile(projectile, damage, knockback, crit);
@@ -1419,7 +1419,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
 
             return false;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             switch ((int)Projectile.ai[1])
             {
@@ -1917,7 +1917,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         {
             return style != 6;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             target.AddBuff(24, 300);
             //target.immune[Projectile.owner] = 0;
@@ -2152,7 +2152,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             Projectile.height = 24;
             Projectile.aiStyle = -1;
             Projectile.friendly = true;
-            Projectile.magic = true;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
             Projectile.timeLeft = 60;
@@ -2260,7 +2260,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             Projectile.height = 210;
             Projectile.aiStyle = -1;
             Projectile.friendly = true;
-            Projectile.magic = true;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
@@ -2268,7 +2268,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             Projectile.localNPCHitCooldown = -1;
             Projectile.ignoreWater = true;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             //target.immune[Projectile.owner] = 3;
             if (!target.friendly && target.active && target.CanBeChasedBy())
@@ -2320,7 +2320,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                             Projectile.localAI[1] = SoundEngine.PlayTrackedSound(SoundID.DD2_BookStaffTwisterLoop, Projectile.Center).ToFloat();
                         }
 
-                        ActiveSound activeSound = SoundEngine.GetActiveSound(SlotId.FromFloat(Projectile.localAI[1]));
+                        SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[1]), out ActiveSound activeSound);
                         if (activeSound != null)
                         {
                             activeSound.Position = Projectile.Center;
@@ -2505,7 +2505,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                             while (k < 5)
                             {
                                 var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
-                                if (tile.HasTile && (Main.tileSolid[tile.type] || Main.tileSolidTop[tile.type]))
+                                if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
                                 {
                                     flag = true;
                                     break;
@@ -2557,7 +2557,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                                 while (k < 5)
                                 {
                                     var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
-                                    if (tile.HasTile && (Main.tileSolid[tile.type] || Main.tileSolidTop[tile.type]))
+                                    if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
                                     {
                                         flag = true;
                                         break;
@@ -2585,13 +2585,13 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             base.AI();
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             base.OnHitNPC(target, damage, knockback, crit);
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("土元素之柱/地震");
+            // DisplayName.SetDefault("土元素之柱/地震");
             base.SetStaticDefaults();
         }
         public override void SetDefaults()
@@ -2601,7 +2601,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             Projectile.height = 1;
             Projectile.aiStyle = -1;
             Projectile.friendly = true;
-            Projectile.magic = true;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
             Projectile.ignoreWater = true;
@@ -2611,7 +2611,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
     public class MoonAttack : ModProjectile
     {
         public bool boost = false;
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             for (int n = 0; n < 15; n++)
             {
@@ -2745,7 +2745,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("沉静的月神");
+            // DisplayName.SetDefault("沉静的月神");
         }
         public override void SetDefaults()
         {
@@ -2965,7 +2965,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                     }
             }
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             target.AddBuff(BuffID.Daybreak, 120);
             //target.immune[Projectile.owner] = 0;
@@ -3244,13 +3244,13 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("潮蚀");
-            Description.SetDefault("欸，这个debuff明明是给npc的，你是怎么得到的呢\n不要问为什么是恋恋，因为恋恋无处不在");
+            // DisplayName.SetDefault("潮蚀");
+            // Description.SetDefault("欸，这个debuff明明是给npc的，你是怎么得到的呢\n不要问为什么是恋恋，因为恋恋无处不在");
         }
     }
     public class TidalErosionGBNPC : GlobalNPC
     {
-        public override bool StrikeNPC(NPC npc, ref double damage, int defense, ref float knockback, int hitDirection, ref bool crit)
+        public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
             if (npc.HasBuff<TidalErosion>())
             {
@@ -3260,7 +3260,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                     Dust.NewDustPerfect(npc.Center, MyDustId.Water).velocity *= 6;
                 }
             }
-            return base.StrikeNPC(npc, ref damage, defense, ref knockback, hitDirection, ref crit);
+            return base.ModifyIncomingHit(npc, ref damage, defense, ref knockback, hitDirection, ref crit);
         }
     }
     public class BlessingFromLunarGod : ModBuff
@@ -3279,8 +3279,8 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("月神的祝福");
-            Description.SetDefault("免疫几乎所有Debuff");
+            // DisplayName.SetDefault("月神的祝福");
+            // Description.SetDefault("免疫几乎所有Debuff");
         }
     }
     public class WaterUltra : ModBuff
@@ -3290,8 +3290,8 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("穿石之流");
-            Description.SetDefault("不要再欺负小石辣————(");
+            // DisplayName.SetDefault("穿石之流");
+            // Description.SetDefault("不要再欺负小石辣————(");
         }
     }
     public class WoodUltra : ModBuff
@@ -3301,8 +3301,8 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("常青藤鞭");
-            Description.SetDefault("不要再欺负小石辣————(");
+            // DisplayName.SetDefault("常青藤鞭");
+            // Description.SetDefault("不要再欺负小石辣————(");
         }
     }
     public class Reincarnation : ModBuff
@@ -3313,8 +3313,8 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("复苏");
-            Description.SetDefault("生命超快速恢复！！");
+            // DisplayName.SetDefault("复苏");
+            // Description.SetDefault("生命超快速恢复！！");
         }
     }
 }
