@@ -388,7 +388,7 @@ namespace StoneOfThePhilosophers.UI
             Visible = true;
             SoundEngine.PlaySound(SoundID.MenuOpen);
             BasePanel.SetUpElementList();
-            var Offset = BasePanel.Offset = StoneOfThePhilosophersHelper.MouseScreenUI;
+            var Offset = BasePanel.Offset = UIMethods.MouseScreenUI;
             BasePanel.Left.Set(Offset.X - 420, 0f);
             BasePanel.Top.Set(Offset.Y - 128, 0f);
             BasePanel.Recalculate();

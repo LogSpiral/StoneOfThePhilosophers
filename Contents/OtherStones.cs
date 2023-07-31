@@ -16,7 +16,6 @@ using Steamworks;
 using static Terraria.ModLoader.PlayerDrawLayer;
 using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
-using CoolerItemVisualEffect;
 using static Terraria.Localization.NetworkText;
 
 namespace StoneOfThePhilosophers.Contents
@@ -772,7 +771,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             if (Projectile.ai[1] == 2)
             {
                 if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
-                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f);
+                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (hit.Crit ? .6f : .2f);
                 for (int n = 0; n < 2; n++)
                 {
                     if (!Main.rand.NextBool(3))
@@ -784,13 +783,13 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                 }
                 if (!target.friendly && target.active && target.CanBeChasedBy())
                 {
-                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damageDone / ElementChargePlayer.Devider;
                 }
             }
             else
             {
                 if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
-                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (crit ? .6f : .2f) * .25f;
+                    target.velocity += Projectile.velocity * (Projectile.ai[0] == 0 ? 1f : 0.25f) * (hit.Crit ? .6f : .2f) * .25f;
                 for (int n = 0; n < 5 - Projectile.penetrate; n++)
                 {
                     if (Projectile.ai[0] == 0 && Main.rand.NextBool(2))
@@ -802,7 +801,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
                 }
                 if (!target.friendly && target.active && target.CanBeChasedBy())
                 {
-                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+                    Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damageDone / ElementChargePlayer.Devider;
                 }
                 if ((Main.rand.NextBool(3) || Projectile.penetrate == 1) && Projectile.ai[0] != 0)
                 {
@@ -1020,7 +1019,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             else target.AddBuff(BuffID.Poisoned, 360);
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[2] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[2] += damageDone / ElementChargePlayer.Devider;
             }
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -1049,7 +1048,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             if (target != null)
             {
                 //var fac = MathF.Cos(Main.GameUpdateCount * MathHelper.Pi / 7.5f) * .5f + .5f;
-                float factor = Projectile.frameCounter == 2 ? Terraria.Utils.GetLerpValue(180, 150, Projectile.timeLeft, true) : 1;
+                float factor = Projectile.frameCounter == 2 ? Utils.GetLerpValue(180, 150, Projectile.timeLeft, true) : 1;
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, (target.Center - Projectile.Center).SafeNormalize(default) * Projectile.ai[1] * factor, Utils.GetLerpValue(maxDistanceCopy / 8, maxDistanceCopy, maxDistance, true) * (Extra ? 0.25f : 0.125f) * factor);
                 //Projectile.velocity = Projectile.velocity.SafeNormalize(default) * Projectile.ai[1];
                 if (Main.GameUpdateCount % 3 == 0)
@@ -1165,7 +1164,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             //}
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[3] += damageDone / ElementChargePlayer.Devider;
             }
             target.immune[projectile.owner] = 5;
 
@@ -1239,11 +1238,11 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            base.HitEffect(hitDirection, damage);
+            base.HitEffect(hit);
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit)
         {
-            base.OnHitNPC(target, damage, knockback, crit);
+            base.OnHitNPC(target, hit);
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
@@ -1252,7 +1251,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
             projectile.Kill();
-            base.OnHitByProjectile(projectile, damage, knockback, crit);
+            base.OnHitByProjectile(projectile, hit, damageDone);
         }
     }
     public class WaterAttack : ModProjectile
@@ -1440,7 +1439,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         }
                         if (!target.friendly && target.active && target.CanBeChasedBy())
                         {
-                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += damage / ElementChargePlayer.Devider;
+                            Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[1] += damageDone / ElementChargePlayer.Devider;
                         }
                         if ((int)Projectile.ai[1] == 1)
                         {
@@ -1469,7 +1468,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                                 }
                             }
                             if (target.CanBeChasedBy() && target.type != NPCID.WallofFlesh && target.type != NPCID.WallofFleshEye)
-                                target.velocity += Projectile.velocity * (crit ? .6f : .2f) * .25f;
+                                target.velocity += Projectile.velocity * (hit.Crit ? .6f : .2f) * .25f;
                         }
                         break;
                     }
@@ -1478,7 +1477,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         break;
                     }
             }
-            base.OnHitNPC(target, damage, knockback, crit);
+            base.OnHitNPC(target, hit, damageDone);
         }
         public override void AI()
         {
@@ -1602,7 +1601,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         //{
                         //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0, 0);
                         //}
-                        StoneOfThePhilosophersHelper.VertexDraw(projectile.TailVertexFromProj(default, 30, .5f, false, Color.Yellow * alpha),
+                        DrawingMethods.VertexDraw(projectile.TailVertexFromProj(default, 30, .5f, false, Color.Yellow * alpha),
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value,
@@ -1648,7 +1647,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         //{
                         //    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0, 0);
                         //}
-                        StoneOfThePhilosophersHelper.VertexDraw(projectile.TailVertexFromProj(default, t => MathHelper.SmoothStep(30, 0, t), t => Color.Yellow * t.WaterDropFactor(), .5f),
+                        DrawingMethods.VertexDraw(projectile.TailVertexFromProj(default, t => MathHelper.SmoothStep(30, 0, t), t => Color.Yellow * t.WaterDropFactor(), .5f),
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_0").Value,
@@ -1999,7 +1998,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[0] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[0] += damageDone / ElementChargePlayer.Devider;
             }
 
 
@@ -2273,9 +2272,9 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             //target.immune[Projectile.owner] = 3;
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[4] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[4] += damageDone / ElementChargePlayer.Devider;
             }
-            base.OnHitNPC(target, damage, knockback, crit);
+            base.OnHitNPC(target, hit, damageDone);
         }
         public override void AI()
         {
@@ -2472,13 +2471,13 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                 //    }
                 //}
                 var effect = ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ShaderSwooshEffectEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-                if (effect != null) 
+                if (effect != null)
                 {
                     var paras = effect.Parameters;
                     int count = 0;
-                    foreach (var para in paras) 
+                    foreach (var para in paras)
                     {
-                        
+
                         Main.spriteBatch.DrawString(FontAssets.MouseText.Value, para.Name + " | " + para.ParameterType.ToString() + " | " + para.ParameterClass.ToString(), new Vector2(400, 300 + count * 20), Color.White);
                         count++;
                     }
@@ -2540,7 +2539,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                     {
                         if (npc.active && !npc.friendly && npc.CanBeChasedBy() && !npc.boss && Vector2.Distance(npc.Center, Projectile.Center) < 200)
                         {
-                            npc.velocity = VirtualDreamFactorMethods.RectangleCollision(npc.position, npc.velocity, npc.width, npc.height, rectangle);
+                            npc.velocity = OtherMethods.RectangleCollision(npc.position, npc.velocity, npc.width, npc.height, rectangle);
                         }
                     }
                     //var plr = Main.player[Projectile.owner];
@@ -2587,7 +2586,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            base.OnHitNPC(target, damage, knockback, crit);
+            base.OnHitNPC(target, hit, damageDone);
         }
         public override void SetStaticDefaults()
         {
@@ -2619,7 +2618,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[5] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[5] += damageDone / ElementChargePlayer.Devider;
             }
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
@@ -2726,7 +2725,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                 if (n > 11) index += 8;
                 vertexs[n] = vertexInfos[index];
             }
-            StoneOfThePhilosophersHelper.VertexDraw(vertexs, ModContent.Request<Texture2D>($"StoneOfThePhilosophers/Images/MagicArea_{(boost ? 5 : 2)}").Value, TextureAssets.MagicPixel.Value);
+            DrawingMethods.VertexDraw(vertexs, ModContent.Request<Texture2D>($"StoneOfThePhilosophers/Images/MagicArea_{(boost ? 5 : 2)}").Value, TextureAssets.MagicPixel.Value);
             #endregion
 
             //var vector = Main.screenTarget.Size();
@@ -2874,13 +2873,13 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         //    new Vector2(-Main.GlobalTimeWrappedHourly * 2, 0), false, null,
                         //    "HeatMap");
                         var vertexs = projectile.TailVertexFromProj(default, t => 16, t => Color.White * MathF.Pow(t, 2f).WaterDropFactor() * 2 * alpha, .5f);//MathF.Pow(t, 1.5f).WaterDropFactor() * 
-                        StoneOfThePhilosophersHelper.VertexDraw(vertexs,
+                        DrawingMethods.VertexDraw(vertexs,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value,
                             new Vector2(-Main.GlobalTimeWrappedHourly * 2, 0), false, null,
                             "HeatMap", true, true);//default, 30, .5f, true, Color.Yellow
-                        StoneOfThePhilosophersHelper.VertexDraw(vertexs,
+                        DrawingMethods.VertexDraw(vertexs,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value,
                             ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/HeatMap_4").Value,
@@ -3008,7 +3007,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             if (!target.friendly && target.active && target.CanBeChasedBy())
             {
-                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[6] += damage / ElementChargePlayer.Devider;
+                Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().ElementChargeValue[6] += damageDone / ElementChargePlayer.Devider;
             }
         }
         public override void AI()
@@ -3254,13 +3253,12 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         {
             if (npc.HasBuff<TidalErosion>())
             {
-                damage += 10;
+                modifiers.FinalDamage += 10;
                 for (int n = 0; n < 10; n++)
                 {
                     Dust.NewDustPerfect(npc.Center, MyDustId.Water).velocity *= 6;
                 }
             }
-            return base.ModifyIncomingHit(npc, ref damage, defense, ref knockback, hitDirection, ref crit);
         }
     }
     public class BlessingFromLunarGod : ModBuff

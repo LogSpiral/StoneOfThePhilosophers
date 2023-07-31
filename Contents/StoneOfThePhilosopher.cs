@@ -239,7 +239,7 @@ namespace StoneOfThePhilosophers.Contents
                                 0, 0, 0, -1,
                                 0, 0, 0, height) *
                 Matrix.CreateTranslation(offset);
-                StoneOfThePhilosophersHelper.VertexDrawEX(vertexs[(6 * n)..(6 * n + 6)],
+                DrawingMethods.VertexDrawEX(vertexs[(6 * n)..(6 * n + 6)],
                     ModContent.Request<Texture2D>($"StoneOfThePhilosophers/{path}").Value,
                     ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value, null,
                     new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * scaler, false, transform, pass, n == 0, false);
@@ -273,7 +273,7 @@ namespace StoneOfThePhilosophers.Contents
                             0, 0, 0, -1,
                             0, 0, 0, height) *
             Matrix.CreateTranslation(offset);
-            StoneOfThePhilosophersHelper.VertexDrawEX(loopVertexInfos,
+            DrawingMethods.VertexDrawEX(loopVertexInfos,
                 ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/line_1").Value,
                 ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_4").Value, null,
                 new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * loopScaler, true, loopTransform, null, false, true);

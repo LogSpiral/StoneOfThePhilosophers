@@ -1,6 +1,4 @@
 displayName = 贤者之石
 author = Log_Spiral
 version = 0.1
-modReferences = CoolerItemVisualEffect
 includeSource = true
-sortAfter = CoolerItemVisualEffect

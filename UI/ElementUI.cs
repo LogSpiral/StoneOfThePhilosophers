@@ -425,12 +425,13 @@ namespace StoneOfThePhilosophers.UI
     {
         public static bool Visible { get; private set; }
         public static int timer;
+
         public void Open()
         {
             Visible = true;
             SoundEngine.PlaySound(SoundID.MenuOpen);
             BasePanel.SetUpElementList();
-            var Offset = BasePanel.Offset = StoneOfThePhilosophersHelper.MouseScreenUI;
+            var Offset = BasePanel.Offset = UIMethods.MouseScreenUI;
             BasePanel.Left.Set(Offset.X - 420, 0f);
             BasePanel.Top.Set(Offset.Y - 128, 0f);
             BasePanel.Recalculate();
