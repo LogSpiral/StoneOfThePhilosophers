@@ -1,0 +1,136 @@
+Buffs: {
+	BlessingFromLunarGod: {
+		DisplayName: Blessing From Lunar God
+		Description: Mods.StoneOfThePhilosophers.Buffs.BlessingFromLunarGod.Description
+	}
+
+	Reincarnation: {
+		DisplayName: Reincarnation
+		Description: Mods.StoneOfThePhilosophers.Buffs.Reincarnation.Description
+	}
+
+	TidalErosion: {
+		DisplayName: Tidal Erosion
+		Description: Mods.StoneOfThePhilosophers.Buffs.TidalErosion.Description
+	}
+
+	WaterUltra: {
+		DisplayName: Water Ultra
+		Description: Mods.StoneOfThePhilosophers.Buffs.WaterUltra.Description
+	}
+
+	WoodUltra: {
+		DisplayName: Wood Ultra
+		Description: Mods.StoneOfThePhilosophers.Buffs.WoodUltra.Description
+	}
+}
+
+Items: {
+	StoneOfEarth: {
+		DisplayName: Stone Of Earth
+		Tooltip: ""
+	}
+
+	StoneOfEarthEX: {
+		DisplayName: Stone Of Earth E X
+		Tooltip: ""
+	}
+
+	StoneOfFire: {
+		DisplayName: Stone Of Fire
+		Tooltip: ""
+	}
+
+	StoneOfFireEX: {
+		DisplayName: Stone Of Fire E X
+		Tooltip: ""
+	}
+
+	StoneOfMetal: {
+		DisplayName: Stone Of Metal
+		Tooltip: ""
+	}
+
+	StoneOfMetalEX: {
+		DisplayName: Stone Of Metal E X
+		Tooltip: ""
+	}
+
+	StoneOfMoon: {
+		DisplayName: Stone Of Moon
+		Tooltip: ""
+	}
+
+	StoneOfSun: {
+		DisplayName: Stone Of Sun
+		Tooltip: ""
+	}
+
+	StoneOfThePhilosopher: {
+		DisplayName: Stone Of The Philosopher
+		Tooltip: ""
+	}
+
+	StoneOfThePhilosopherEX: {
+		DisplayName: Stone Of The Philosopher E X
+		Tooltip: ""
+	}
+
+	StoneOfWater: {
+		DisplayName: Stone Of Water
+		Tooltip: ""
+	}
+
+	StoneOfWaterEX: {
+		DisplayName: Stone Of Water E X
+		Tooltip: ""
+	}
+
+	StoneOfWood: {
+		DisplayName: Stone Of Wood
+		Tooltip: ""
+	}
+
+	StoneOfWoodEX: {
+		DisplayName: Stone Of Wood E X
+		Tooltip: ""
+	}
+}
+
+NPCs.WoodCrystal.DisplayName: Wood Crystal
+
+Projectiles: {
+	EarthAttack.DisplayName: Earth Attack
+	EarthSpecialAttack.DisplayName: Earth Special Attack
+	FireAttack.DisplayName: Fire Attack
+	MetalAttack.DisplayName: Metal Attack
+	MoonAttack.DisplayName: Moon Attack
+	StoneOfEarthProj.DisplayName: Stone Of Earth Proj
+	StoneOfFireProj.DisplayName: Stone Of Fire Proj
+	StoneOfMetalProj.DisplayName: Stone Of Metal Proj
+	StoneOfMoonProj.DisplayName: Stone Of Moon Proj
+	StoneOfSunProj.DisplayName: Stone Of Sun Proj
+	StoneOfThePhilosopherProj.DisplayName: Stone Of The Philosopher Proj
+	StoneOfWaterProj.DisplayName: Stone Of Water Proj
+	StoneOfWoodProj.DisplayName: Stone Of Wood Proj
+	SunAttack.DisplayName: Sun Attack
+	WaterAttack.DisplayName: Water Attack
+	WoodAttack.DisplayName: Wood Attack
+	WoodAttackUltra.DisplayName: Wood Attack Ultra
+}
+
+Configs: {
+	StoneOfThePhilosophersConfig: {
+		DisplayName: Stone Of The Philosophers Config
+
+		combineFaster: {
+			Label: 快速元素融合
+			Tooltip: 默认是开启的，但是也许有些人喜欢自己手动点击「融合」
+		}
+
+		UseScreenShader: {
+			Label: 使用奇妙滤镜
+			Tooltip: 天旋地转！！话说为什么阿汪要在这里留个滤镜
+		}
+	}
+}
