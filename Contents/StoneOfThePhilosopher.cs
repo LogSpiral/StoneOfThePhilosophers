@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LogSpiralLibrary.CodeLibrary.DataStructures;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StoneOfThePhilosophers.UI;
 using System;

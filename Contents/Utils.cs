@@ -14,6 +14,7 @@ using Terraria.UI;
 using UtfUnknown.Core.Probers.MultiByte.Chinese;
 using StoneOfThePhilosophers.UI;
 using Terraria.GameInput;
+using LogSpiralLibrary.CodeLibrary.DataStructures;
 
 namespace StoneOfThePhilosophers.Contents
 {

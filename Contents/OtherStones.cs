@@ -17,6 +17,7 @@ using static Terraria.ModLoader.PlayerDrawLayer;
 using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
 using static Terraria.Localization.NetworkText;
+using LogSpiralLibrary.CodeLibrary.DataStructures;
 
 namespace StoneOfThePhilosophers.Contents
 {
