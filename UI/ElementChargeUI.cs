@@ -4,14 +4,9 @@ using ReLogic.Content;
 using StoneOfThePhilosophers.Contents;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace StoneOfThePhilosophers.UI
 {

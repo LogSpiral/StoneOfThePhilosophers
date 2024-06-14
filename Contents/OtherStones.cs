@@ -9,14 +9,8 @@ using Terraria.DataStructures;
 using Terraria.Audio;
 using Terraria.GameContent;
 using ReLogic.Graphics;
-using System.Runtime.CompilerServices;
-using rail;
-using StoneOfThePhilosophers.Contents;
-using Steamworks;
-using static Terraria.ModLoader.PlayerDrawLayer;
 using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
-using static Terraria.Localization.NetworkText;
 using LogSpiralLibrary.CodeLibrary.DataStructures;
 
 namespace StoneOfThePhilosophers.Contents

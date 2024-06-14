@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
@@ -14,9 +9,6 @@ using ReLogic.Content;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
-using Microsoft.Xna.Framework.Input;
-using ReLogic.Graphics;
-using Terraria.GameContent;
 
 namespace StoneOfThePhilosophers.UI
 {

@@ -2,16 +2,10 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.ID;
-using Terraria.GameContent;
 using Terraria.DataStructures;
-using Terraria.UI;
-using UtfUnknown.Core.Probers.MultiByte.Chinese;
 using StoneOfThePhilosophers.UI;
 using Terraria.GameInput;
 using LogSpiralLibrary.CodeLibrary.DataStructures;
