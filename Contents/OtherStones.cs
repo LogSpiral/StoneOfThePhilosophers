@@ -848,7 +848,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             return base.OnTileCollide(oldVelocity);
         }
         public Vector2 offset;
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
             if (Projectile.ai[1] != 2) return;
             Main.player[Projectile.owner].GetModPlayer<ElementChargePlayer>().strengthOfShake += 2;
@@ -869,7 +869,7 @@ ModContent.ProjectileType<EarthAttack>(), projectile.damage, projectile.knockBac
             {
                 Dust.NewDustPerfect(Projectile.Center + Projectile.velocity + Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, Main.rand.NextFloat(0, 128)), DustID.Silver, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4) + Projectile.velocity, 0, default, Main.rand.NextFloat(1, 2));
             }
-            base.Kill(timeLeft);
+            base.OnKill(timeLeft);
         }
         public override void AI()
         {
