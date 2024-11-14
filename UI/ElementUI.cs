@@ -9,6 +9,7 @@ using ReLogic.Content;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
+using LogSpiralLibrary;
 
 namespace StoneOfThePhilosophers.UI
 {
@@ -108,6 +109,7 @@ namespace StoneOfThePhilosophers.UI
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
             //spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/ElementPanel").Value, rect, Color.White);
             var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/ElementPanel").Value;
+            //spriteBatch.DrawLine(new Vector2(200), new Vector2(800, 200), Color.White * ((float)LogSpiralLibraryMod.ModTime / 120f).CosFactor(), 80);
             spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White, MathHelper.Pi, new Vector2(118), 1f * factor, 0, 0);
             spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .5f, Main.GlobalTimeWrappedHourly, new Vector2(118), 1.5f * factor, 0, 0);
             spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .75f, -Main.GlobalTimeWrappedHourly * 2, new Vector2(118), 1.25f * factor, 0, 0);

@@ -9,6 +9,7 @@ using Terraria.DataStructures;
 using StoneOfThePhilosophers.UI;
 using Terraria.GameInput;
 using LogSpiralLibrary.CodeLibrary.DataStructures;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 
 namespace StoneOfThePhilosophers.Contents
 {

@@ -12,6 +12,7 @@ using ReLogic.Graphics;
 using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
 using LogSpiralLibrary.CodeLibrary.DataStructures;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -1537,7 +1538,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
     public class FireAttack : ModProjectile
     {
         //BezierCurve<FloatVector2, Vector2> bezierCurve;
-        Projectile projectile => Projectile;
+        Projectile projectile => Projectile;//这个不要学我，不过也是移植导致的，1.3时代的这个属性是用的小写开头，1.4为了满足命名规范改大写了
         /// <summary>
         /// 0为火球 1真火球 2大爆炸 3小爆炸 4凤凰 5追踪真火 6火之领域
         /// </summary>
