@@ -82,7 +82,7 @@ namespace StoneOfThePhilosophers.UI
             this.CalculateBorder = CalculateBorder;
             OnLeftMouseDown += DragStart;
             OnLeftMouseUp += DragEnd;
-            Buttons = new();
+            Buttons = [];
         }
         public override void OnActivate()
         {

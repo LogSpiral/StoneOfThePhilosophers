@@ -159,9 +159,9 @@ namespace StoneOfThePhilosophers.Contents
 
             base.Load();
         }
-        public static Dictionary<ElementCombination, ElementAttack> Attacks = new Dictionary<ElementCombination, ElementAttack>();
-        public static Dictionary<ElementCombination, string> Names = new Dictionary<ElementCombination, string>();
-        public static Dictionary<StoneElements, Color> ElementColor = new Dictionary<StoneElements, Color>();
+        public static Dictionary<ElementCombination, ElementAttack> Attacks = [];
+        public static Dictionary<ElementCombination, string> Names = [];
+        public static Dictionary<StoneElements, Color> ElementColor = [];
 
         #region 火相关组合
         public static void FireFire(StoneOfThePhilosopherProj modproj, Projectile projectile, bool dying)
