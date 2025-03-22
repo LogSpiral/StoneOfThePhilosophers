@@ -235,8 +235,7 @@ namespace StoneOfThePhilosophers.UI
         {
             if (!Active && timer < 15) timer++;
             timer2 = MathHelper.Lerp(timer2, (Active && IsMouseHovering) ? 1f : 0f, 0.1f);
-            if (IsMouseHovering)
-                Main.instance.MouseText(SpellName);
+
             base.Update(gameTime);
         }
 
@@ -289,6 +288,9 @@ namespace StoneOfThePhilosophers.UI
 
 
             //spriteBatch.Draw(Texture.Value, parentCen, null, Color.White * factor * .5f, 0f, Texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
+            if (IsMouseHovering)
+                Main.instance.MouseText(SpellName);
 
         }
     }

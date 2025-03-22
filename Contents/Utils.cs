@@ -212,7 +212,7 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
             #region 矩阵生成与绘制
             float height = 2000f;
-            Vector3 offset = new Vector3(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
+            Vector3 offset = new(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
             for (int n = 0; n < MagicFieldCount; n++)
             {
                 string pass = n switch

@@ -84,8 +84,7 @@ namespace StoneOfThePhilosophers
             var (c2, s2) = MathF.SinCos(scaler);
             //var (c, s) = MathF.SinCos(Main.GlobalTimeWrappedHourly); //Main.GlobalTimeWrappedHourly
             //var (c2, s2) = MathF.SinCos(MathHelper.Pi / 3);
-            Matrix matrix = new Matrix
-                (
+            Matrix matrix = new                (
                 1, 0, c * c2, 0,
                 0, 1, s * c2, 0,
                 0, 0, s2, 0,
@@ -134,7 +133,7 @@ namespace StoneOfThePhilosophers
         public const string CursedIchorFlame = "StoneOfThePhilosophers:CursedIchorFlame";
         public override void AddRecipeGroups()
         {
-            RecipeGroup group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " ÌúÇ¦¿ó", new int[]
+            RecipeGroup group = new(() => Language.GetTextValue("LegacyMisc.37") + " ÌúÇ¦¿ó", new int[]
             {
                 ItemID.IronOre,
                 ItemID.LeadOre

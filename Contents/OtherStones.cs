@@ -13,6 +13,7 @@ using StoneOfThePhilosophers.UI;
 using ReLogic.Utilities;
 using LogSpiralLibrary.CodeLibrary.DataStructures;
 using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+using LogSpiralLibrary;
 
 namespace StoneOfThePhilosophers.Contents
 {
@@ -63,11 +64,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddRecipeGroup(StoneOfThePhilosophersSystem.GoldPlatinumOres, 10);
             base.AddOtherIngredients(recipe);
         }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("金之石");
-            // Tooltip.SetDefault("使用金元素魔法程度的能力\n金符「金属疲劳」");
-        }
         public override void SetDefaults()
         {
             item.shoot = ModContent.ProjectileType<StoneOfMetalProj>();
@@ -82,11 +78,6 @@ namespace StoneOfThePhilosophers.Contents
             Recipe recipe = CreateRecipe();
             AddEXRequire<StoneOfMetal>(recipe, true);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("真·金之石");
-            // Tooltip.SetDefault("控制金元素魔法程度的能力\n金符「银龙」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -109,11 +100,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.Stinger, 5);
             base.AddOtherIngredients(recipe);
         }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("木之石");
-            // Tooltip.SetDefault("使用木元素魔法程度的能力\n木符「风灵的角笛」");
-        }
         public override void SetDefaults()
         {
             item.shoot = ModContent.ProjectileType<StoneOfWoodProj>();
@@ -132,11 +118,6 @@ namespace StoneOfThePhilosophers.Contents
             AddEXRequire<StoneOfWood>(recipe);
             recipe.Register();
         }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("真·木之石");
-            // Tooltip.SetDefault("控制木元素魔法程度的能力\n木符「翠绿风暴」");
-        }
         public override bool Extra => true;
         public override void SetDefaults()
         {
@@ -152,16 +133,11 @@ namespace StoneOfThePhilosophers.Contents
         {
             recipe.AddIngredient(ItemID.LargeSapphire);
             recipe.AddIngredient(ItemID.WaterBolt);
-            //recipe.AddIngredient(ItemID.) //TODO 加入珊瑚礁块的配方，等1.4.4
+            recipe.AddIngredient(ItemID.ReefBlock,20);
             recipe.AddIngredient(ItemID.SharkFin, 5);
             recipe.AddIngredient(ItemID.Shiverthorn, 5);
             recipe.AddIngredient(ItemID.WaterBucket);
             base.AddOtherIngredients(recipe);
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("水之石");
-            // Tooltip.SetDefault("使用水元素魔法程度的能力\n水符「水精公主」");
         }
         public override void SetDefaults()
         {
@@ -180,11 +156,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.NeptunesShell);
             AddEXRequire<StoneOfWater>(recipe);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("真·水之石");
-            // Tooltip.SetDefault("控制水元素魔法程度的能力\n水符「湖葬」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -206,11 +177,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.LavaBucket);
             base.AddOtherIngredients(recipe);
         }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("火之石");
-            // Tooltip.SetDefault("使用火元素魔法程度的能力\n火符「火神之光」");
-        }
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -229,11 +195,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.InfernoFork);
             AddEXRequire<StoneOfFire>(recipe);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("真·火之石");
-            // Tooltip.SetDefault("控制火元素魔法程度的能力\n火符「火神的辉光」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -256,11 +217,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.Waterleaf, 5);
             base.AddOtherIngredients(recipe);
         }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("土之石");
-            // Tooltip.SetDefault("使用土元素魔法程度的能力\n土符「慵懒三石塔」");
-        }
         public override void SetDefaults()
         {
             item.shoot = ModContent.ProjectileType<StoneOfEarthProj>();
@@ -279,11 +235,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.AncientBattleArmorMaterial, 4);
             AddEXRequire<StoneOfEarth>(recipe);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("真·土之石");
-            // Tooltip.SetDefault("控制土元素魔法程度的能力\n土符「三石塔之震」");
         }
         public override bool Extra => true;
         public override void SetDefaults()
@@ -305,17 +256,11 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.CrystalShard, 20);
             recipe.AddIngredient(ItemID.SoulofLight, 20);
             recipe.AddIngredient(ItemID.SoulofNight, 20);
-            //recipe.AddIngredient(ItemID.moonb, 50);
             recipe.AddIngredient(ItemID.Moonglow, 6);
             recipe.AddIngredient(ItemID.MoonStone);
-            recipe.AddIngredient(ItemID.LargeDiamond);
+            recipe.AddIngredient(ItemID.LargeAmethyst);
             recipe.AddTile(TileID.CrystalBall);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("月之石");
-            // Tooltip.SetDefault("使用月元素魔法程度的能力\n月符「沉静的月神」");
         }
         public override void SetDefaults()
         {
@@ -344,11 +289,6 @@ namespace StoneOfThePhilosophers.Contents
             recipe.AddIngredient(ItemID.LargeDiamond);
             recipe.AddTile(TileID.CrystalBall);
             recipe.Register();
-        }
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("日之石");
-            // Tooltip.SetDefault("使用日元素魔法程度的能力\n日符「皇家圣焰」");
         }
         public override void SetDefaults()
         {
@@ -2185,7 +2125,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         Vector2 top2 = Projectile.Top;
                         Vector2 bottom = Projectile.Bottom;
                         Vector2.Lerp(top2, bottom, 0.5f);
-                        Vector2 vector44 = new Vector2(0f, bottom.Y - top2.Y);
+                        Vector2 vector44 = new(0f, bottom.Y - top2.Y);
                         vector44.X = vector44.Y * num290;
                         new Vector2(top2.X - vector44.X / 2f, top2.Y);
                         Texture2D value108 = TextureAssets.Projectile[Projectile.type].Value;
@@ -2200,8 +2140,8 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         if (num293 < 4.11f)
                             num293 = 4.11f;
 
-                        Color value109 = new Color(160, 140, 100, 127);
-                        Color color69 = new Color(140, 160, 255, 127);
+                        Color value109 = new(160, 140, 100, 127);
+                        Color color69 = new(140, 160, 255, 127);
                         float num294 = num288 % 60f;
                         if (num294 < 30f)
                             color69 *= Utils.GetLerpValue(22f, 30f, num294, clamped: true);
@@ -2219,7 +2159,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
 
                             float num298 = num296 - 0.35f;
                             Vector2 position19 = spinningpoint5.RotatedBy(num297);
-                            Vector2 value110 = new Vector2(0f, num296 + 1f);
+                            Vector2 value110 = new(0f, num296 + 1f);
                             value110.X = value110.Y * num290;
                             Color color70 = Color.Lerp(Color.Transparent, value109, num296 * 2f);
                             if (num296 > 0.5f)
@@ -2336,7 +2276,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         Vector2 top = Projectile.Top;
                         Vector2 bottom = Projectile.Bottom;
                         Vector2 value = Vector2.Lerp(top, bottom, 0.5f);
-                        Vector2 value2 = new Vector2(0f, bottom.Y - top.Y);
+                        Vector2 value2 = new(0f, bottom.Y - top.Y);
                         value2.X = value2.Y * 0.2f;
 
                         if (Projectile.ai[0] < num - 30f)
@@ -2346,10 +2286,10 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                                 float value3 = -1f;
                                 float value4 = 0.9f;
                                 float amount = Main.rand.NextFloat();
-                                Vector2 value5 = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(value3, value4, amount));
+                                Vector2 value5 = new(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(value3, value4, amount));
                                 value5.X *= MathHelper.Lerp(2.2f, 0.6f, amount);
                                 value5.X *= -1f;
-                                Vector2 value6 = new Vector2(6f, 10f);
+                                Vector2 value6 = new(6f, 10f);
                                 Vector2 position2 = value + value2 * value5 * 0.5f + value6;
                                 Dust dust = Main.dust[Dust.NewDust(position2, 0, 0, DustID.ApprenticeStorm)];
                                 dust.position = position2;
@@ -2466,18 +2406,18 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
 
                 //    }
                 //}
-                var effect = ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ShaderSwooshEffectEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-                if (effect != null)
-                {
-                    var paras = effect.Parameters;
-                    int count = 0;
-                    foreach (var para in paras)
-                    {
+                //var effect = LogSpiralLibraryMod.ShaderSwooshEX;//ModContent.Request<Effect>("StoneOfThePhilosophers/Effects/ShaderSwooshEffectEX", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+                //if (effect != null)
+                //{
+                //    var paras = effect.Parameters;
+                //    int count = 0;
+                //    foreach (var para in paras)
+                //    {
 
-                        Main.spriteBatch.DrawString(FontAssets.MouseText.Value, para.Name + " | " + para.ParameterType.ToString() + " | " + para.ParameterClass.ToString(), new Vector2(400, 300 + count * 20), Color.White);
-                        count++;
-                    }
-                }
+                //        Main.spriteBatch.DrawString(FontAssets.MouseText.Value, para.Name + " | " + para.ParameterType.ToString() + " | " + para.ParameterClass.ToString(), new Vector2(400, 300 + count * 20), Color.White);
+                //        count++;
+                //    }
+                //}
             }
             return false;
         }
@@ -2886,7 +2826,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
                         spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                         spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 5) * .5f, 0, 0);
-                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 2) * .5f, 0, 0);
+                        spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.Orange *  .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 2) * .5f, 0, 0);
                         spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * alpha, projectile.rotation + MathHelper.PiOver2, new Vector2(36), new Vector2(1, 5) * .25f, 0, 0);
                         spriteBatch.Draw(starLight, projectile.Center - projectile.velocity * 2 - Main.screenPosition, null, Color.White * .5f * alpha, projectile.rotation, new Vector2(36), new Vector2(1, 2) * .25f, 0, 0);
                         spriteBatch.End();

@@ -84,7 +84,7 @@ namespace StoneOfThePhilosophers.TestStateBar
 
         private void DrawLifeBar(SpriteBatch spriteBatch)
         {
-            Vector2 vector = new Vector2(Main.screenWidth - 300 + 4, 15f);
+            Vector2 vector = new(Main.screenWidth - 300 + 4, 15f);
             bool isHovered = false;
             ResourceDrawSettings resourceDrawSettings = default(ResourceDrawSettings);
             resourceDrawSettings.ElementCount = _heartCountRow1;
@@ -133,7 +133,7 @@ namespace StoneOfThePhilosophers.TestStateBar
         {
             Vector2 value = topLeftAnchor + new Vector2(130f, -24f);
             Player localPlayer = Main.LocalPlayer;
-            Color color = new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
+            Color color = new(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
             string text = Lang.inter[0].Value + " " + localPlayer.statLifeMax2 + "/" + localPlayer.statLifeMax2;
             Vector2 vector = FontAssets.MouseText.Value.MeasureString(text);
             spriteBatch.DrawString(FontAssets.MouseText.Value, Lang.inter[0].Value, value + new Vector2((0f - vector.X) * 0.5f, 0f), color, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
@@ -142,7 +142,7 @@ namespace StoneOfThePhilosophers.TestStateBar
 
         private void DrawManaBar(SpriteBatch spriteBatch)
         {
-            Vector2 vector = new Vector2(Main.screenWidth - 40, 22f);
+            Vector2 vector = new(Main.screenWidth - 40, 22f);
             _ = _starCount;
             bool isHovered = false;
             ResourceDrawSettings resourceDrawSettings = default(ResourceDrawSettings);
@@ -171,7 +171,7 @@ namespace StoneOfThePhilosophers.TestStateBar
         private static void DrawManaText(SpriteBatch spriteBatch)
         {
             Vector2 vector = FontAssets.MouseText.Value.MeasureString(Lang.inter[2].Value);
-            Color color = new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
+            Color color = new(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
             int num = 50;
             if (vector.X >= 45f)
                 num = (int)vector.X + 5;
@@ -253,7 +253,7 @@ namespace StoneOfThePhilosophers.TestStateBar
 
         private void PrepareFields(Player player)
         {
-            PlayerStatsSnapshot playerStatsSnapshot = new PlayerStatsSnapshot(player);
+            PlayerStatsSnapshot playerStatsSnapshot = new(player);
             _playerLifeFruitCount = playerStatsSnapshot.LifeFruitCount;
             _lifePerHeart = playerStatsSnapshot.LifePerSegment;
             _currentPlayerLife = playerStatsSnapshot.Life;

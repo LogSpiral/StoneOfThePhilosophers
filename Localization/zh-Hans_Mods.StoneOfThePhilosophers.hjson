@@ -1,0 +1,191 @@
+Buffs: {
+	BlessingFromLunarGod: {
+		DisplayName: Blessing From Lunar God
+		Description: Mods.StoneOfThePhilosophers.Buffs.BlessingFromLunarGod.Description
+	}
+
+	Reincarnation: {
+		DisplayName: Reincarnation
+		Description: Mods.StoneOfThePhilosophers.Buffs.Reincarnation.Description
+	}
+
+	TidalErosion: {
+		DisplayName: Tidal Erosion
+		Description: Mods.StoneOfThePhilosophers.Buffs.TidalErosion.Description
+	}
+
+	WaterUltra: {
+		DisplayName: Water Ultra
+		Description: Mods.StoneOfThePhilosophers.Buffs.WaterUltra.Description
+	}
+
+	WoodUltra: {
+		DisplayName: Wood Ultra
+		Description: Mods.StoneOfThePhilosophers.Buffs.WoodUltra.Description
+	}
+}
+
+Items: {
+	StoneOfMetal: {
+		DisplayName: 金之石
+		Tooltip: 
+		'''
+		使用金元素魔法程度的能力
+		金符「金属疲劳」
+		'''
+	}
+
+	StoneOfMetalEX: {
+		DisplayName: 真·金之石
+		Tooltip: 
+		'''
+		控制金元素魔法程度的能力
+		金符「银龙」
+		'''
+	}
+	StoneOfWood: {
+		DisplayName: 木之石
+		Tooltip: 
+		'''
+		使用木元素魔法程度的能力
+		木符「风灵的角笛」
+		'''
+	}
+
+	StoneOfWoodEX: {
+		DisplayName: 真·木之石
+		Tooltip: 
+		'''
+		控制木元素魔法程度的能力
+		木符「翠绿风暴」
+		'''
+	}
+	StoneOfWater: {
+		DisplayName: 水之石
+		Tooltip: 
+		'''
+		使用水元素魔法程度的能力
+		水符「水精公主」
+		'''
+	}
+
+	StoneOfWaterEX: {
+		DisplayName: 真·水之石
+		Tooltip: 
+		'''
+		控制水元素魔法程度的能力
+		水符「湖葬」
+		'''
+	}
+	StoneOfFire: {
+		DisplayName: 火之石
+		Tooltip: 
+		'''
+		使用火元素魔法程度的能力
+		火符「火神之光」
+		'''
+	}
+
+	StoneOfFireEX: {
+		DisplayName: 真·火之石
+		Tooltip: 
+		'''
+		控制火元素魔法程度的能力
+		火符「火神的辉光」
+		'''
+	}
+	StoneOfEarth: {
+		DisplayName: 土之石
+		Tooltip: 
+		'''
+		使用土元素魔法程度的能力
+		土符「慵懒三石塔」
+		'''
+	}
+
+	StoneOfEarthEX: {
+		DisplayName: 真·土之石
+		Tooltip: 
+		'''
+		控制土元素魔法程度的能力
+		土符「三石塔之震」
+		'''
+	}
+	StoneOfMoon: {
+		DisplayName: 月之石
+		Tooltip: 
+		'''
+		使用月元素魔法程度的能力
+		月符「沉静的月神」
+		'''
+	}
+
+	StoneOfSun: {
+		DisplayName: 日之石
+		Tooltip: 
+		'''
+		使用日元素魔法程度的能力
+		日符「皇家圣焰」
+		'''
+	}
+
+	StoneOfThePhilosopher: {
+		DisplayName: 贤者之石
+		Tooltip: 
+		'''
+		使用元素魔法程度的能力
+		五耀「贤者之石」
+		'''
+	}
+
+	StoneOfThePhilosopherEX: {
+		DisplayName: 真·贤者之石
+		Tooltip: 
+		'''
+		掌握元素魔法程度的能力
+		七耀「贤者之石」
+		'''
+	}
+
+	
+
+
+}
+
+NPCs.WoodCrystal.DisplayName: Wood Crystal
+
+Projectiles: {
+	EarthAttack.DisplayName: Earth Attack
+	EarthSpecialAttack.DisplayName: Earth Special Attack
+	FireAttack.DisplayName: Fire Attack
+	MetalAttack.DisplayName: Metal Attack
+	MoonAttack.DisplayName: Moon Attack
+	StoneOfEarthProj.DisplayName: Stone Of Earth Proj
+	StoneOfFireProj.DisplayName: Stone Of Fire Proj
+	StoneOfMetalProj.DisplayName: Stone Of Metal Proj
+	StoneOfMoonProj.DisplayName: Stone Of Moon Proj
+	StoneOfSunProj.DisplayName: Stone Of Sun Proj
+	StoneOfThePhilosopherProj.DisplayName: Stone Of The Philosopher Proj
+	StoneOfWaterProj.DisplayName: Stone Of Water Proj
+	StoneOfWoodProj.DisplayName: Stone Of Wood Proj
+	SunAttack.DisplayName: Sun Attack
+	WaterAttack.DisplayName: Water Attack
+	WoodAttack.DisplayName: Wood Attack
+	WoodAttackUltra.DisplayName: Wood Attack Ultra
+}
+
+Configs: {
+	StoneOfThePhilosophersConfig: {
+		DisplayName: Stone Of The Philosophers Config
+
+		combineFaster: {
+			Label: 快速元素融合
+			Tooltip: 默认是开启的，但是也许有些人喜欢自己手动点击「融合」
+		}
+
+		UseScreenShader: {
+			Label: 使用奇妙滤镜
+			Tooltip: 天旋地转！！话说为什么阿汪要在这里留个滤镜
+		}
+	}
+}

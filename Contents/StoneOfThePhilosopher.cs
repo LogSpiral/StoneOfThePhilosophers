@@ -110,7 +110,7 @@ namespace StoneOfThePhilosophers.Contents
         public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
         public const float dis = 64;
         public int Cycle => 60;
-        public Color MainColor => new Color(248, 191, 37);//Color.Yellow
+        public Color MainColor => new(248, 191, 37);//Color.Yellow
         public bool UseMana => (int)projectile.ai[0] % Cycle == 0;
         public override void SetDefaults()
         {
@@ -172,7 +172,7 @@ namespace StoneOfThePhilosophers.Contents
             #endregion
             #region 矩阵生成与绘制
             float height = 2000f;
-            Vector3 offset = new Vector3(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
+            Vector3 offset = new(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
             for (int n = 0; n < MagicFieldCount; n++)
             {
                 string pass = n switch
@@ -256,9 +256,9 @@ namespace StoneOfThePhilosophers.Contents
                 loopVertexInfos[2 * n].Color = Color.Gold * MathHelper.Clamp((projectile.ai[0] - ChargeTime) - n, 0, 1);
                 loopVertexInfos[2 * n + 1].Color = default;
             }
-            Vector2 loopScaler = new Vector2(0, 0.6f);
+            Vector2 loopScaler = new(0, 0.6f);
             float loopTheta = Theta * .5f;
-            Vector3 loopScale = new Vector3(2f, 2f, 2f);
+            Vector3 loopScale = new(2f, 2f, 2f);
             Matrix loopTransform =
             Matrix.CreateScale(loopScale * new Vector3(Size, Size, dis)) *
             Matrix.CreateRotationZ(loopTheta) *
