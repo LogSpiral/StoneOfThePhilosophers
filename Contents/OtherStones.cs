@@ -1812,7 +1812,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             }
             return false;
         }
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
             //switch (style)
             //{
@@ -2864,7 +2864,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         {
             return base.OnTileCollide(oldVelocity);
         }
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
             switch (style)
             {

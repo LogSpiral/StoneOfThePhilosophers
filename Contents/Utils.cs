@@ -279,7 +279,7 @@ namespace StoneOfThePhilosophers.Contents
         {
             return false;
         }
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
             //if (projectile.ai[0] >= 60f)
             //{
