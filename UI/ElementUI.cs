@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
-using StoneOfThePhilosophers.Contents;
 using ReLogic.Content;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+using StoneOfThePhilosophers.Contents.Philosopher;
 
 namespace StoneOfThePhilosophers.UI
 {
@@ -163,7 +164,7 @@ namespace StoneOfThePhilosophers.UI
             {
                 if (lastButton.timer == 15 && StoneOfThePhilosophersConfig.CombineFaster && ElementUI.Visible)
                 {
-                    var elementPlr = Main.LocalPlayer.GetModPlayer<ElementPlayer>();
+                    var elementPlr = Main.LocalPlayer.GetModPlayer<ElementCombinePlayer>();
                     elementPlr.element1 = combinationBuffer.element1;
                     elementPlr.element2 = combinationBuffer.element2;
                     ElementSystem.Instance.elementUI.Close();
@@ -179,7 +180,7 @@ namespace StoneOfThePhilosophers.UI
         }
         public void SetUpElementList()
         {
-            var elementPlr = Main.LocalPlayer.GetModPlayer<ElementPlayer>();
+            var elementPlr = Main.LocalPlayer.GetModPlayer<ElementCombinePlayer>();
             Buttons.Clear();
             Elements.Clear();
             lastButton = null;
@@ -387,7 +388,7 @@ namespace StoneOfThePhilosophers.UI
     //    LunarSun = 56,
     //    SunSun = 66
     //}
-    public class ElementPlayer : ModPlayer
+    public class ElementCombinePlayer : ModPlayer
     {
         public StoneElements element1;
         public StoneElements element2;

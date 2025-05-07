@@ -2,6 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using StoneOfThePhilosophers.Contents;
+using StoneOfThePhilosophers.Contents.Earth;
+using StoneOfThePhilosophers.Contents.Fire;
+using StoneOfThePhilosophers.Contents.Metal;
+using StoneOfThePhilosophers.Contents.Moon;
+using StoneOfThePhilosophers.Contents.Philosopher;
+using StoneOfThePhilosophers.Contents.Sun;
+using StoneOfThePhilosophers.Contents.Water;
+using StoneOfThePhilosophers.Contents.Wood;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -95,15 +103,15 @@ namespace StoneOfThePhilosophers.UI
                     var _color = Color.Lerp(color, Color.White, 0.25f - 0.25f * MathF.Cos(elementBarValue * Main.GlobalTimeWrappedHourly * 8));
                     spriteBatch.Draw(ElementPanelFill.Value, topLeft + offset + new Vector2(18, -12) + offsetUnit * n, new Rectangle(0, 0, (int)((n == count - 1 ? extraValue : 1) * 12f * factor2 + 1), 12), _color * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
                 }
-            var (c, s) = Main.LocalPlayer.ElementPlayer();
-            float l = s.GetElementCost((int)CurrentElement - 1) / 5;
-            if (c.ElementChargeValue[(int)CurrentElement - 1] / 5 >= l)
+            var mplr = Main.LocalPlayer.GetModPlayer<ElementSkillPlayer>();
+            float l = mplr.GetElementCost((int)CurrentElement - 1) / 5;
+            if (mplr.ElementChargeValue[(int)CurrentElement - 1] / 5 >= l)
             {
                 float offsetY = 12 * factor2 * (count - 1) - 12 + 12 * extraValue;
                 var drawCen = topLeft + offset + new Vector2(24, 0) + Vector2.UnitY * offsetY;
                 var scaler = factor2;
                 var _color = Color.Lerp(color, Color.White, 0.25f - 0.25f * MathF.Cos(elementBarValue * Main.GlobalTimeWrappedHourly * 16)) * scaler;
-                spriteBatch.Draw(ModContent.Request<Texture2D>("StoneOfThePhilosophers/Images/Style_8").Value, drawCen, null, _color with { A = 0 } * factor1, MathHelper.PiOver2, new Vector2(256, 0), new Vector2(MathF.Min(l * 12 * scaler,offsetY + 12), 24) / new Vector2(256), 0, 0);
+                spriteBatch.Draw(ModAsset.Style_8.Value, drawCen, null, _color with { A = 0 } * factor1, MathHelper.PiOver2, new Vector2(256, 0), new Vector2(MathF.Min(l * 12 * scaler,offsetY + 12), 24) / new Vector2(256), 0, 0);
             }
             for (int n = 0; n < 20; n++)
                 spriteBatch.Draw(ElementPanelMiddleBorder.Value, topLeft + offset + offsetUnit * n + new Vector2(24, -12), new Rectangle(0, 0, (int)(12f * factor2 + 1), 24), Color.White * factor1 * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
@@ -175,7 +183,7 @@ namespace StoneOfThePhilosophers.UI
                 }
                 elementChargeBar.CurrentElement = elements;
                 var current = elementChargeBar.elementBarValue;
-                var target = player.GetModPlayer<ElementChargePlayer>().ElementChargeValue[(int)elementChargeBar.CurrentElement - 1] / 100f;
+                var target = player.GetModPlayer<Contents.ElementSkillPlayer>().ElementChargeValue[(int)elementChargeBar.CurrentElement - 1] / 100f;
                 
                 var result = MathHelper.Lerp(current, target, 0.1f);
                 if (result < 0.0001f) result = 0;

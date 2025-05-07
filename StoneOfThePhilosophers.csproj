@@ -1,11 +1,11 @@
-
+﻿
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\tModLoader.targets" />
 	<PropertyGroup>
 		<AssemblyName>StoneOfThePhilosophers</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<Solaestas-UsePublicizer>True</Solaestas-UsePublicizer>
-		<Solaestas-UseAssetPath>false</Solaestas-UseAssetPath>
+		<Solaestas-UseAssetPath>true</Solaestas-UseAssetPath>
 
 	</PropertyGroup>
 	<ItemGroup>

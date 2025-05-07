@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace StoneOfThePhilosophers.Contents
+namespace StoneOfThePhilosophers.Contents.Philosopher
 {
     public partial class StoneOfThePhilosopherProj : ModProjectile
     {

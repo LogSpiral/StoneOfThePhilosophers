@@ -1,155 +1,156 @@
 Buffs: {
 	BlessingFromLunarGod: {
-		DisplayName: Blessing From Lunar God
-		Description: Mods.StoneOfThePhilosophers.Buffs.BlessingFromLunarGod.Description
+		DisplayName: 月神的祝福
+		Description: 攻速和攻击力大幅提升
 	}
 
 	Reincarnation: {
-		DisplayName: Reincarnation
-		Description: Mods.StoneOfThePhilosophers.Buffs.Reincarnation.Description
+		DisplayName: 复苏
+		Description: 生命超快速恢复！！
 	}
 
 	TidalErosion: {
-		DisplayName: Tidal Erosion
-		Description: Mods.StoneOfThePhilosophers.Buffs.TidalErosion.Description
+		DisplayName: 潮解侵蚀
+		Description: 防御降低
 	}
 
 	WaterUltra: {
-		DisplayName: Water Ultra
-		Description: Mods.StoneOfThePhilosophers.Buffs.WaterUltra.Description
+		DisplayName: 滴水穿石
+		Description: 水箭替换成水炮！
 	}
 
 	WoodUltra: {
-		DisplayName: Wood Ultra
-		Description: Mods.StoneOfThePhilosophers.Buffs.WoodUltra.Description
+		DisplayName: 常春藤鞭
+		Description: 攻击附带能量藤蔓
 	}
 }
 
 Items: {
-	StoneOfMetal: {
-		DisplayName: 金之石
-		Tooltip: 
-		'''
-		使用金元素魔法程度的能力
-		金符「金属疲劳」
-		'''
-	}
-
-	StoneOfMetalEX: {
-		DisplayName: 真·金之石
-		Tooltip: 
-		'''
-		控制金元素魔法程度的能力
-		金符「银龙」
-		'''
-	}
-	StoneOfWood: {
-		DisplayName: 木之石
-		Tooltip: 
-		'''
-		使用木元素魔法程度的能力
-		木符「风灵的角笛」
-		'''
-	}
-
-	StoneOfWoodEX: {
-		DisplayName: 真·木之石
-		Tooltip: 
-		'''
-		控制木元素魔法程度的能力
-		木符「翠绿风暴」
-		'''
-	}
-	StoneOfWater: {
-		DisplayName: 水之石
-		Tooltip: 
-		'''
-		使用水元素魔法程度的能力
-		水符「水精公主」
-		'''
-	}
-
-	StoneOfWaterEX: {
-		DisplayName: 真·水之石
-		Tooltip: 
-		'''
-		控制水元素魔法程度的能力
-		水符「湖葬」
-		'''
-	}
-	StoneOfFire: {
-		DisplayName: 火之石
-		Tooltip: 
-		'''
-		使用火元素魔法程度的能力
-		火符「火神之光」
-		'''
-	}
-
-	StoneOfFireEX: {
-		DisplayName: 真·火之石
-		Tooltip: 
-		'''
-		控制火元素魔法程度的能力
-		火符「火神的辉光」
-		'''
-	}
 	StoneOfEarth: {
 		DisplayName: 土之石
-		Tooltip: 
-		'''
-		使用土元素魔法程度的能力
-		土符「慵懒三石塔」
-		'''
+		Tooltip:
+			'''
+			使用土元素魔法程度的能力
+			土符「慵懒三石塔」
+			'''
 	}
 
 	StoneOfEarthEX: {
 		DisplayName: 真·土之石
-		Tooltip: 
-		'''
-		控制土元素魔法程度的能力
-		土符「三石塔之震」
-		'''
+		Tooltip:
+			'''
+			控制土元素魔法程度的能力
+			土符「三石塔之震」
+			'''
 	}
+
+	StoneOfFire: {
+		DisplayName: 火之石
+		Tooltip:
+			'''
+			使用火元素魔法程度的能力
+			火符「火神之光」
+			'''
+	}
+
+	StoneOfFireEX: {
+		DisplayName: 真·火之石
+		Tooltip:
+			'''
+			控制火元素魔法程度的能力
+			火符「火神的辉光」
+			'''
+	}
+
+	StoneOfMetal: {
+		DisplayName: 金之石
+		Tooltip:
+			'''
+			使用金元素魔法程度的能力
+			金符「金属疲劳」
+			'''
+	}
+
+	StoneOfMetalEX: {
+		DisplayName: 真·金之石
+		Tooltip:
+			'''
+			控制金元素魔法程度的能力
+			金符「银龙」
+			'''
+	}
+
 	StoneOfMoon: {
 		DisplayName: 月之石
-		Tooltip: 
-		'''
-		使用月元素魔法程度的能力
-		月符「沉静的月神」
-		'''
+		Tooltip:
+			'''
+			使用月元素魔法程度的能力
+			月符「沉静的月神」
+			'''
 	}
 
 	StoneOfSun: {
 		DisplayName: 日之石
-		Tooltip: 
-		'''
-		使用日元素魔法程度的能力
-		日符「皇家圣焰」
-		'''
+		Tooltip:
+			'''
+			使用日元素魔法程度的能力
+			日符「皇家圣焰」
+			'''
 	}
 
 	StoneOfThePhilosopher: {
 		DisplayName: 贤者之石
-		Tooltip: 
-		'''
-		使用元素魔法程度的能力
-		五耀「贤者之石」
-		'''
+		Tooltip:
+			'''
+			使用元素魔法程度的能力
+			五耀「贤者之石」
+			'''
 	}
 
 	StoneOfThePhilosopherEX: {
 		DisplayName: 真·贤者之石
-		Tooltip: 
-		'''
-		掌握元素魔法程度的能力
-		七耀「贤者之石」
-		'''
+		Tooltip:
+			'''
+			掌握元素魔法程度的能力
+			七耀「贤者之石」
+			'''
 	}
 
-	
+	StoneOfWater: {
+		DisplayName: 水之石
+		Tooltip:
+			'''
+			使用水元素魔法程度的能力
+			水符「水精公主」
+			'''
+	}
 
+	StoneOfWaterEX: {
+		DisplayName: 真·水之石
+		Tooltip:
+			'''
+			控制水元素魔法程度的能力
+			水符「湖葬」
+			'''
+	}
 
+	StoneOfWood: {
+		DisplayName: 木之石
+		Tooltip:
+			'''
+			使用木元素魔法程度的能力
+			木符「风灵的角笛」
+			'''
+	}
+
+	StoneOfWoodEX: {
+		DisplayName: 真·木之石
+		Tooltip:
+			'''
+			控制木元素魔法程度的能力
+			木符「翠绿风暴」
+			'''
+	}
 }
 
 NPCs.WoodCrystal.DisplayName: Wood Crystal
@@ -176,7 +177,7 @@ Projectiles: {
 
 Configs: {
 	StoneOfThePhilosophersConfig: {
-		DisplayName: Stone Of The Philosophers Config
+		DisplayName: 贤者之石设置
 
 		combineFaster: {
 			Label: 快速元素融合
@@ -184,8 +185,8 @@ Configs: {
 		}
 
 		UseScreenShader: {
-			Label: 使用奇妙滤镜
-			Tooltip: 天旋地转！！话说为什么阿汪要在这里留个滤镜
+			// Label: 使用奇妙滤镜
+			// Tooltip: 天旋地转！！话说为什么阿汪要在这里留个滤镜
 		}
 	}
 }

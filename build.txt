@@ -1,5 +1,5 @@
 displayName = 贤者之石
 author = Log_Spiral
 version = 0.1
-includeSource = true
+homepage = https://github.com/LogSpiral/StoneOfThePhilosophers
 modReferences = LogSpiralLibrary
