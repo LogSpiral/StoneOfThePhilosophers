@@ -7,17 +7,6 @@ using System.Threading.Tasks;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
-using StoneOfThePhilosophers.Contents.Philosopher;
 
 namespace StoneOfThePhilosophers.Contents.Moon;
 

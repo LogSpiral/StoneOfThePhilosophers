@@ -1,36 +1,42 @@
 ﻿using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.UI;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
+using System;
 
 namespace StoneOfThePhilosophers.Contents.Sun;
 public class StoneOfSunProj : MagicArea
 {
-    public override StoneElements Elements => StoneElements.Solar;
-    public override Color MainColor => Color.White;
-    public override int Cycle => 60;
-    public override void SpecialAttack(Color dustColor, bool trigger)
+    protected override StoneElements Elements => StoneElements.Solar;
+    protected override int Cycle => 45;
+    public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+    public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(projectile, unit, dying, AttackCounter, Extra);
+
+    public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
     {
-        if (trigger)
+        if (!trigger) return;
+        foreach (var target in Main.projectile)
         {
-            var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), Main.MouseWorld, default, ModContent.ProjectileType<SunAttack>(), Projectile.damage / 3, projectile.knockBack, projectile.owner, 3);
-            proj.timeLeft = 1200;
-            proj.tileCollide = false;
-            proj.width = proj.height = 320;
-            proj.Center = player.Center + new Vector2(0, 256);
-            proj.penetrate = -1;
-            proj.usesLocalNPCImmunity = true;
-            proj.localNPCHitCooldown = 20;
-            proj.extraUpdates = 0;
+            if (target.active && target.type == ModContent.ProjectileType<SunAttack>() && target.ai[0] == 3)
+            {
+                target.timeLeft = 1120;
+                return;
+            }
         }
-        base.SpecialAttack(dustColor, trigger);
+        var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), Main.MouseWorld, default, ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner, 3);
+        proj.timeLeft = 1200;
+        proj.tileCollide = false;
+        proj.width = proj.height = 320;
+        proj.Center = Main.player[projectile.owner].Center + new Vector2(0, 256);
+        proj.penetrate = -1;
+        proj.usesLocalNPCImmunity = true;
+        proj.localNPCHitCooldown = 20;
+        proj.extraUpdates = 0;
     }
-    public override void ShootProj(Vector2 unit, bool dying = false)
+    public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 3 != 0) return;
-        attackCounter++;
         SoundEngine.PlaySound(SoundID.Item74);
         if (dying)
         {
@@ -43,6 +49,5 @@ ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack,
             Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedByRandom(MathHelper.Pi / 48f) * 32,
 ModContent.ProjectileType<SunAttack>(), projectile.damage, projectile.knockBack, projectile.owner);
         }
-
     }
 }

@@ -8,6 +8,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
+using StoneOfThePhilosophers.Effects;
 
 namespace StoneOfThePhilosophers.Contents.Fire;
 public class FireAttack : ModProjectile
@@ -193,7 +194,7 @@ public class FireAttack : ModProjectile
                 }
 
             }
-            SoundEngine.PlaySound(SoundID.Item62);
+            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
             target.immune[Projectile.owner] = 2;
         }
         else if (Style == 4)
@@ -277,7 +278,7 @@ public class FireAttack : ModProjectile
                     dust.velocity *= 0.5f;
                 }
             }
-            SoundEngine.PlaySound(SoundID.Item62);
+            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
         }
         return false;
     }
@@ -385,10 +386,10 @@ public class FireAttack : ModProjectile
                     Main.instance.GraphicsDevice.Textures[2] = ModAsset.HeatMap_0.Value;
                     Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
                     Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
-                    StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(Projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
-                    StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
+                    HeatMapEffect.HeatMap.Parameters["uTime"].SetValue(Projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                    HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
 
-                    StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+                    HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
                     #endregion
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, -2 * r, new Vector2(16), new Vector2(12f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//

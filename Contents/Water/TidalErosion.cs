@@ -1,6 +1,9 @@
 ﻿using LogSpiralLibrary.CodeLibrary.Utilties;
 using Terraria.ModLoader;
 using Terraria;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace StoneOfThePhilosophers.Contents.Water;
 
@@ -23,11 +26,10 @@ public class TidalErosionGBNPC : GlobalNPC
     {
         if (npc.HasBuff<TidalErosion>())
         {
-            modifiers.FinalDamage += 10;
+            modifiers.ArmorPenetration += 20;
             for (int n = 0; n < 10; n++)
-            {
                 Dust.NewDustPerfect(npc.Center, MyDustId.Water).velocity *= 6;
-            }
+
         }
     }
 }

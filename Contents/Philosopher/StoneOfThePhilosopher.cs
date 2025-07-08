@@ -1,118 +1,157 @@
 ﻿using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StoneOfThePhilosophers.UI;
+using StoneOfThePhilosophers.Contents.Earth;
+using StoneOfThePhilosophers.Contents.Fire;
+using StoneOfThePhilosophers.Contents.Metal;
+using StoneOfThePhilosophers.Contents.Moon;
+using StoneOfThePhilosophers.Contents.Sun;
+using StoneOfThePhilosophers.Contents.Water;
+using StoneOfThePhilosophers.Contents.Wood;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace StoneOfThePhilosophers.Contents.Philosopher;
 
 public class StoneOfThePhilosopher : MagicStone
 {
-    //public virtual bool Extra => false;
-    public override void UseStyle(Player player, Rectangle heldItemFrame)
+    public const string DebuffTexturePath = "StoneOfThePhilosophers/Contents/Philosopher/Attacks/DebuffTemplate";
+    public override bool AltFunctionUse(Player player)
     {
-        //var elementPlr = player.GetModPlayer<ElementPlayer>();
+        var cplr = player.GetModPlayer<ElementCombinePlayer>();
+        var combination = Extra ? cplr.CombinationEX : cplr.Combination;
+        if (combination.Mode != 1) return false;
 
-        //if (player.itemAnimation == player.itemAnimationMax)
-        //{
-        //    if (player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0)
-        //    {
-        //    }
-        //    else
-        //    {
-        //        if (ElementUI.Visible)
-        //            ElementSystem.Instance.elementUI.Close();
-        //        else
-        //        {
-        //            ElementUI.IsExtra = Extra;
-        //            ElementSystem.Instance.elementUI.Open();
-
-        //        }
-        //    }
-        //}
+        var mplr = player.GetModPlayer<ElementSkillPlayer>();
+        int index = (int)combination.MainElements - 1;
+        return mplr.ElementChargeValue[index] >= mplr.GetElementCost(index);
     }
-    public override bool AltFunctionUse(Player player) => true;
+    public override void UpdateEquip(Player player)
+    {
+        int m = Main.debuff.Length;
+        for (int n = 0; n < m; n++)
+            if (Main.debuff[n])
+                player.buffImmune[n] = true;
+        base.UpdateEquip(player);
+    }
     public override void AddRecipes()
     {
-        CreateRecipe().Register();
-    }
-    public override void SetStaticDefaults()
-    {
-        // DisplayName.SetDefault("贤者之石");
-        // Tooltip.SetDefault("使用元素魔法程度的能力。\n五耀「贤者之石」");
+        CreateRecipe()
+            .AddIngredient<StoneOfFireEX>()
+            .AddIngredient<StoneOfWaterEX>()
+            .AddIngredient<StoneOfMetalEX>()
+            .AddIngredient<StoneOfWoodEX>()
+            .AddIngredient<StoneOfEarthEX>()
+            .AddIngredient(ItemID.Ectoplasm, 10)
+            .AddIngredient(ItemID.SoulofMight, 10)
+            .AddIngredient(ItemID.SoulofFright, 10)
+            .AddIngredient(ItemID.SoulofSight, 10)
+            .AddTile(TileID.CrystalBall)
+            .Register();
     }
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.shoot = ModContent.ProjectileType<StoneOfThePhilosopherProj>();
-        Item.damage = 30;
+        Item.damage = 80;
         Item.mana = 5;
-    }
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-    {
-        var elementPlr = player.GetModPlayer<ElementCombinePlayer>();
-        return player.altFunctionUse != 2 && elementPlr.element1 != 0 && elementPlr.element2 != 0;
     }
     public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
     {
-        if (player.altFunctionUse == 2) mult = 0;
+        mult = 0;
     }
 }
 public class StoneOfThePhilosopherEX : StoneOfThePhilosopher
 {
     public override bool Extra => true;
-    public override void SetStaticDefaults()
+    public override void SetDefaults()
     {
-        // DisplayName.SetDefault("真·贤者之石");
-        // Tooltip.SetDefault("掌握元素魔法程度的能力。\n七耀「贤者之石」");
+        base.SetDefaults();
+        Item.damage = 120;
+        Item.mana = 5;
+    }
+    public override void AddRecipes()
+    {
+        CreateRecipe()
+            .AddIngredient<StoneOfThePhilosopher>()
+            .AddIngredient<StoneOfMoon>()
+            .AddIngredient<StoneOfSun>()
+            .AddIngredient(ItemID.FragmentSolar, 15)
+            .AddIngredient(ItemID.FragmentNebula, 15)
+            .AddIngredient(ItemID.FragmentVortex, 15)
+            .AddIngredient(ItemID.FragmentStardust, 15)
+            .AddIngredient(ItemID.LunarBar, 30)
+            .AddTile(TileID.LunarCraftingStation)
+            .Register();
     }
 }
 public partial class StoneOfThePhilosopherProj : ModProjectile
 {
     public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_1";
-    public StoneElements Element1 => ElementPlr.element1;
-    public StoneElements Element2 => ElementPlr.element2;
-    public ElementCombination ElementCombination => (Element1, Element2);
-    /// <summary>
-    /// 0为二融合 1为五融合 2为七融合 3为*全融合*
-    /// </summary>
-    public int CombineState;
+    public const float dis = 64;
+
+    #region 辅助属性
     public Projectile projectile => Projectile;
     public Player player => Main.player[projectile.owner];
     public ElementCombinePlayer ElementPlr => player.GetModPlayer<ElementCombinePlayer>();
+    public int Cycle
+    {
+        get
+        {
+            if (field != -1) return field;
+            ElementCombination combination = Extra ? ElementPlr.CombinationEX : ElementPlr.Combination;
 
+            int state = combination.Mode;
+            if (state == 1)
+            {
+                field = combination.MainElements switch
+                {
+                    StoneElements.Fire => 30,
+                    StoneElements.Water => player.HasBuff<WaterUltra>() ? 4 : 6,
+                    StoneElements.Wood => 18,
+                    StoneElements.Metal => 18,
+                    StoneElements.Soil => 24,
+                    StoneElements.Lunar => (int)((Main.dayTime ? 18 : 12) * (player.HasBuff<BlessingFromLunarGod>() ? 0.75f : 1f)),
+                    StoneElements.Solar or _ => 45
+                };
+            }
+            else
+                field = 60;
+
+            return field;
+        }
+    } = -1;
+    public Color MainColor => new(248, 191, 37);//Color.Yellow
+    public bool UseMana => (int)Timer % Cycle == 0;
+    public bool Extra { get; set; }
+
+    public int SpecialAttackIndex { get; set; }
+    protected int AttackCounter { get; private set; }
+    #endregion
+
+    #region 插值属性
     public bool Released => projectile.timeLeft < 12;
-    public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(projectile.ai[0] / ChargeTime * 2, 0, 1);
-    public float Theta => projectile.ai[0] / 120f * MathHelper.TwoPi;
+    public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(Timer / ChargeTime * 2, 0, 1);
+    public float Theta => Timer / 120f * MathHelper.TwoPi;
     public float Alpha
     {
         get
         {
             float value = -MathHelper.Pi / 2f * (1 - 1 / (projectile.velocity.Length() / 64 + 1));
-            return MathHelper.SmoothStep(0, value, Utils.GetLerpValue(ChargeTime / 2, ChargeTime, projectile.ai[0], true));
-            if (projectile.ai[0] >= ChargeTime)
-            {
-                return -MathHelper.Pi / 3f;
-            }
-            else if (projectile.ai[0] >= ChargeTime / 2)
-            {
-                return -(projectile.ai[0] - ChargeTime / 2) * (projectile.ai[0] - ChargeTime / 2) / ChargeTime / ChargeTime * 4 * MathHelper.Pi / 3f;
-            }
-            return 0;
+            return MathHelper.SmoothStep(0, value, Utils.GetLerpValue(ChargeTime / 2, ChargeTime, Timer, true));
         }
     }
     public float ChargeTime => 45f;
-    public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / ChargeTime * 2) * projectile.velocity.ToRotation();
+    public float Beta => MathHelper.SmoothStep(0, 1, Timer / ChargeTime * 2) * (SpecialAttackIndex == 0 ? projectile.velocity.ToRotation() : -MathHelper.PiOver2);
     public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
-    public const float dis = 64;
-    public int Cycle => 60;
-    public Color MainColor => new(248, 191, 37);//Color.Yellow
-    public bool UseMana => (int)projectile.ai[0] % Cycle == 0;
+    #endregion
+
+
     public override void SetDefaults()
     {
         projectile.width = 1;
@@ -124,10 +163,7 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
         projectile.penetrate = -1;
         projectile.hide = true;
     }
-    public override bool ShouldUpdatePosition()
-    {
-        return false;
-    }
+    public override bool ShouldUpdatePosition() => false;
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         Main.instance.DrawCacheProjsOverWiresUI.Add(index);
@@ -136,19 +172,33 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         #region 顶点准备
-        int MagicFieldCount = 4;
+        ElementCombination combination = Extra ? ElementPlr.CombinationEX : ElementPlr.Combination;
+
+        int state = combination.Mode;
+
+        int MagicFieldCount = state switch
+        {
+            0 => Extra ? 9 : 7,
+            1 => 3,
+            2 or _ => 4,
+        };
         int vertexCount = 4 * MagicFieldCount;
         CustomVertexInfoEX[] vertexInfos = new CustomVertexInfoEX[vertexCount];//这里是最基本的顶点们
         for (int n = 0; n < vertexCount; n++)
         {
             var vec = new Vector4(n % 2, n / 2 % 2, 0, 1);
             vertexInfos[n].TexCoord = new Vector3(vec.X, vec.Y, Light);
-            vertexInfos[n].Color = (n / 4) switch
+            vertexInfos[n].Color = Color.Gold;
+            if (n > 7)
             {
-                0 or 1 => Color.Gold,
-                2 => ElementColor[Element1],
-                3 or _ => ElementColor[Element2]
-            };
+                vertexInfos[n].Color = state switch
+                {
+                    0 => ElementColor[(StoneElements)(n / 4 - 1)],
+                    1 => ElementColor[combination.MainElements],
+                    2 or _ => ElementColor[n > 11 ? combination.RealCoElements : combination.MainElements]
+                };
+            }
+
             //vertexInfos[n].Color = n < 4 ? Color.Red : Color.Cyan;
             vertexInfos[n].Position = new Vector4(n % 2, n / 2 % 2, 0, 1);
         }
@@ -179,25 +229,31 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             string pass = n switch
             {
                 0 or 1 => "OriginColor",
-                2 or 3 or _ => "VertexColor"
+                _ => "VertexColor"
             };
             string path = n switch
             {
                 0 => "UI/ElementPanel",
                 1 => "Images/MagicArea_2",
-                2 or 3 or _ => "Images/MagicArea_1"
+                _ => "Images/MagicArea_1"
             };
-            Vector2 scaler = n switch
+            Vector2 uTimeScaler = n switch
             {
                 0 => new Vector2(-0.09f, 0.6f),
                 1 => new Vector2(-0.15f, 1f),
                 2 or 3 or _ => new Vector2(0.12f, -0.8f)
             };
-            Matrix translation = n switch
+            Matrix translation = Matrix.CreateTranslation(-Vector3.One);
+            if (state is 0 or 2 && n > 1)
             {
-                0 or 1 => Matrix.CreateTranslation(-Vector3.One),
-                2 or 3 or _ => Matrix.CreateTranslation(-.5f, -.5f, -1f)
-            };
+                if (state == 0)
+                {
+                    float s = -MathF.Sin(MathF.Sqrt(Timer / Cycle) * MathHelper.TwoPi);
+                    translation = Matrix.CreateTranslation(s, s, -1f);
+                }
+                else
+                    translation = Matrix.CreateTranslation(-.5f, -.5f, -1f);
+            }
             float theta = n switch
             {
                 0 => 1,
@@ -205,14 +261,33 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
                 2 => -2f,
                 3 or _ => 3f
             } * Theta;
-            float sinValue = .25f * MathF.Sin(projectile.ai[0] / 120f * MathHelper.TwoPi);
-            Vector3 scale = n switch
-            {
-                0 => new Vector3(1, 1, 1f),
-                1 => new Vector3(1.5f, 1.5f, 2f),
-                2 => new Vector3(.5f, .5f, 1.5f + sinValue),
-                3 or _ => new Vector3(-.5f, -.5f, 1.5f - sinValue)
-            };
+
+
+            if (state == 0 && n > 1)
+                theta = n * MathHelper.TwoPi / (Extra ? 7 : 5f) - Theta;
+
+            Vector3 scale = default;
+            if (n > 1)
+                switch (state)
+                {
+                    case 0:
+                        float sinValue = .25f * MathF.Sin((Timer / 120f + (n - 2) / (Extra ? 7f : 5f)) * MathHelper.TwoPi);
+                        scale = new Vector3(.5f, .5f, 1.5f + sinValue);
+                        break;
+                    case 1:
+                        scale = new Vector3(1.25f, 1.25f, 1.5f);
+                        break;
+                    case 2:
+                        sinValue = .25f * MathF.Sin(Timer / 120f * MathHelper.TwoPi);
+                        scale = new Vector3(.5f, .5f, 1.5f + sinValue * (n % 2 == 0 ? 1 : -1));
+                        break;
+                }
+            else
+                scale = n switch
+                {
+                    0 => new Vector3(1, 1, 1f),
+                    1 or _ => new Vector3(1.5f, 1.5f, 2f)
+                };
             //声明矩阵transform
             //缩放为原来的两倍
             //平移至以原点为中心
@@ -225,22 +300,22 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             //平移回去
             //非常ez啊
             Matrix transform =
-            Matrix.CreateScale(2) *
-            translation *
-            Matrix.CreateScale(scale * new Vector3(Size, Size, dis)) *
-            Matrix.CreateRotationZ(theta) *
-            Matrix.CreateRotationY(Alpha) *
-            Matrix.CreateRotationZ(Beta) *
-            Matrix.CreateTranslation(new Vector3(projectile.Center, 0) - offset) *
-            new Matrix(height, 0, 0, 0,
-                            0, height, 0, 0,
-                            0, 0, 0, -1,
-                            0, 0, 0, height) *
-            Matrix.CreateTranslation(offset);
+                Matrix.CreateScale(2) *
+                translation *
+                Matrix.CreateScale(scale * new Vector3(Size, Size, dis)) *
+                Matrix.CreateRotationZ(theta) *
+                Matrix.CreateRotationY(Alpha) *
+                Matrix.CreateRotationZ(Beta) *
+                Matrix.CreateTranslation(new Vector3(projectile.Center, 0) - offset) *
+                new Matrix(height, 0, 0, 0,
+                                0, height, 0, 0,
+                                0, 0, 0, -1,
+                                0, 0, 0, height) *
+                Matrix.CreateTranslation(offset);
             DrawingMethods.VertexDrawEX(vertexs[(6 * n)..(6 * n + 6)],
                 ModContent.Request<Texture2D>($"StoneOfThePhilosophers/{path}").Value,
                 ModAsset.Style_4.Value, null,
-                new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * scaler, false, transform, pass, n == 0, false);
+                new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * uTimeScaler, false, transform, pass, n == 0, false);
         }
         #endregion
         #region 环环
@@ -254,7 +329,7 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             loopVertexInfos[2 * n + 1].Position.W = 1f;
             loopVertexInfos[2 * n].TexCoord = new Vector3(factor * 2, 0, Light);
             loopVertexInfos[2 * n + 1].TexCoord = new Vector3(factor * 2, 1, Light);
-            loopVertexInfos[2 * n].Color = Color.Gold * MathHelper.Clamp(projectile.ai[0] - ChargeTime - n, 0, 1);
+            loopVertexInfos[2 * n].Color = Color.Gold * MathHelper.Clamp(Timer - ChargeTime - n, 0, 1);
             loopVertexInfos[2 * n + 1].Color = default;
         }
         Vector2 loopScaler = new(0, 0.6f);
@@ -281,62 +356,61 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
     public override void OnKill(int timeLeft)
     {
     }
+    public float Timer
+    {
+        get => projectile.ai[0];
+        set => projectile.ai[0] = value;
+    }
     public override void AI()
     {
+        #region UpdateProjectile
+        Timer++;
         projectile.friendly = false;
-        //if (projectile.ai[0] == 0) 
-        //{
-
-        //}
-        projectile.ai[0]++;
-        //UpdateVertex();
         if (projectile.owner == Main.myPlayer)
         {
             Vector2 diff = Main.MouseWorld - player.Center;
-            //diff.Normalize();
             projectile.velocity = diff;
             projectile.direction = Main.MouseWorld.X > player.position.X ? 1 : -1;
             projectile.netUpdate = true;
         }
         projectile.Center = player.Center;
+        #endregion
+
+        #region UpdatePlayer
         int dir = projectile.direction;
         player.ChangeDir(dir);
-        //player.heldProj = projectile.whoAmI;
         player.itemTime = 2;
         player.itemAnimation = 2;
         player.itemRotation = (float)Math.Atan2(projectile.velocity.Y * dir, projectile.velocity.X * dir);
-        if (projectile.timeLeft > 12)
+        #endregion
+
+        ElementCombination combination = Extra ? ElementPlr.CombinationEX : ElementPlr.Combination;
+        int state = combination.Mode;
+        if (!Released)
         {
-            if (projectile.ai[0] > ChargeTime + 30)// && projectile.ai[0] > 300
-            {
+            if ((state == 1 && !player.channel && (SpecialAttackIndex == 0 || Timer > 60)) || (state != 1 && (Timer > ChargeTime + 45)))
                 projectile.timeLeft = 12;
-            }
             else
             {
                 projectile.timeLeft = 14;
-                if (projectile.ai[0] < ChargeTime / 2)
+                if (state == 1 && SpecialAttackIndex != 0)
                 {
-                    var fac = projectile.ai[0] * 2 / ChargeTime;
-                    fac *= 4 * (1 - fac);
-
+                    MagicArea.SpecialAttackDustSpawning(Projectile, elementColor[combination.MainElements], Timer == 55);
+                    HandleSpecialAttack(combination.MainElements);
                 }
-                if (UseMana)
+                else if (UseMana)
                 {
                     if (!player.CheckMana(player.inventory[player.selectedItem].mana, true))
-                    {
                         projectile.timeLeft = 12;
-                    }
-                    if (projectile.ai[0] >= 30)
-                        ShootProj();
+
+                    else if (Timer >= ChargeTime)
+                        ShootProj(combination);
                 }
             }
         }
         else
-        {
-            if (projectile.ai[0] > 15f)
-            {
-                ShootProj(true);
-            }
-        }
+            if (SpecialAttackIndex == 0)
+            ShootProj(combination, true);
+
     }
 }

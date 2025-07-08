@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.UI;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -8,44 +7,42 @@ using Terraria;
 namespace StoneOfThePhilosophers.Contents.Earth;
 public class StoneOfEarthProj : MagicArea
 {
-    public override StoneElements Elements => StoneElements.Soil;
-    public override Color MainColor => Color.Orange;
-    public override int Cycle => Extra ? 24 : 36;
-    public override void SpecialAttack(Color dustColor, bool trigger)
+    protected override StoneElements Elements => StoneElements.Soil;
+    protected override int Cycle => Extra ? 24 : 36;
+    public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+    public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
+
+    public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
     {
-        if (trigger)
+        if (!trigger) return;
+        var player = Main.player[projectile.owner];
+        var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), player.Center, default, ModContent.ProjectileType<EarthSpecialAttack>(), 0, 0, projectile.owner, 0, SpecialAttackIndex - 1);
+        if (SpecialAttackIndex == 2)
         {
-
-            var proj = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), player.Center, default, ModContent.ProjectileType<EarthSpecialAttack>(), 0, 0, Projectile.owner, 0, specialAttackIndex - 1);
-            if (specialAttackIndex == 2)
-            {
-                proj.timeLeft = 1200;
-                proj.friendly = false;
-                proj.damage = Projectile.damage;
-            }
-            else
-            {
-                int k = 0;
-                Point mouseCen = Main.MouseWorld.ToTileCoordinates();
-                while (k < 64)
-                {
-                    var tile = Main.tile[mouseCen + new Point(0, k)];
-                    if (tile.HasTile && Main.tileSolid[tile.TileType])
-                        break;
-                    k++;
-                }
-                proj.Center = (mouseCen + new Point(0, k)).ToVector2() * 16 + new Vector2(0, 4);
-            }
-
+            proj.timeLeft = 1200;
+            proj.friendly = false;
+            proj.damage = projectile.damage;
         }
-        base.SpecialAttack(dustColor, trigger);
+        else
+        {
+            int k = 0;
+            Point mouseCen = Main.MouseWorld.ToTileCoordinates();
+            while (k < 64)
+            {
+                var tile = Main.tile[mouseCen + new Point(0, k)];
+                if (tile.HasTile && Main.tileSolid[tile.TileType])
+                    break;
+                k++;
+            }
+            proj.Center = (mouseCen + new Point(0, k)).ToVector2() * 16 + new Vector2(0, 4);
+        }
     }
-    public override void ShootProj(Vector2 unit, bool dying = false)
+
+    public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 2 == 1) return;
         SoundEngine.PlaySound(SoundID.Item69);
-        attackCounter++;
-        if (attackCounter % 5 == 0 && Extra)
+        if (AttackCounter % 5 == 0 && Extra)
         {
             for (int n = 0; n < 3; n++)
             {

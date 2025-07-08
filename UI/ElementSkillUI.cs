@@ -1,366 +1,237 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using SilkyUIFramework;
+using SilkyUIFramework.Attributes;
+using SilkyUIFramework.BasicElements;
+using SilkyUIFramework.Extensions;
 using StoneOfThePhilosophers.Contents;
+using StoneOfThePhilosophers.Contents.Philosopher;
 using System.Collections.Generic;
-using Terraria.ModLoader;
-using Terraria.UI;
-using Terraria.Audio;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
-using Terraria.DataStructures;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using StoneOfThePhilosophers.Contents.Fire;
-using StoneOfThePhilosophers.Contents.Water;
-using StoneOfThePhilosophers.Contents.Earth;
-using StoneOfThePhilosophers.Contents.Moon;
-using StoneOfThePhilosophers.Contents.Sun;
-using StoneOfThePhilosophers.Contents.Wood;
-using StoneOfThePhilosophers.Contents.Metal;
+using Terraria.ModLoader;
 
-namespace StoneOfThePhilosophers.UI
+namespace StoneOfThePhilosophers.UI;
+
+[RegisterUI("Vanilla: Radial Hotbars", $"{nameof(StoneOfThePhilosophers)}: {nameof(ElementSkillUI)}")]
+public class ElementSkillUI : BasicBody
 {
-    public class ElementSkillSystem : ModSystem
+    public static ElementSkillUI Instance { get; private set; }
+
+    public ElementSkillPanel ElementSkillPanelNeo { get; private set; }
+
+    static bool Active;
+
+    public override bool Enabled { get => Active || timer > 0; set => Active = value; }
+
+    protected override void OnInitialize()
     {
-        public ElementSkillUI skillUI;
-        public UserInterface SkillInterface;
-        public static ElementSkillSystem Instance;
-        public override void Load()
+        Instance = this;
+        FitWidth = true;
+        FitHeight = true;
+        ElementSkillPanelNeo = new ElementSkillPanel(this);
+        ElementSkillPanelNeo.SetSize(256, 256);
+        ElementSkillPanelNeo.Join(this);
+        BorderColor = Color.Transparent;
+    }
+
+    public static void Open(int itemID, Vector2? position = null)
+    {
+        Instance.ElementSkillPanelNeo.DragOffset = new Vector2(0f, 0f);
+        Instance.ElementSkillPanelNeo.SetUpElementList();
+        Instance.ElementSkillPanelNeo.MouseDragOffset = default;
+        Instance.DragOffset = default;
+        Active = true;
+        SoundEngine.PlaySound(SoundID.MenuOpen);
+        Instance.itemType = itemID;
+        var targetVector = (position ?? Main.MouseScreen) / Main.ScreenSize.ToVector2();
+        targetVector -= new Vector2(.5f);
+        targetVector *= Main.GameZoomTarget * Main.ForcedMinimumZoom;
+        targetVector += new Vector2(.5f);
+        Instance.SetLeft(0, targetVector.X - .5f, .5f);
+        Instance.SetTop(0, targetVector.Y - .5f, .5f);
+    }
+
+    public static void Close()
+    {
+        SoundEngine.PlaySound(SoundID.MenuClose);
+        Active = false;
+    }
+    int timer;
+    int itemType;
+    protected override void UpdateStatus(GameTime gameTime)
+    {
+        timer += Active ? 1 : -1;
+        timer = MathHelper.Clamp(timer, 0, 15);
+        ElementSkillPanelNeo.Factor = MathHelper.SmoothStep(0, 1, timer / 15f);
+        if (Main.LocalPlayer.HeldItem.type != itemType && Active) Close();
+        base.UpdateStatus(gameTime);
+    }
+
+    protected override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        return;
+        base.Draw(gameTime, spriteBatch);
+        //return;
+    }
+}
+public class ElementSkillPanel : SUIDraggableView
+{
+    public List<ElementSkillButton> Buttons = [];
+    public float Factor { set; get; }
+    public ElementSkillPanel(UIElementGroup controlTarget) : base(controlTarget)
+    {
+
+    }
+    public override void HandleDraw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        //spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Black);
+        var graphicDevice = Main.instance.GraphicsDevice;
+        SamplerState samplerState = graphicDevice.SamplerStates[0];
+        DepthStencilState depthState = graphicDevice.DepthStencilState;
+        RasterizerState rasterizerState = graphicDevice.RasterizerState;
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
+
+        var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
+        Vector2 center = Bounds.Center;
+        spriteBatch.Draw(panelText, center, null, Color.White, MathHelper.Pi, new Vector2(256), .5f * Factor, 0, 0);
+        spriteBatch.Draw(panelText, center, null, Color.White * .5f, Main.GlobalTimeWrappedHourly, new Vector2(256), .75f * Factor, 0, 0);
+        //spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .75f, -Main.GlobalTimeWrappedHourly * 2, new Vector2(256), .625f * factor, 0, 0);
+
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
+
+        DrawChildren(gameTime, spriteBatch);
+    }
+
+    public void SetUpElementList()
+    {
+        var elementSkillPlr = Main.LocalPlayer.GetModPlayer<ElementSkillPlayer>();
+        Buttons.Clear();
+        Elements.Clear();
+        if (Main.LocalPlayer.HeldItem.ModItem is not MagicStone magicStone) return;
+        var type = (int)magicStone.Elements - 1;
+        if (Main.LocalPlayer.HeldItem.ModItem is StoneOfThePhilosopher stoneOfThePhilosopher) 
         {
-            skillUI = new ElementSkillUI();
-            SkillInterface = new UserInterface();
-            skillUI.Activate();
-            SkillInterface.SetState(skillUI);
-            Instance = this;
-            base.Load();
+            var mplr = Main.LocalPlayer.GetModPlayer<ElementCombinePlayer>();
+            var combination = stoneOfThePhilosopher.Extra ? mplr.CombinationEX : mplr.Combination;
+            if (combination.Mode != 1) return;
+            type = (int)combination.MainElements - 1;
         }
-        public override void Unload()
+        int max = ElementSkillPlayer.skillCounts[type];
+        for (int n = 0; n < max; n++)
         {
-            skillUI = null;
-            SkillInterface = null;
-            Instance = null;
-            base.Unload();
-        }
-        public override void UpdateUI(GameTime gameTime)
-        {
-            if (ElementSkillUI.Visible || ElementSkillUI.timer > 0)
-                SkillInterface?.Update(gameTime);
-        }
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-        {
-            int inventoryIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Inventory");
-            if (inventoryIndex != -1)
+            int index = n;
+            var button = new ElementSkillButton(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Element" + type), ElementSkillPlayer.GetSkillName(type, index));
+            button.SetSize(40, 40);
+            button.MouseEnter += delegate
             {
-                layers.Insert(inventoryIndex + 1, new LegacyGameInterfaceLayer("StoneOfThePhilosophers: ElementSkillUI", () =>
-                {
-                    if (ElementSkillUI.timer > 0)
-                        skillUI.Draw(Main.spriteBatch);
-                    return true;
-                }, InterfaceScaleType.UI));
-            }
+                SoundEngine.PlaySound(SoundID.MenuTick);
+            };
+            button.LeftMouseClick += delegate
+            {
+                SoundEngine.PlaySound(SoundID.Unlock);
+                //elementSkillPlr.skillIndex[type] = index;
+                elementSkillPlr.skillIndex[type] = index + 1;
+
+                ElementSkillUI.Close();
+                ElementCombineUI.Close();
+            };
+            Vector2 target = (-MathHelper.TwoPi * (1f / max * n)).ToRotationVector2() * (max - 1) * 64;
+            button.SetLeft(target.X - 20, .5f);
+            button.SetTop(target.Y - 20, .5f);
+            button.Positioning = Positioning.Absolute;
+
+            Buttons.Add(button);
+            button.Join(this);
         }
     }
-    public class ElementSkillPanel : UIElement
+    protected override void UpdateStatus(GameTime gameTime)
     {
-        /// <summary>
-        /// 是否可拖动
-        /// </summary>
-        public bool Draggable;
-        public bool Dragging;
-        public Vector2 Offset;
-        public float border;
-        public bool CalculateBorder;
-        public ElementSkillButton lastButton;
-        /// <summary>
-        /// <br>元素按钮</br>
-        /// <br>为什么是list呢？难道你还打算以后整点别的？</br>
-        /// </summary>
-        public List<ElementSkillButton> Buttons;
-        /// <summary>
-        /// <br>动画插值</br>
-        /// <br>决定ui的大小和透明度之类</br>
-        /// </summary>
-        public float factor;
-        public ElementSkillPanel(float border = 3, bool CalculateBorder = true)
-        {
-            SetPadding(10f);
-            this.border = border;
-            this.CalculateBorder = CalculateBorder;
-            OnLeftMouseDown += DragStart;
-            OnLeftMouseUp += DragEnd;
-            Buttons = [];
-        }
-        public override void OnActivate()
-        {
-            base.OnActivate();
-        }
-        public override void Recalculate()
-        {
-            base.Recalculate();
-            //panelInfo.destination = GetDimensions().ToRectangle();
-        }
-        public override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            CalculatedStyle dimenstions = GetDimensions();
-            var rect = dimenstions.ToRectangle();
-            if (CalculateBorder)
-            {
-                rect = Utils.CenteredRectangle(rect.Center.ToVector2(), rect.Size() + new Vector2(border * 2));
-            }
-            var graphicDevice = Main.instance.GraphicsDevice;
-            SamplerState samplerState = graphicDevice.SamplerStates[0];
-            DepthStencilState depthState = graphicDevice.DepthStencilState;
-            RasterizerState rasterizerState = graphicDevice.RasterizerState;
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
-
-            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
-            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White, MathHelper.Pi, new Vector2(256), .5f * factor, 0, 0);
-            spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .5f, Main.GlobalTimeWrappedHourly, new Vector2(256), .75f * factor, 0, 0);
-            //spriteBatch.Draw(panelText, rect.Center.ToVector2(), null, Color.White * .75f, -Main.GlobalTimeWrappedHourly * 2, new Vector2(256), .625f * factor, 0, 0);
-
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
-        }
-        // 可拖动界面
-        private void DragStart(UIMouseEvent evt, UIElement listeningElement)
-        {
-            // 当点击的是子元素不进行移动
-            //Main.NewText((Draggable, evt.Target == this));
-            if (Draggable && evt.Target == this)
-            {
-                Offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
-                Dragging = true;
-            }
-        }
-
-        // 可拖动/调整大小界面
-        private void DragEnd(UIMouseEvent evt, UIElement listeningElement)
-        {
-            Dragging = false;
-        }
-        public override void OnInitialize()
-        {
-
-        }
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-            foreach (var button in Buttons)
-            {
-                button.factor = factor;
-            }
-            if (IsMouseHovering)
-            {
-                Main.LocalPlayer.mouseInterface = true;
-                //panelInfo.mainColor = KeepOrigin ? CoolerUIPanel.BackgroundDefaultUnselectedColor : Color.White;
-
-            }
-            if (Dragging)
-            {
-                Left.Set(Main.mouseX - Offset.X, 0f);
-                Top.Set(Main.mouseY - Offset.Y, 0f);
-                Recalculate();
-                OnDrag?.Invoke(this);
-            }
-        }
-        public void SetUpElementList()
-        {
-            var elementSkillPlr = Main.LocalPlayer.GetModPlayer<ElementSkillPlayer>();
-            Buttons.Clear();
-            Elements.Clear();
-            lastButton = null;
-            var type = Main.LocalPlayer.HeldItem.type;
-            if (type == ModContent.ItemType<StoneOfFireEX>()) type = 0;
-            if (type == ModContent.ItemType<StoneOfWaterEX>()) type = 1;
-            if (type == ModContent.ItemType<StoneOfWoodEX>()) type = 2;
-            if (type == ModContent.ItemType<StoneOfMetalEX>()) type = 3;
-            if (type == ModContent.ItemType<StoneOfEarthEX>()) type = 4;
-            if (type == ModContent.ItemType<StoneOfMoon>()) type = 5;
-            if (type == ModContent.ItemType<StoneOfSun>()) type = 6;
-            int max = ElementSkillPlayer.skillCounts[type];
-            for (int n = 0; n < max; n++)
-            {
-                int index = n;
-                var button = new ElementSkillButton(ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Element" + type), ElementSkillPlayer.skillName[type, index]);
-                button.SetSize(40, 40);
-                button.OnMouseOver += (_, _) =>
-                {
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                };
-                var element = (StoneElements)(n + 1);
-                button.OnLeftClick += (_, _) =>
-                {
-                    SoundEngine.PlaySound(SoundID.Unlock);
-                    //elementSkillPlr.skillIndex[type] = index;
-                    elementSkillPlr.skillIndex[type] = index;
-
-                    ElementSkillSystem.Instance.skillUI.Close();
-                };
-                Vector2 target = (-MathHelper.TwoPi * (1f / max * n)).ToRotationVector2() * (max - 1) * 64;
-                button.Left.Set(target.X - 20, .5f);
-                button.Top.Set(target.Y - 20, .5f);
-
-                Buttons.Add(button);
-                Append(button);
-            }
-            Recalculate();
-        }
-        public event ElementEvent OnDrag;
+        foreach (var button in Buttons)
+            button.Factor = Factor;
+        base.UpdateStatus(gameTime);
     }
-    public class ElementSkillButton : UIElement
+}
+public class ElementSkillButton : UIView
+{
+    public bool Active = true;
+    public Asset<Texture2D> Texture { get; private set; }
+    public ElementSkillButton(Asset<Texture2D> texture, string spellName)
     {
-        public bool Active = true;
-        public Asset<Texture2D> Texture { get; private set; }
-        public ElementSkillButton(Asset<Texture2D> texture, string spellName)
-        {
-            if (texture is not null)
-            {
-                Texture = texture;
-                Width.Set(Texture.Width(), 0f);
-                Height.Set(Texture.Height(), 0f);
-            }
-            SpellName = spellName;
-        }
-        public string SpellName;
-        #region 各种设置方法
-
-        public void SetImage(Asset<Texture2D> texture, bool changeSize = false)
+        if (texture is not null)
         {
             Texture = texture;
-            if (changeSize)
-            {
-                Width.Set(Texture.Width(), 0f);
-                Height.Set(Texture.Height(), 0f);
-            }
+            SetSize(texture.Width(), texture.Height());
         }
-        #endregion
-        public float factor;
-        //public float factorInActive;
-        public int timer = 0;
-        public float timer2;
-        public override void Update(GameTime gameTime)
-        {
-            if (!Active && timer < 15) timer++;
-            timer2 = MathHelper.Lerp(timer2, (Active && IsMouseHovering) ? 1f : 0f, 0.1f);
-
-            base.Update(gameTime);
-        }
-
-        public override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            CalculatedStyle dimensions = GetDimensions();
-            Vector2 selfCen = dimensions.Center();
-            Vector2 parentCen = Parent?.GetDimensions().Center() ?? selfCen;
-            Vector2 normalVec = selfCen - parentCen;
-            normalVec = new Vector2(-normalVec.Y, normalVec.X);
-            var t = factor;
-            var scaler = t;
-            var scaler2 = t;
-            if (!Active)
-            {
-                t = MathHelper.SmoothStep(0, 1, timer / 15f);
-                parentCen = Parent?.GetDimensions().Center() ?? selfCen;
-                parentCen = Vector2.Lerp(parentCen, selfCen, 0.2f);
-                normalVec = selfCen - parentCen;
-                normalVec = new Vector2(normalVec.Y, -normalVec.X);
-                scaler -= t / 4;
-                scaler2 -= t;
-                t = 1 - t;
-            }
-            Vector2 result = Vector2.Lerp(parentCen, Vector2.Lerp(normalVec + (selfCen + parentCen) * .5f, selfCen, t), t);//t * t * selfCen + 2 * t * (1 - t) * (normalVec + (selfCen + parentCen) * .5f) + (1 - t) * (1 - t) * parentCen
-
-            #region 底板
-            var graphicDevice = Main.instance.GraphicsDevice;
-            SamplerState samplerState = graphicDevice.SamplerStates[0];
-            DepthStencilState depthState = graphicDevice.DepthStencilState;
-            RasterizerState rasterizerState = graphicDevice.RasterizerState;
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
-
-            var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
-            spriteBatch.Draw(panelText, result, null, Color.White * scaler2, Main.GlobalTimeWrappedHourly * .5f, new Vector2(256), .25f * scaler2 * (1f + .5f * timer2), 0, 0);
-            //spriteBatch.Draw(panelText, result, null, Color.White * scaler2 * .5f, -Main.GlobalTimeWrappedHourly, new Vector2(118), .35f * scaler2 * (1f + .5f * timer2), 0, 0);
-
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
-            #endregion
-
-
-            spriteBatch.Draw(Texture.Value, result, null, Color.White with { A = 127 } * factor, 0f, Texture.Size() / 2f, (1f + .5f * timer2) * scaler, SpriteEffects.None, 0f);
-            spriteBatch.Draw(Texture.Value, result + Main.rand.NextVector2Unit() * 4, null, Color.White with { A = 51 } * scaler2 * .5f, 0f, Texture.Size() / 2f, (1f + .5f * timer2) * scaler, SpriteEffects.None, 0f);
-            //TODO 按钮按下之后的效果
-            //TODO 按钮旁边的光效之类的东西
-            //TODO 融合按钮
-            //TODO 融合后的气场
-
-
-            //spriteBatch.Draw(Texture.Value, parentCen, null, Color.White * factor * .5f, 0f, Texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
-
-            if (IsMouseHovering)
-                Main.instance.MouseText(SpellName);
-
-        }
+        SpellName = spellName;
     }
-    
-    public class ElementSkillUI : UIState
+    public string SpellName;
+    public float Factor { get; set; }
+    //public float factorInActive;
+    public int timer = 0;
+    float scaleFactor;
+    protected override void UpdateStatus(GameTime gameTime)
     {
-        public static bool Visible { get; private set; }
-        public static int timer;
-        public void Open()
-        {
-            Visible = true;
-            SoundEngine.PlaySound(SoundID.MenuOpen);
-            BasePanel.SetUpElementList();
-            var Offset = BasePanel.Offset = UIMethods.MouseScreenUI;
-            BasePanel.Left.Set(Offset.X - 420, 0f);
-            BasePanel.Top.Set(Offset.Y - 128, 0f);
-            BasePanel.Recalculate();
-        }
-        public void Close()
-        {
-            Visible = false;
-            Main.blockInput = false;
-            SoundEngine.PlaySound(SoundID.MenuClose);
+        if (!Active && timer < 15) timer++;
+        scaleFactor = MathHelper.Lerp(scaleFactor, (Active && IsMouseHovering) ? 1f : 0f, 0.1f);
 
-        }
-        public bool CacheSetupElements;
-        public ElementSkillPanel BasePanel;
-        /// <summary>
-        /// 记录手持物品类型，变了就自动关闭
-        /// </summary>
-        public int itemType;
-        public override void Update(GameTime gameTime)
+        base.UpdateStatus(gameTime);
+    }
+    public override void HandleDraw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        Vector2 selfCen = Bounds.Center;
+        Vector2 parentCen = Parent?.GetBounds().Center ?? selfCen;
+        Vector2 normalVec = selfCen - parentCen;
+        normalVec = new Vector2(-normalVec.Y, normalVec.X);
+        var t = Factor;
+        var scaler = t;
+        var scaler2 = t;
+        if (!Active)
         {
-            if (CacheSetupElements)
-            {
-                BasePanel.SetUpElementList();
-                CacheSetupElements = false;
-            }
-            timer += Visible ? 1 : -1;
-            timer = (int)MathHelper.Clamp(timer, 0, 15);
-            BasePanel.factor = MathHelper.SmoothStep(0, 1, timer / 15f);
-            if (Main.LocalPlayer.HeldItem.type != itemType && Visible) Close();
-            base.Update(gameTime);
+            t = MathHelper.SmoothStep(0, 1, timer / 15f);
+            parentCen = Parent?.GetBounds().Center ?? selfCen;
+            parentCen = Vector2.Lerp(parentCen, selfCen, 0.2f);
+            normalVec = selfCen - parentCen;
+            normalVec = new Vector2(normalVec.Y, -normalVec.X);
+            scaler -= t / 4;
+            scaler2 -= t;
+            t = 1 - t;
         }
-        //一个底板 一堆按钮 右键切换开关状态 默认水火符 
-        public override void OnInitialize()
-        {
-            #region 贴图加载
+        Vector2 result = Vector2.Lerp(parentCen, Vector2.Lerp(normalVec + (selfCen + parentCen) * .5f, selfCen, t), t);//t * t * selfCen + 2 * t * (1 - t) * (normalVec + (selfCen + parentCen) * .5f) + (1 - t) * (1 - t) * parentCen
 
-            #endregion
+        #region 底板
+        var graphicDevice = Main.instance.GraphicsDevice;
+        SamplerState samplerState = graphicDevice.SamplerStates[0];
+        DepthStencilState depthState = graphicDevice.DepthStencilState;
+        RasterizerState rasterizerState = graphicDevice.RasterizerState;
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, depthState, rasterizerState, null, Main.UIScaleMatrix);
 
-            #region 面板初始化
-            BasePanel = new ElementSkillPanel()
-            {
-                Top = StyleDimension.FromPixels(256f),
-                HAlign = 0.2f
-            };
-            //BasePanel.SetPos(new Vector2(256, 256));
-            BasePanel.SetSize(256, 256).SetPadding(12f);
-            BasePanel.Draggable = true;
-            Append(BasePanel);
-            #endregion
-        }
+        var panelText = ModContent.Request<Texture2D>("StoneOfThePhilosophers/UI/Skill/SkillDecider").Value;
+        spriteBatch.Draw(panelText, result, null, Color.White * scaler2, Main.GlobalTimeWrappedHourly * .5f, new Vector2(256), .25f * scaler2 * (1f + .5f * scaleFactor), 0, 0);
+        //spriteBatch.Draw(panelText, result, null, Color.White * scaler2 * .5f, -Main.GlobalTimeWrappedHourly, new Vector2(118), .35f * scaler2 * (1f + .5f * timer2), 0, 0);
+
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
+        #endregion
+
+
+        spriteBatch.Draw(Texture.Value, result, null, Color.White with { A = 127 } * Factor, 0f, Texture.Size() / 2f, (1f + .5f * scaleFactor) * scaler, SpriteEffects.None, 0f);
+        spriteBatch.Draw(Texture.Value, result + Main.rand.NextVector2Unit() * 4, null, Color.White with { A = 51 } * scaler2 * .5f, 0f, Texture.Size() / 2f, (1f + .5f * scaleFactor) * scaler, SpriteEffects.None, 0f);
+        //TODO 按钮按下之后的效果
+        //TODO 按钮旁边的光效之类的东西
+        //TODO 融合按钮
+        //TODO 融合后的气场
+
+
+        //spriteBatch.Draw(Texture.Value, parentCen, null, Color.White * factor * .5f, 0f, Texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
+        if (IsMouseHovering)
+            Main.instance.MouseText(SpellName);
+
     }
 }

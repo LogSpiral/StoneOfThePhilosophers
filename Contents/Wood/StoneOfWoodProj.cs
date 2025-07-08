@@ -9,56 +9,49 @@ namespace StoneOfThePhilosophers.Contents.Wood;
 
 public class StoneOfWoodProj : MagicArea
 {
-    public override StoneElements Elements => StoneElements.Wood;
-    public override Color MainColor => Color.Green;
-    public override int Cycle => Extra ? 18 : 24;//24
-    public override void SpecialAttack(Color dustColor, bool trigger)
+    protected override StoneElements Elements => StoneElements.Wood;
+    protected override int Cycle => Extra ? 18 : 24;//24
+    public override void SpecialAttack(bool trigger) => SpecialAttackStatic(projectile, trigger, SpecialAttackIndex);
+    public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
+    public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
     {
-        switch (specialAttackIndex)
+        if (!trigger) return;
+        var player = Main.player[projectile.owner];
+        switch (SpecialAttackIndex)
         {
             case 1:
                 {
-                    //叶绿射线
-                    if (trigger)
-                    {
-                        player.AddBuff(ModContent.BuffType<WoodUltra>(), 450);
-                    }
+                    // 常青藤鞭
+                    player.AddBuff(ModContent.BuffType<WoodUltra>(), 450);
+
                     break;
                 }
             case 2:
                 {
-                    //巨木之晶
-                    if (trigger)
+                    // 巨木之晶
+                    for (int n = 0; n < 3; n++)
                     {
-                        for (int n = 0; n < 3; n++)
-                        {
-                            var npc = NPC.NewNPCDirect(projectile.GetNPCSource_FromThis(), player.Center, ModContent.NPCType<WoodCrystal>(), 0, player.whoAmI, n);
-                            npc.defense = player.statDefense;
-                        }
+                        var npc = NPC.NewNPCDirect(projectile.GetNPCSource_FromThis(), player.Center, ModContent.NPCType<WoodCrystal>(), 0, player.whoAmI, n);
+                        npc.defense = player.statDefense;
                     }
                     break;
                 }
             case 3:
                 {
-                    //愈伤组织
-                    if (trigger)
-                    {
-                        player.AddBuff(ModContent.BuffType<Reincarnation>(), 300);
-                        int healValue = player.statLifeMax2 - player.statLife;
-                        healValue = MathHelper.Clamp(healValue, 0, 50);
-                        player.statLife += healValue;
-                        player.HealEffect(healValue);
-                    }
+                    // 愈伤组织
+                    player.AddBuff(ModContent.BuffType<Reincarnation>(), 300);
+                    int healValue = player.statLifeMax2 - player.statLife;
+                    healValue = MathHelper.Clamp(healValue, 0, 50);
+                    player.statLife += healValue;
+                    player.HealEffect(healValue);
                     break;
                 }
         }
-        base.SpecialAttack(dustColor, trigger);
     }
-    public override void ShootProj(Vector2 unit, bool dying = false)
+    public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 2 == 1) return;
-
-        attackCounter++;
+        var player = Main.player[projectile.owner];
         SoundEngine.PlaySound(SoundID.Item74);
         int m = Main.rand.Next(4, 6) - (dying ? 2 : 0) + (Extra ? Main.rand.Next(3) : 0);
         float randAngle = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12);

@@ -1,18 +1,6 @@
-﻿using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.Audio;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent;
 
 namespace StoneOfThePhilosophers.Contents.Wood;
 

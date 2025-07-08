@@ -2,17 +2,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\tModLoader.targets" />
 	<PropertyGroup>
-		<AssemblyName>StoneOfThePhilosophers</AssemblyName>
-		<LangVersion>latest</LangVersion>
-		<Solaestas-UsePublicizer>True</Solaestas-UsePublicizer>
-		<Solaestas-UseAssetPath>true</Solaestas-UseAssetPath>
-
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.6.1" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\LogSpiralLibrary\LogSpiralLibrary.csproj" />
+	  <ProjectReference Include="..\SilkyUIFramework\SilkyUIFramework.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" />

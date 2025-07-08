@@ -7,6 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+using StoneOfThePhilosophers.Effects;
 
 namespace StoneOfThePhilosophers.Contents.Water;
 
@@ -79,15 +80,15 @@ public class WaterAttack : ModProjectile
                     Main.instance.GraphicsDevice.Textures[2] = ModAsset.HeatMap_1.Value;
                     Main.instance.GraphicsDevice.SamplerStates[1] = SamplerState.AnisotropicWrap;
                     Main.instance.GraphicsDevice.SamplerStates[2] = SamplerState.AnisotropicClamp;
-                    StoneOfThePhilosophers.HeatMap.Parameters["uTime"].SetValue(Projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
+                    HeatMapEffect.HeatMap.Parameters["uTime"].SetValue(Projectile.velocity.SafeNormalize(default).RotatedBy(MathHelper.PiOver2) * Main.GlobalTimeWrappedHourly);
                     var matrix =
                         Matrix.CreateTranslation(-0.5f, -0.5f, 0) *
                         Matrix.CreateScale(1, 1.5f, 1) *
 
                         Matrix.CreateRotationZ(-2 * r) *
                         Matrix.CreateTranslation(0.5f, 0.5f, 0);
-                    StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(matrix);
-                    StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+                    HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(matrix);
+                    HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
                     #endregion
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(16f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
@@ -98,8 +99,8 @@ public class WaterAttack : ModProjectile
 
                         Matrix.CreateRotationZ(r) *
                         Matrix.CreateTranslation(0.5f, 0.5f, 0);
-                    StoneOfThePhilosophers.HeatMap.Parameters["uTransform"].SetValue(matrix);
-                    StoneOfThePhilosophers.HeatMap.CurrentTechnique.Passes[0].Apply();
+                    HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(matrix);
+                    HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
 
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(20f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//

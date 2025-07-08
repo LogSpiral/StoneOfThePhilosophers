@@ -1,3 +1,45 @@
+RecipeGroups: {
+	IronLeadOres: 铁铅矿
+	GoldPlatinumOres: 金铂矿
+	CobaltPalladiumBars: 钴钯金锭
+	MythrilOrichalcumBars: 秘山铜锭
+	AdamantiteTitaniumBars: 精钛金锭
+	CursedIchorFlame: 咒火灵液
+}
+
+Spells: {
+	FireFire: 火符「火神的辉光」
+	WaterFire: 水火「燃素之雨」
+	WaterWater: 水符「湖葬」
+	WoodFire: 木火「森林大火」
+	WoodWater: 水木「水精灵」
+	WoodWood: 木符「翠绿风暴」
+	MetalFire: 火金「圣爱尔摩火柱」
+	MetalWater: 金水「水银之毒」
+	MetalWood: 金木「元素收割者」
+	MetalMetal: 金符「银龙」
+	SoilFire: 火土「环状熔岩带」
+	SoilWater: 土水「诺亚的大洪水」
+	SoilWood: 木土「自然之握」
+	SoilMetal: 土金「翡翠巨城」
+	SoilSoil: 土符「三石塔之震」
+	LunarFire: 月火「月之秽火」
+	LunarWater: 月水「静月之海」
+	LunarWood: 月木「卫星向日葵」
+	LunarMetal: 月金「卫星监察者」
+	LunarSoil: 月土「月狂冲击」
+	LunarLunar: 月符「沉静的月神」
+	SolarFire: 日火「希腊火」
+	SolarWater: 日水「氢化日珥」
+	SolarWood: 日木「光合作用」
+	SolarMetal: 日金「天罚剑」
+	SolarSoil: 日土「陨落天星」
+	SolarLunar: 日月「皇家钻戒」
+	SolarSolar: 日符「皇家圣焰」
+	FiveElements: 五曜「贤者之石」
+	SevenElements: 七曜「贤者之石」
+}
+
 Buffs: {
 	BlessingFromLunarGod: {
 		DisplayName: 月神的祝福
@@ -23,9 +65,50 @@ Buffs: {
 		DisplayName: 常春藤鞭
 		Description: 攻击附带能量藤蔓
 	}
+
+	WaterFireBuff: {
+		// DisplayName: Water Fire Buff
+		// Description: Mods.StoneOfThePhilosophers.Buffs.WaterFireBuff.Description
+	}
+
+	LunarFireBuff: {
+		// DisplayName: Lunar Fire Buff
+		// Description: Mods.StoneOfThePhilosophers.Buffs.LunarFireBuff.Description
+	}
+
+	SoilFireBuff: {
+		// DisplayName: Soil Fire Buff
+		// Description: Mods.StoneOfThePhilosophers.Buffs.SoilFireBuff.Description
+	}
 }
 
 Items: {
+	SpellPrefixs: {
+		Fire: 焱火
+		Water: 淼水
+		Wood: 森木
+		Metal: 鑫金
+		Earth: 垚土
+		Moon: 寒月
+		Sun: 炎日
+	}
+
+	SpellNames: {
+		Fire0: 灼炎炼狱
+		Water0: 穿石之流
+		Water1: 潮汐领域
+		Wood0: 常青藤鞭
+		Wood1: 巨木之晶
+		Wood2: 愈伤组织
+		Metal0: 钢铁洪流
+		Earth0: 大地之柱
+		Earth1: 山崩地裂
+		Moon0: 月影降临
+		Sun0: 歌未竟
+	}
+
+	MagicStones.MiddleClickTip: 使用鼠标中键以开启配置ui
+
 	StoneOfEarth: {
 		DisplayName: 土之石
 		Tooltip:
@@ -173,6 +256,18 @@ Projectiles: {
 	WaterAttack.DisplayName: Water Attack
 	WoodAttack.DisplayName: Wood Attack
 	WoodAttackUltra.DisplayName: Wood Attack Ultra
+	// WaterFireAttack.DisplayName: Water Fire Attack
+	// WaterFireRain.DisplayName: Water Fire Rain
+	// LunarFireTorch.DisplayName: Lunar Fire Torch
+	// MetalFireHandler.DisplayName: Metal Fire Handler
+	// MetalFirePillar.DisplayName: Metal Fire Pillar
+	// SoilFireZone.DisplayName: Soil Fire Zone
+	// WoodFireLeaf.DisplayName: Wood Fire Leaf
+	// WoodFirePlant.DisplayName: Wood Fire Plant
+	// WoodFireHandler.DisplayName: Wood Fire Handler
+	// SolarFireBall.DisplayName: Solar Fire Ball
+	// SolarFireZone.DisplayName: Solar Fire Zone
+	// SolarFireLaser.DisplayName: Solar Fire Laser
 }
 
 Configs: {

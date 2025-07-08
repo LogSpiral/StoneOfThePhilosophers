@@ -1,18 +1,6 @@
-﻿using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Terraria.GameContent;
-using Terraria.Audio;
 
 namespace StoneOfThePhilosophers.Contents.Water;
 

@@ -13,10 +13,6 @@ using Terraria;
 namespace StoneOfThePhilosophers.Contents.Earth;
 public class EarthAttack : ModProjectile
 {
-    public override bool OnTileCollide(Vector2 oldVelocity)
-    {
-        return base.OnTileCollide(oldVelocity);
-    }
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -29,10 +25,6 @@ public class EarthAttack : ModProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = 60;
         Projectile.ignoreWater = true;
-    }
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
     }
     public override bool PreDraw(ref Color lightColor)
     {

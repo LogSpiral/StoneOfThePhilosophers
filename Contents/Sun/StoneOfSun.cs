@@ -1,16 +1,4 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
