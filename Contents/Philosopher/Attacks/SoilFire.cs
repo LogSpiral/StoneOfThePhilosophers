@@ -1,25 +1,24 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties;
+﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
-using LogSpiralLibrary;
-using Terraria.DataStructures;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
-using Microsoft.Xna.Framework.Graphics;
-using static Terraria.GameContent.Animations.IL_Actions.Sprites;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Terraria.Audio;
 
 namespace StoneOfThePhilosophers.Contents.Philosopher.Attacks;
+
 public class SoilFireZoneVisual : VertexDrawInfo
 {
-    CustomVertexInfo[] _vertexInfos = new CustomVertexInfo[40];
+    private CustomVertexInfo[] _vertexInfos = new CustomVertexInfo[40];
     public override CustomVertexInfo[] VertexInfos => _vertexInfos;
     public float rotation;
+
     public override void Update()
     {
         if (!autoUpdate)
@@ -39,6 +38,7 @@ public class SoilFireZoneVisual : VertexDrawInfo
             VertexInfos[2 * i + 1] = new CustomVertexInfo(center, new Vector3(f, 0, 1));
         }
     }
+
     public override void PreDraw(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice)
     {
         base.PreDraw(spriteBatch, graphicsDevice);
@@ -57,6 +57,7 @@ public class SoilFireZoneVisual : VertexDrawInfo
         Main.graphics.GraphicsDevice.SamplerStates[2] = sampler;
         Main.graphics.GraphicsDevice.SamplerStates[3] = SamplerState.AnisotropicWrap;
     }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         Main.graphics.GraphicsDevice.Textures[0] = LogSpiralLibraryMod.BaseTex[21].Value;
@@ -73,14 +74,11 @@ public class SoilFireZoneVisual : VertexDrawInfo
         fac = fac < .1f ? MathHelper.SmoothStep(0, 1, fac * 10f) :
             MathHelper.SmoothStep(1, 0, (fac - .1f) / .9f);
 
-
         effect.Parameters["lightShift"].SetValue(fac * 1.1f - 1);
 
         base.Draw(spriteBatch);
-
-
-
     }
+
     public static SoilFireZoneVisual NewZone(string canvasName, int timeLeft, float scaler, float rotation, Vector2 center)
     {
         var result = new SoilFireZoneVisual();
@@ -94,12 +92,14 @@ public class SoilFireZoneVisual : VertexDrawInfo
         return result;
     }
 }
+
 public class SoilFireZone : ModProjectile
 {
     public const string CanvasName = $"{nameof(StoneOfThePhilosophers)}:{nameof(SoilFireZone)}";
-    readonly static MaskEffect maskEffect = Main.dedServ ? new() : new(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
-    readonly static BloomEffect bloomEffect = new(0, 1f, 2, 3, true, 0, true);
-    readonly static IRenderEffect[][] renderEffects = [[maskEffect, bloomEffect]];
+    private static readonly MaskEffect maskEffect = Main.dedServ ? new() : new(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
+    private static readonly BloomEffect bloomEffect = new(0, 1f, 2, 3, true, 0, true);
+    private static readonly IRenderEffect[][] renderEffects = [[maskEffect, bloomEffect]];
+
     public override void Load()
     {
         if (Main.dedServ) return;
@@ -107,6 +107,7 @@ public class SoilFireZone : ModProjectile
 
         base.Load();
     }
+
     public override void OnSpawn(IEntitySource source)
     {
         if (Main.dedServ) return;
@@ -115,9 +116,10 @@ public class SoilFireZone : ModProjectile
         maskEffect.FillTex = LogSpiralLibraryMod.Mask[6].Value;
         maskEffect.GlowColor = Color.Red;
         SoilFireZoneVisual.NewZone(CanvasName, Projectile.timeLeft, 300, Projectile.rotation, Projectile.Center);
-
     }
+
     public override string Texture => $"Terraria/Images/Item_{ItemID.Dirt1Echo}";
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 1;
@@ -129,6 +131,7 @@ public class SoilFireZone : ModProjectile
         Projectile.penetrate = -1;
         Projectile.aiStyle = -1;
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         Vector2 center = Projectile.Center;
@@ -147,25 +150,31 @@ public class SoilFireZone : ModProjectile
         }
         return false;
     }
+
     public override void AI()
     {
-        if(Projectile.timeLeft == 232)
+        if (Projectile.timeLeft == 232)
             SoundEngine.PlaySound(SoundID.Item74);
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(ModContent.BuffType<SoilFireBuff>(), 30);
         target.AddBuff(BuffID.OnFire, 600);
     }
+
     public override bool? CanCutTiles() => false;
+
     public override bool PreDraw(ref Color lightColor) => false;
+
     public override bool ShouldUpdatePosition() => false;
 }
+
 public class SoilFireBuff : ModBuff
 {
     public override string Texture => StoneOfThePhilosopher.DebuffTexturePath;
-
 }
+
 public class SoilFireGlobalNPC : GlobalNPC
 {
     public override void AI(NPC npc)

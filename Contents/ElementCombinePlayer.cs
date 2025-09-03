@@ -1,21 +1,21 @@
 ﻿using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+
 namespace StoneOfThePhilosophers.Contents;
 
 public class ElementCombination
 {
-
     public StoneElements MainElements { get; private set; }
 
     public StoneElements CoElements { get; private set; }
 
     public StoneElements RealCoElements => CoElements == StoneElements.Empty ? MainElements : CoElements;
 
-    public int Mode 
+    public int Mode
     {
-        get 
+        get
         {
-            if(MainElements == 0) // 如果主元素为0说明副元素一定也为0
+            if (MainElements == 0) // 如果主元素为0说明副元素一定也为0
                 return 0; // 采用多元素融合模式
             if (CoElements == 0) // 如果副元素为0则只有主元素，采用单元素模式
                 return 1;
@@ -36,12 +36,10 @@ public class ElementCombination
             CoElements = element1;
         }
     }
-
 }
 
 public class ElementCombinePlayer : ModPlayer
 {
-
     public ElementCombination Combination { get; } = new();
 
     public ElementCombination CombinationEX { get; } = new();
@@ -66,7 +64,6 @@ public class ElementCombinePlayer : ModPlayer
             (StoneElements)tag.GetByte("element4")
             );
     }
-
 }
 
 public enum StoneElements

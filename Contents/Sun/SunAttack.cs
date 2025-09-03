@@ -1,42 +1,47 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
 using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StoneOfThePhilosophers.Effects;
 using System;
+using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using LogSpiralLibrary;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
-using Terraria.DataStructures;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
-using StoneOfThePhilosophers.Effects;
 
 namespace StoneOfThePhilosophers.Contents.Sun;
+
 public class SunAttack : ModProjectile
 {
     #region Canvas
-    const string CanvasName = nameof(StoneOfThePhilosophers) + ":" + nameof(StoneOfSun);
-    readonly static AirDistortEffect airDistortEffect = new(32, 1.5f, 0, .5f);
-    readonly static BloomEffect bloomEffect = new(0, 1.05f, 1, 3, true, 2, true);
-    readonly static IRenderEffect[][] renderEffects = [[airDistortEffect], [bloomEffect]];
+
+    private const string CanvasName = nameof(StoneOfThePhilosophers) + ":" + nameof(StoneOfSun);
+    private static readonly AirDistortEffect airDistortEffect = new(32, 1.5f, 0, .5f);
+    private static readonly BloomEffect bloomEffect = new(0, 1.05f, 1, 3, true, 2, true);
+    private static readonly IRenderEffect[][] renderEffects = [[airDistortEffect], [bloomEffect]];
+
     public override void Load()
     {
         RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new(renderEffects));
         base.Load();
     }
 
-    UltraCanvas ultraCanvas;
+    private UltraCanvas ultraCanvas;
 
-    void DrawSun(float alpha, float distortScaler)
+    private void DrawSun(float alpha, float distortScaler)
     {
         var origState = Main.graphics.GraphicsDevice.BlendState;
         Main.graphics.GraphicsDevice.BlendState = BlendState.Additive;
         //Main.spriteBatch.End();
         //Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
         #region Shader
+
         float r = Main.rand.NextFloat();
         Main.instance.GraphicsDevice.Textures[1] = ModAsset.Style_6.Value;
         Main.instance.GraphicsDevice.Textures[2] = ModAsset.HeatMap_4.Value;
@@ -46,7 +51,8 @@ public class SunAttack : ModProjectile
         HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(Matrix.Identity);
         HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
-        #endregion
+        #endregion Shader
+
         Main.spriteBatch.Draw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r + MathHelper.PiOver2, new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f) * distortScaler, 0, 0);
 
         Main.spriteBatch.Draw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(8f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f) * distortScaler, 0, 0);
@@ -55,9 +61,9 @@ public class SunAttack : ModProjectile
         //Main.spriteBatch.End();
         //Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
         Main.graphics.GraphicsDevice.BlendState = origState;
-
     }
-    void DrawExposion(float distortScaler)
+
+    private void DrawExposion(float distortScaler)
     {
         var fac = 1 - Projectile.timeLeft / 21f;
         var fac1 = fac.HillFactor2(1);
@@ -70,14 +76,15 @@ public class SunAttack : ModProjectile
         Main.spriteBatch.Draw(ModAsset.FlameOfNuclear_Alpha.Value, Projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Yellow, Color.White, fac1) * fac1, Projectile.rotation, new Vector2(128), 2f * fac, 0, 0);
         Main.graphics.GraphicsDevice.BlendState = origState;
     }
-    void DrawLaser(float distortScaler)
+
+    private void DrawLaser(float distortScaler)
     {
         var origState = Main.graphics.GraphicsDevice.BlendState;
         Main.graphics.GraphicsDevice.BlendState = BlendState.Additive;
 
         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
         float dummySclaer = MathF.Pow(distortScaler, 3.0f);
-        var vertexs = Projectile.TailVertexFromProj(default, t => 16 * dummySclaer, t => Color.White * MathF.Pow(t, 2f).WaterDropFactor() * 2 * alpha, .5f);//MathF.Pow(t, 1.5f).WaterDropFactor() * 
+        var vertexs = Projectile.TailVertexFromProj(default, t => 16 * dummySclaer, t => Color.White * MathF.Pow(t, 2f).WaterDropFactor() * 2 * alpha, .5f);//MathF.Pow(t, 1.5f).WaterDropFactor() *
         DrawingMethods.VertexDraw(vertexs,
             ModAsset.Style_4.Value,
             ModAsset.Style_8.Value,
@@ -101,7 +108,8 @@ public class SunAttack : ModProjectile
 
         Main.graphics.GraphicsDevice.BlendState = origState;
     }
-    void DrawSelf(float distortScaler)
+
+    private void DrawSelf(float distortScaler)
     {
         switch (Style)
         {
@@ -113,7 +121,6 @@ public class SunAttack : ModProjectile
                 }
             case 1:
                 {
-
                     DrawExposion(distortScaler);
                     break;
                 }
@@ -130,7 +137,8 @@ public class SunAttack : ModProjectile
                 }
         }
     }
-    void UpdateCanvas()
+
+    private void UpdateCanvas()
     {
         if (ultraCanvas != null)
             ultraCanvas.timeLeft = Projectile.timeLeft;
@@ -138,16 +146,17 @@ public class SunAttack : ModProjectile
 
     public override void OnSpawn(IEntitySource source)
     {
-        if (Main.netMode == NetmodeID.Server) return;
+        if (Main.dedServ) return;
         ultraCanvas = UltraCanvas.NewUltraCanvas(CanvasName, Projectile.timeLeft, (canvas, scaler) => DrawSelf(scaler));
         base.OnSpawn(source);
     }
-    #endregion
+
+    #endregion Canvas
 
     /// <summary>
     /// 0太阳 1爆炸 2追踪射线 3头顶太阳
     /// </summary>
-    int Style => (int)Projectile.ai[0];
+    private int Style => (int)Projectile.ai[0];
 
     public override void SetDefaults()
     {
@@ -310,7 +319,6 @@ public class SunAttack : ModProjectile
                                 }
                             }
                         }
-
                     }
                     if (Projectile.timeLeft % 30 == 0)
                     {
@@ -324,9 +332,7 @@ public class SunAttack : ModProjectile
                                 var unit = (n / 8f * MathHelper.TwoPi + rand).ToRotationVector2();
                                 var proj = Projectile.NewProjectileDirect(Projectile.GetProjectileSource_FromThis(), Projectile.Center + unit * 192, unit * 24, Type, Projectile.damage / 2, Projectile.knockBack * .5f, Projectile.owner, 2);
                                 proj.penetrate = 3;
-
                             }
-
                         }
                         else
                         {
@@ -352,7 +358,6 @@ public class SunAttack : ModProjectile
                             var proj = Projectile.NewProjectileDirect(Projectile.GetProjectileSource_FromThis(), Projectile.Center + _unit * 96, _unit * 32, Type, Projectile.damage / 2, Projectile.knockBack * .5f, Projectile.owner, 2);
                             proj.penetrate = 3;
                         }
-
                     }
                     break;
                 }
@@ -375,7 +380,6 @@ public class SunAttack : ModProjectile
                     var unit = (n / 8f * MathHelper.TwoPi + rand).ToRotationVector2();
                     var proj = Projectile.NewProjectileDirect(Projectile.GetProjectileSource_FromThis(), Projectile.Center + unit * 192, unit * 16, Type, Projectile.damage, Projectile.knockBack * .5f, Projectile.owner, 2);
                     proj.penetrate = 3;
-
                 }
             }
 
@@ -437,7 +441,6 @@ public class SunAttack : ModProjectile
                             dust.velocity = Projectile.velocity;
                             dust.velocity *= 0.5f;
                         }
-
                     }
                     SoundEngine.PlaySound(SoundID.Item62);
                     break;

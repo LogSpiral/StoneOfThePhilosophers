@@ -1,17 +1,19 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 
 namespace StoneOfThePhilosophers.Contents.Metal;
+
 public class MetalAttack : ModProjectile
 {
     public bool Extra => Projectile.ai[1] == 1;
     public int TargetIndex = -1;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 32;
@@ -25,10 +27,12 @@ public class MetalAttack : ModProjectile
         Projectile.localNPCHitCooldown = 5;
         Projectile.aiStyle = -1;
     }
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (Projectile.ai[1] == 2)
@@ -51,6 +55,7 @@ public class MetalAttack : ModProjectile
 
         return false;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (Projectile.ai[1] == 2)
@@ -96,6 +101,7 @@ public class MetalAttack : ModProjectile
             }
         }
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         if (Projectile.ai[1] == 2)
@@ -104,12 +110,12 @@ public class MetalAttack : ModProjectile
             return targetHitbox.Intersects(Utils.CenteredRectangle(projHitbox.Center(), projHitbox.Size() * 3));
         return base.Colliding(projHitbox, targetHitbox);
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (Projectile.ai[1] == 2)
         {
             if (Projectile.timeLeft > 45) return false;
-
         }
         else
         {
@@ -137,7 +143,9 @@ public class MetalAttack : ModProjectile
 
         return base.OnTileCollide(oldVelocity);
     }
+
     public Vector2 offset;
+
     public override void OnKill(int timeLeft)
     {
         if (Projectile.ai[1] != 2) return;
@@ -161,6 +169,7 @@ public class MetalAttack : ModProjectile
         }
         base.OnKill(timeLeft);
     }
+
     public override void AI()
     {
         if (Projectile.ai[1] == 2)
@@ -241,21 +250,22 @@ public class MetalAttack : ModProjectile
             }
         }
 
-
-
         base.AI();
     }
 }
+
 public class MetalPiece : ModGore
 {
     public override void OnSpawn(Gore gore, IEntitySource source)
     {
         base.OnSpawn(gore, source);
     }
+
     public override Color? GetAlpha(Gore gore, Color lightColor)
     {
         return base.GetAlpha(gore, lightColor);
     }
+
     public override bool Update(Gore gore)
     {
         gore.alpha = (int)MathHelper.Lerp(255, 5, Utils.GetLerpValue(0, 15, gore.timeLeft, true));

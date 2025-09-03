@@ -1,13 +1,14 @@
 ﻿using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Wood;
+
 public class WoodCrystal : ModNPC
 {
     public override void SetDefaults()
@@ -19,12 +20,15 @@ public class WoodCrystal : ModNPC
         NPC.friendly = true;
         base.SetDefaults();
     }
+
     public override void SetStaticDefaults()
     {
         // DisplayName.SetDefault("巨木之晶");
         base.SetStaticDefaults();
     }
-    Player Player => Main.player[(int)NPC.ai[0]];
+
+    private Player Player => Main.player[(int)NPC.ai[0]];
+
     public override void AI()
     {
         NPC.ai[2]++;
@@ -53,6 +57,7 @@ public class WoodCrystal : ModNPC
 
         base.AI();
     }
+
     public void OnHitByNPC(NPC target)
     {
         if (!target.CanBeChasedBy()) return;
@@ -61,6 +66,7 @@ public class WoodCrystal : ModNPC
             Dust.NewDustPerfect(target.Center, MyDustId.GreenFXPowder, Main.rand.NextFloat(0, MathHelper.TwoPi).ToRotationVector2() * Main.rand.NextFloat(4, 8)).noGravity = true;//MathHelper.TwoPi / 30 * n
         Player.ApplyDamageToNPC(target, (int)(target.damage * Main.rand.NextFloat(0.85f, 1.15f) * .5f), 0, 1, Main.rand.NextBool(10));
     }
+
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         var r = NPC.ai[2] / 60f * MathHelper.TwoPi + MathHelper.TwoPi / 3 * NPC.ai[1] + MathHelper.Pi;
@@ -70,22 +76,25 @@ public class WoodCrystal : ModNPC
         for (int n = 1; n < 4; n++)
         {
             spriteBatch.Draw(TextureAssets.Npc[Type].Value, NPC.Center - screenPos + r.ToRotationVector2() * 80 - (r - n / 30f * MathHelper.TwoPi).ToRotationVector2() * 80, null, Color.White with { A = 0 } * (1 - 0.25f * n), r - n / 30f * MathHelper.TwoPi, new Vector2(15), 1f * (1 - 0.25f * n), 0, 0);
-
         }
         return false;
     }
+
     public override void HitEffect(NPC.HitInfo hit)
     {
         base.HitEffect(hit);
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit)
     {
         base.OnHitNPC(target, hit);
     }
+
     public override bool? CanBeHitByProjectile(Projectile projectile)
     {
         return base.CanBeHitByProjectile(projectile);
     }
+
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
     {
         projectile.Kill();

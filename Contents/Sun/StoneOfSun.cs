@@ -3,6 +3,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace StoneOfThePhilosophers.Contents.Sun;
+
 public class StoneOfSun : MagicStone
 {
     public override StoneElements Elements => StoneElements.Solar;
@@ -23,6 +24,7 @@ public class StoneOfSun : MagicStone
         recipe.AddTile(TileID.CrystalBall);
         recipe.Register();
     }
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -31,17 +33,3 @@ public class StoneOfSun : MagicStone
         Item.mana = 20;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

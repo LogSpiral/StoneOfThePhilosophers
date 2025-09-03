@@ -2,11 +2,11 @@
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+
 namespace StoneOfThePhilosophers.Contents.Philosopher.Attacks;
 
 public class MetalFireHandler : ModProjectile
@@ -22,6 +22,7 @@ public class MetalFireHandler : ModProjectile
         Projectile.width = 32;
         base.SetDefaults();
     }
+
     public override void AI()
     {
         try
@@ -33,7 +34,7 @@ public class MetalFireHandler : ModProjectile
                 while (point.Y + t < Main.maxTilesY && t < 100)
                 {
                     t++;
-                    var tile = Main.tile[point.X, point.Y + t];
+                    var tile = Framing.GetTileSafely(point.X, point.Y + t);
                     if (tile.HasTile && Main.tileSolid[tile.TileType])
                         break;
                 }
@@ -41,7 +42,7 @@ public class MetalFireHandler : ModProjectile
                 while (point.Y + t > 0 && t > -100)
                 {
                     t--;
-                    var tile = Main.tile[point.X, point.Y + t];
+                    var tile = Framing.GetTileSafely(point.X, point.Y + t);
                     if (!tile.HasTile)
                         break;
                     if (!Main.tileSolid[tile.type])
@@ -53,7 +54,6 @@ public class MetalFireHandler : ModProjectile
         }
         catch
         {
-
         }
         Projectile.ai[2]--;
         Projectile.friendly = Projectile.ai[2] <= 0;
@@ -61,20 +61,22 @@ public class MetalFireHandler : ModProjectile
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - Vector2.UnitY * 100,
                 default, ModContent.ProjectileType<MetalFirePillar>(), Projectile.damage / 2, Projectile.knockBack, Projectile.owner);
 
-
         if (Projectile.timeLeft % 10 == 0)
             Collision.HitTiles(Projectile.Center, default, 32, 32);
     }
+
     public override void OnKill(int timeLeft)
     {
         Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - Vector2.UnitY * 100, default, ModContent.ProjectileType<MetalFirePillar>(), Projectile.damage * 2 / 3, Projectile.knockBack, Projectile.owner);
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.ai[2] = 30;
         Projectile.timeLeft -= 60;
         Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - Vector2.UnitY * 100, default, ModContent.ProjectileType<MetalFirePillar>(), Projectile.damage / 2, Projectile.knockBack, Projectile.owner);
     }
+
     public override string Texture => $"Terraria/Images/Item_{ItemID.LivingIchorBlock}";
 
     public override bool PreDraw(ref Color lightColor)
@@ -97,6 +99,7 @@ public class MetalFirePillar : ModProjectile
         Projectile.width = 32;
         base.SetDefaults();
     }
+
     public override void AI()
     {
         if (Projectile.timeLeft == 180)
@@ -113,14 +116,14 @@ public class MetalFirePillar : ModProjectile
         }
         base.AI();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         SpriteBatch spriteBatch = Main.spriteBatch;
-        float k = MathHelper.SmoothStep(0,1, Projectile.timeLeft / 170f);
+        float k = MathHelper.SmoothStep(0, 1, Projectile.timeLeft / 170f);
         float h = 1;
         if (Projectile.timeLeft > 170)
         {
-
             float t = 180 - Projectile.timeLeft;
             t *= .1f;
             k = MathHelper.SmoothStep(0, 1, t);
@@ -140,6 +143,6 @@ public class MetalFirePillar : ModProjectile
     120 * h, k * 128, 0, 1f * k);
         return false;
     }
-    public override string Texture => $"Terraria/Images/Item_{ItemID.LivingIchorBlock}";
 
+    public override string Texture => $"Terraria/Images/Item_{ItemID.LivingIchorBlock}";
 }

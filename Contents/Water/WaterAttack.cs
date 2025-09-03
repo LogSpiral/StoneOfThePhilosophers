@@ -1,13 +1,13 @@
 ﻿using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StoneOfThePhilosophers.Effects;
 using System;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using StoneOfThePhilosophers.Effects;
 
 namespace StoneOfThePhilosophers.Contents.Water;
 
@@ -17,6 +17,7 @@ public class WaterAttack : ModProjectile
     {
         return (int)Projectile.ai[1] != 2;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 8;
@@ -31,10 +32,12 @@ public class WaterAttack : ModProjectile
         Projectile.aiStyle = -1;
         Projectile.extraUpdates = 2;
     }
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         switch ((int)Projectile.ai[1])
@@ -46,7 +49,6 @@ public class WaterAttack : ModProjectile
                     {
                         for (int m = 0; m < 4; m++)
                             Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0, 0);
-
                     }
                     break;
                 }
@@ -74,7 +76,9 @@ public class WaterAttack : ModProjectile
                     float alpha = (Projectile.timeLeft / 600f).SmoothSymmetricFactor(1 / 12f);
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
                     #region Shader
+
                     float r = Main.GlobalTimeWrappedHourly * 2f;
                     Main.instance.GraphicsDevice.Textures[1] = ModAsset.MagicArea_4.Value;
                     Main.instance.GraphicsDevice.Textures[2] = ModAsset.HeatMap_1.Value;
@@ -90,7 +94,8 @@ public class WaterAttack : ModProjectile
                     HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(matrix);
                     HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
-                    #endregion
+                    #endregion Shader
+
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(16f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
 
                     matrix =
@@ -102,7 +107,6 @@ public class WaterAttack : ModProjectile
                     HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(matrix);
                     HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
-
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(20f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
@@ -112,6 +116,7 @@ public class WaterAttack : ModProjectile
 
         return false;
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         switch ((int)Projectile.ai[1])
@@ -142,14 +147,12 @@ public class WaterAttack : ModProjectile
                                 Projectile.timeLeft = 3;
                                 Projectile.velocity = oldVelocity;
                             }
-
                         }
                     }
                     else
                     {
                         if (Projectile.alpha == 0 && !Main.rand.NextBool(4))
                         {
-
                             Projectile.alpha = 1;
                             if (Projectile.velocity.X != oldVelocity.X) Projectile.velocity.X = -oldVelocity.X;
                             if (Projectile.velocity.Y != oldVelocity.Y) Projectile.velocity.Y = -oldVelocity.Y;
@@ -161,7 +164,6 @@ public class WaterAttack : ModProjectile
                                 Projectile.timeLeft = 3;
                                 Projectile.velocity = oldVelocity;
                             }
-
                         }
                     }
                     break;
@@ -172,9 +174,9 @@ public class WaterAttack : ModProjectile
                 }
         }
 
-
         return false;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         switch ((int)Projectile.ai[1])
@@ -236,6 +238,7 @@ public class WaterAttack : ModProjectile
         }
         base.OnHitNPC(target, hit, damageDone);
     }
+
     public override void AI()
     {
         switch ((int)Projectile.ai[1])
@@ -293,9 +296,9 @@ public class WaterAttack : ModProjectile
                     break;
                 }
         }
-
     }
 }
+
 public class WaterUltra : ModBuff
 {
 }

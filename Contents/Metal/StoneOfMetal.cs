@@ -1,24 +1,13 @@
-﻿using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.Audio;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.DataStructures;
-using Terraria.GameContent;
 
 namespace StoneOfThePhilosophers.Contents.Metal;
 
 public class StoneOfMetal : MagicStone
 {
     public override StoneElements Elements => StoneElements.Metal;
+
     public override void AddOtherIngredients(Recipe recipe)
     {
         recipe.AddIngredient(ItemID.LargeTopaz);
@@ -28,6 +17,7 @@ public class StoneOfMetal : MagicStone
         recipe.AddRecipeGroup(ExtraRecipeGroupsSystem.GoldPlatinumOres, 10);
         base.AddOtherIngredients(recipe);
     }
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -35,6 +25,7 @@ public class StoneOfMetal : MagicStone
         Item.shoot = ModContent.ProjectileType<StoneOfMetalProj>();
     }
 }
+
 public class StoneOfMetalEX : StoneOfMetal
 {
     public override void AddRecipes()
@@ -43,11 +34,12 @@ public class StoneOfMetalEX : StoneOfMetal
         AddEXRequire<StoneOfMetal>(recipe, true);
         recipe.Register();
     }
+
     public override bool Extra => true;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.damage = 70;
     }
 }
-

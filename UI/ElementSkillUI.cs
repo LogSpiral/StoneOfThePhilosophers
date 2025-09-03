@@ -22,7 +22,7 @@ public class ElementSkillUI : BasicBody
 
     public ElementSkillPanel ElementSkillPanelNeo { get; private set; }
 
-    static bool Active;
+    private static bool Active;
 
     public override bool Enabled { get => Active || timer > 0; set => Active = value; }
 
@@ -59,8 +59,10 @@ public class ElementSkillUI : BasicBody
         SoundEngine.PlaySound(SoundID.MenuClose);
         Active = false;
     }
-    int timer;
-    int itemType;
+
+    private int timer;
+    private int itemType;
+
     protected override void UpdateStatus(GameTime gameTime)
     {
         timer += Active ? 1 : -1;
@@ -77,14 +79,16 @@ public class ElementSkillUI : BasicBody
         //return;
     }
 }
+
 public class ElementSkillPanel : SUIDraggableView
 {
     public List<ElementSkillButton> Buttons = [];
     public float Factor { set; get; }
+
     public ElementSkillPanel(UIElementGroup controlTarget) : base(controlTarget)
     {
-
     }
+
     public override void HandleDraw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         //spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Black);
@@ -114,7 +118,7 @@ public class ElementSkillPanel : SUIDraggableView
         Elements.Clear();
         if (Main.LocalPlayer.HeldItem.ModItem is not MagicStone magicStone) return;
         var type = (int)magicStone.Elements - 1;
-        if (Main.LocalPlayer.HeldItem.ModItem is StoneOfThePhilosopher stoneOfThePhilosopher) 
+        if (Main.LocalPlayer.HeldItem.ModItem is StoneOfThePhilosopher stoneOfThePhilosopher)
         {
             var mplr = Main.LocalPlayer.GetModPlayer<ElementCombinePlayer>();
             var combination = stoneOfThePhilosopher.Extra ? mplr.CombinationEX : mplr.Combination;
@@ -149,6 +153,7 @@ public class ElementSkillPanel : SUIDraggableView
             button.Join(this);
         }
     }
+
     protected override void UpdateStatus(GameTime gameTime)
     {
         foreach (var button in Buttons)
@@ -156,10 +161,12 @@ public class ElementSkillPanel : SUIDraggableView
         base.UpdateStatus(gameTime);
     }
 }
+
 public class ElementSkillButton : UIView
 {
     public bool Active = true;
     public Asset<Texture2D> Texture { get; private set; }
+
     public ElementSkillButton(Asset<Texture2D> texture, string spellName)
     {
         if (texture is not null)
@@ -169,11 +176,15 @@ public class ElementSkillButton : UIView
         }
         SpellName = spellName;
     }
+
     public string SpellName;
     public float Factor { get; set; }
+
     //public float factorInActive;
     public int timer = 0;
-    float scaleFactor;
+
+    private float scaleFactor;
+
     protected override void UpdateStatus(GameTime gameTime)
     {
         if (!Active && timer < 15) timer++;
@@ -181,10 +192,11 @@ public class ElementSkillButton : UIView
 
         base.UpdateStatus(gameTime);
     }
+
     public override void HandleDraw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 selfCen = Bounds.Center;
-        Vector2 parentCen = Parent?.GetBounds().Center ?? selfCen;
+        Vector2 parentCen = Parent?.Bounds.Center ?? selfCen;
         Vector2 normalVec = selfCen - parentCen;
         normalVec = new Vector2(-normalVec.Y, normalVec.X);
         var t = Factor;
@@ -193,7 +205,7 @@ public class ElementSkillButton : UIView
         if (!Active)
         {
             t = MathHelper.SmoothStep(0, 1, timer / 15f);
-            parentCen = Parent?.GetBounds().Center ?? selfCen;
+            parentCen = Parent?.Bounds.Center ?? selfCen;
             parentCen = Vector2.Lerp(parentCen, selfCen, 0.2f);
             normalVec = selfCen - parentCen;
             normalVec = new Vector2(normalVec.Y, -normalVec.X);
@@ -204,6 +216,7 @@ public class ElementSkillButton : UIView
         Vector2 result = Vector2.Lerp(parentCen, Vector2.Lerp(normalVec + (selfCen + parentCen) * .5f, selfCen, t), t);//t * t * selfCen + 2 * t * (1 - t) * (normalVec + (selfCen + parentCen) * .5f) + (1 - t) * (1 - t) * parentCen
 
         #region 底板
+
         var graphicDevice = Main.instance.GraphicsDevice;
         SamplerState samplerState = graphicDevice.SamplerStates[0];
         DepthStencilState depthState = graphicDevice.DepthStencilState;
@@ -217,8 +230,8 @@ public class ElementSkillButton : UIView
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, depthState, rasterizerState, null, Main.UIScaleMatrix);
-        #endregion
 
+        #endregion 底板
 
         spriteBatch.Draw(Texture.Value, result, null, Color.White with { A = 127 } * Factor, 0f, Texture.Size() / 2f, (1f + .5f * scaleFactor) * scaler, SpriteEffects.None, 0f);
         spriteBatch.Draw(Texture.Value, result + Main.rand.NextVector2Unit() * 4, null, Color.White with { A = 51 } * scaler2 * .5f, 0f, Texture.Size() / 2f, (1f + .5f * scaleFactor) * scaler, SpriteEffects.None, 0f);
@@ -227,11 +240,9 @@ public class ElementSkillButton : UIView
         //TODO 融合按钮
         //TODO 融合后的气场
 
-
         //spriteBatch.Draw(Texture.Value, parentCen, null, Color.White * factor * .5f, 0f, Texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
 
         if (IsMouseHovering)
             Main.instance.MouseText(SpellName);
-
     }
 }

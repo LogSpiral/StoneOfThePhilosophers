@@ -1,22 +1,24 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
+﻿using LogSpiralLibrary.CodeLibrary.Utilties;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StoneOfThePhilosophers.Effects;
 using System;
+using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using StoneOfThePhilosophers.Effects;
 
 namespace StoneOfThePhilosophers.Contents.Fire;
+
 public class FireAttack : ModProjectile
 {
     /// <summary>
     /// 0为火球 1真火球 2大爆炸 3小爆炸 4凤凰 5追踪真火 6火之领域
     /// </summary>
-    int Style => (int)Projectile.ai[0];
+    private int Style => (int)Projectile.ai[0];
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 32;
@@ -28,6 +30,7 @@ public class FireAttack : ModProjectile
         Projectile.penetrate = -1;
         Projectile.aiStyle = -1;
     }
+
     public override void AI()
     {
         switch (Style)
@@ -71,7 +74,6 @@ public class FireAttack : ModProjectile
                                     dust.velocity = Projectile.velocity;
                                     dust.velocity *= 0.5f;
                                 }
-
                             }
                             SoundEngine.PlaySound(SoundID.Item62);
                         }
@@ -162,6 +164,7 @@ public class FireAttack : ModProjectile
         }
         base.AI();
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.OnFire, 300);
@@ -192,7 +195,6 @@ public class FireAttack : ModProjectile
                     dust.velocity = Projectile.velocity;
                     dust.velocity *= 0.5f;
                 }
-
             }
             SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
             target.immune[Projectile.owner] = 2;
@@ -210,7 +212,6 @@ public class FireAttack : ModProjectile
                 proj.Center = Projectile.Center + Projectile.velocity;
                 proj.rotation = MathHelper.TwoPi / 6 * n + Projectile.rotation;
                 proj.tileCollide = false;
-
             }
             for (int num431 = 4; num431 < 31; num431++)
             {
@@ -224,7 +225,6 @@ public class FireAttack : ModProjectile
                     dust.velocity = Projectile.velocity;
                     dust.velocity *= 0.5f;
                 }
-
             }
             var soundEff = SoundID.Item62;
             soundEff.Volume *= .5f;
@@ -246,6 +246,7 @@ public class FireAttack : ModProjectile
             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[0] += damageDone / ElementSkillPlayer.Devider;
         }
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (Style == 0 || Style == 1 || Style == 5)
@@ -282,10 +283,12 @@ public class FireAttack : ModProjectile
         }
         return false;
     }
+
     public override bool? CanCutTiles()
     {
         return Style != 6;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         switch (Style)
@@ -380,7 +383,9 @@ public class FireAttack : ModProjectile
                     float alpha = (Projectile.timeLeft / 300f).SmoothSymmetricFactor(1 / 12f);
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
                     #region Shader
+
                     float r = Main.GlobalTimeWrappedHourly * 2f;
                     Main.instance.GraphicsDevice.Textures[1] = ModAsset.MagicArea_4.Value;
                     Main.instance.GraphicsDevice.Textures[2] = ModAsset.HeatMap_0.Value;
@@ -391,7 +396,8 @@ public class FireAttack : ModProjectile
 
                     HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
-                    #endregion
+                    #endregion Shader
+
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, -2 * r, new Vector2(16), new Vector2(12f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
 
                     Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(16f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//

@@ -1,17 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.UI;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Water;
+
 public class StoneOfWaterProj : MagicArea
 {
     protected override StoneElements Elements => StoneElements.Water;
     protected override int Cycle => player.HasBuff<WaterUltra>() ? 4 : 6;//6
+
     public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+
     public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
+
     public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
     {
         if (!trigger) return;
@@ -40,6 +43,7 @@ public class StoneOfWaterProj : MagicArea
                 }
         }
     }
+
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         var flag = Main.player[projectile.owner].HasBuff<WaterUltra>();
@@ -57,7 +61,6 @@ public class StoneOfWaterProj : MagicArea
                     projectile.owner,
                     flag ? 0 : Main.rand.Next(5),
                     flag ? 1 : 0);
-
             }
         else
         {
@@ -69,7 +72,6 @@ public class StoneOfWaterProj : MagicArea
                     projectile.damage * 3 / 2,
                     projectile.knockBack * 2,
                     projectile.owner, 0, 1);
-
             else
             {
                 if (Extra)
@@ -93,8 +95,6 @@ public class StoneOfWaterProj : MagicArea
                             projectile.owner,
                             Main.rand.Next(5));
             }
-
-
         }
 
         SoundEngine.PlaySound(SoundID.Item84);

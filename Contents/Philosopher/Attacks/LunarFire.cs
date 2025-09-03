@@ -2,7 +2,6 @@
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
 using System;
-using System.Diagnostics.Eventing.Reader;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -13,8 +12,9 @@ namespace StoneOfThePhilosophers.Contents.Philosopher.Attacks;
 
 public class LunarFireTorch : ModProjectile
 {
-    Player Owner => Main.player[Projectile.owner];
+    private Player Owner => Main.player[Projectile.owner];
     public override string Texture => $"Terraria/Images/Item_{ItemID.LivingDemonFireBlock}";
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 900;
@@ -29,7 +29,7 @@ public class LunarFireTorch : ModProjectile
 
     public override void AI()
     {
-        if(Projectile.timeLeft == 880)
+        if (Projectile.timeLeft == 880)
             SoundEngine.PlaySound(SoundID.Item62);
 
         Projectile.Center = Owner.Center - Vector2.UnitY * 96 + Vector2.UnitY * Owner.gfxOffY;
@@ -55,6 +55,7 @@ public class LunarFireTorch : ModProjectile
             }
         base.AI();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         var spriteBatch = Main.spriteBatch;
@@ -68,9 +69,9 @@ public class LunarFireTorch : ModProjectile
         var scalerVector = new Vector2(.75f + MathF.Cos(Projectile.timeLeft * .1f) * .15f, 1);
 
         spriteBatch.DrawQuadraticLaser_PassHeatMap(Projectile.position + Vector2.UnitY * 48, -Vector2.UnitY, LogSpiralLibraryMod.HeatMap[8].Value, LogSpiralLibraryMod.AniTex[8].Value,
-    120 * scalerVector.X * alpha, 96 * scalerVector.Y * alpha,0,alpha);
+    120 * scalerVector.X * alpha, 96 * scalerVector.Y * alpha, 0, alpha);
 
-        spriteBatch.Draw(texture, center, null, color with { A = 0}, 0, origin, 4 * alpha * scalerVector, 0, 0);
+        spriteBatch.Draw(texture, center, null, color with { A = 0 }, 0, origin, 4 * alpha * scalerVector, 0, 0);
         for (int n = 0; n < 3; n++)
             spriteBatch.Draw(texture, center + (MathHelper.TwoPi * (n / 3f + Projectile.timeLeft * .05f)).ToRotationVector2() * 4, null, color with { A = 0 } * .25f, 0, origin, 5 * alpha * alpha * scalerVector, 0, 0);
 
@@ -89,9 +90,11 @@ public class LunarFireTorch : ModProjectile
         return false;
     }
 }
+
 public class LunarFireBuff : ModBuff
 {
     public override string Texture => StoneOfThePhilosopher.DebuffTexturePath;
+
     public override void Update(NPC npc, ref int buffIndex)
     {
         npc.lifeRegen -= 200;
@@ -100,6 +103,7 @@ public class LunarFireBuff : ModBuff
         base.Update(npc, ref buffIndex);
     }
 }
+
 public class LunarFireGlobalNPC : GlobalNPC
 {
     public override void ModifyHitNPC(NPC npc, NPC target, ref NPC.HitModifiers modifiers)
@@ -108,12 +112,14 @@ public class LunarFireGlobalNPC : GlobalNPC
             modifiers.FinalDamage *= 1.2f;
         base.ModifyHitNPC(npc, target, ref modifiers);
     }
+
     public override void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers)
     {
         if (npc.HasBuff<LunarFireBuff>())
             modifiers.FinalDamage *= 1.2f;
         base.ModifyHitPlayer(npc, target, ref modifiers);
     }
+
     public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
     {
         if (npc.HasBuff<LunarFireBuff>())
@@ -121,12 +127,14 @@ public class LunarFireGlobalNPC : GlobalNPC
 
         base.ModifyIncomingHit(npc, ref modifiers);
     }
+
     public override void UpdateLifeRegen(NPC npc, ref int damage)
     {
         if (npc.HasBuff<LunarFireBuff>() && damage < 20)
             damage = 20;
         base.UpdateLifeRegen(npc, ref damage);
     }
+
     public override void AI(NPC npc)
     {
         if (npc.HasBuff<LunarFireBuff>())

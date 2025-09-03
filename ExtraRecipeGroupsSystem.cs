@@ -1,8 +1,10 @@
-﻿using Terraria.ID;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Terraria;
+using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader;
+
 namespace StoneOfThePhilosophers;
+
 public class ExtraRecipeGroupsSystem : ModSystem
 {
     public const string IronLeadOres = "StoneOfThePhilosophers:IronLeadOres";
@@ -11,6 +13,7 @@ public class ExtraRecipeGroupsSystem : ModSystem
     public const string MythrilOrichalcumBars = "StoneOfThePhilosophers:MythrilOrichalcumBars";
     public const string AdamantiteTitaniumBars = "StoneOfThePhilosophers:AdamantiteTitaniumBars";
     public const string CursedIchorFlame = "StoneOfThePhilosophers:CursedIchorFlame";
+
     public override void AddRecipeGroups()
     {
         RecipeGroup group = new(() => Language.GetTextValue("LegacyMisc.37") + Language.GetTextValue("Mods.StoneOfThePhilosphers.IronLeadOres"),

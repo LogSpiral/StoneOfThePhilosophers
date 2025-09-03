@@ -1,26 +1,25 @@
 ﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+using LogSpiralLibrary.CodeLibrary.Utilties;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StoneOfThePhilosophers.Contents.Fire;
 using System;
+using System.Collections.Generic;
+using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria;
 using Terraria.ModLoader;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using StoneOfThePhilosophers.Contents.Fire;
-using System.Collections.Generic;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Graphics;
-using System.Net;
-using LogSpiralLibrary.CodeLibrary.Utilties;
 
 namespace StoneOfThePhilosophers.Contents.Philosopher.Attacks;
 
 public class SolarFireZone : ModProjectile
 {
-    Player Owner => Main.player[Projectile.owner];
+    private Player Owner => Main.player[Projectile.owner];
     public override string Texture => $"Terraria/Images/Item_{ItemID.LivingFireBlock}";
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 900;
@@ -36,7 +35,6 @@ public class SolarFireZone : ModProjectile
 
     public override void AI()
     {
-
         Projectile.Center = Owner.MountedCenter;
         if (Projectile.timeLeft > 300)
         {
@@ -59,9 +57,11 @@ public class SolarFireZone : ModProjectile
         base.AI();
     }
 }
+
 public class SolarFireBall : ModProjectile
 {
     public override string Texture => $"Terraria/Images/Item_{ItemID.LivingFireBlock}";
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 120;
@@ -74,6 +74,7 @@ public class SolarFireBall : ModProjectile
         Projectile.aiStyle = -1;
         base.SetDefaults();
     }
+
     public override void AI()
     {
         if (Projectile.timeLeft > 105)
@@ -110,6 +111,7 @@ public class SolarFireBall : ModProjectile
             Dust.NewDustPerfect(Projectile.Center, DustID.SolarFlare).noGravity = true;
         base.AI();
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int n = 0; n < 10; n++)
@@ -119,6 +121,7 @@ public class SolarFireBall : ModProjectile
 
         base.OnHitNPC(target, hit, damageDone);
     }
+
     public override void OnKill(int timeLeft)
     {
         SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
@@ -132,12 +135,14 @@ public class SolarFireBall : ModProjectile
         proj.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
         base.OnKill(timeLeft);
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         for (int n = 0; n < 10; n++)
             Dust.NewDust(Projectile.position, 16, 16, DustID.SolarFlare);
         return true;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         var spriteBatch = Main.spriteBatch;
@@ -162,11 +167,14 @@ public class SolarFireBall : ModProjectile
     64f, 64f, 0, alpha * .75f);
         return false;
     }
+
     public override bool ShouldUpdatePosition() => Projectile.timeLeft < 105;
 }
+
 public class SolarFireLaser : ModProjectile
 {
     public override string Texture => $"Terraria/Images/Item_{ItemID.LivingFireBlock}";
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 45;
@@ -181,6 +189,7 @@ public class SolarFireLaser : ModProjectile
         Projectile.localNPCHitCooldown = 10;
         base.SetDefaults();
     }
+
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         float fac = (Projectile.timeLeft / 60f + Projectile.ai[0]);
@@ -193,6 +202,7 @@ public class SolarFireLaser : ModProjectile
             Projectile.hide = false;
         base.DrawBehind(index, behindNPCsAndTiles, behindNPCs, behindProjectiles, overPlayers, overWiresUI);
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         if (Projectile.timeLeft > 38) return false;
@@ -201,6 +211,7 @@ public class SolarFireLaser : ModProjectile
         var factor = (45f - Projectile.timeLeft).HillFactor2(45);
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, Projectile.Center + Projectile.velocity * factor * 1600f, 32 * factor, ref point);
     }
+
     public override bool ShouldUpdatePosition() => false;
 
     public override void AI()
@@ -214,20 +225,17 @@ public class SolarFireLaser : ModProjectile
         if (Projectile.velocity != default)
             Projectile.rotation = Projectile.velocity.ToRotation();
         if (Projectile.timeLeft == 45)
-            SoundEngine.PlaySound(MySoundID.LaserBeam with { MaxInstances = -1}, Projectile.Center);
+            SoundEngine.PlaySound(MySoundID.LaserBeam with { MaxInstances = -1 }, Projectile.Center);
         base.AI();
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
-
-
-
         var factor = (45f - Projectile.timeLeft).HillFactor2(45);
         var spriteBatch = Main.spriteBatch;
 
-
         #region 顶点准备
+
         int MagicFieldCount = 1;
         int vertexCount = 4 * MagicFieldCount;
         CustomVertexInfoEX[] vertexInfos = new CustomVertexInfoEX[vertexCount];//这里是最基本的顶点们
@@ -239,8 +247,11 @@ public class SolarFireLaser : ModProjectile
             //vertexInfos[n].Color = n < 4 ? Color.Red : Color.Cyan;
             vertexInfos[n].Position = new Vector4(n % 2, n / 2 % 2, 0, 1);
         }
-        #endregion
+
+        #endregion 顶点准备
+
         #region 顶点连接
+
         vertexCount = 6 * MagicFieldCount;
         CustomVertexInfoEX[] vertexs = new CustomVertexInfoEX[vertexCount];//三角形会共用顶点对吧，所以我就不得不准备个大一点的数组然后给所有的三角形安排上自己的顶点
         for (int n = 0; n < vertexCount; n++)
@@ -257,8 +268,11 @@ public class SolarFireLaser : ModProjectile
             index += n / 6 * 4;
             vertexs[n] = vertexInfos[index];
         }
-        #endregion
+
+        #endregion 顶点连接
+
         #region 矩阵生成与绘制
+
         float height = 2000f;
         Vector3 offset = new(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
         for (int n = 0; n < MagicFieldCount; n++)
@@ -278,7 +292,7 @@ public class SolarFireLaser : ModProjectile
             float k = 1 + MathF.Pow(1 - factor, 2);
             Vector3 scale = n switch
             {
-                0 => new Vector3(k ,k, 1f),
+                0 => new Vector3(k, k, 1f),
                 1 or _ => new Vector3(1.5f, 1.5f, 2f)
             };
 
@@ -311,12 +325,10 @@ public class SolarFireLaser : ModProjectile
                 ModAsset.Style_4.Value, null,
                 new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * scaler, false, transform, pass, n == 0, n == 1);
         }
-        #endregion
 
+        #endregion 矩阵生成与绘制
 
         spriteBatch.DrawQuadraticLaser_PassHeatMap(Projectile.Center, Projectile.velocity, LogSpiralLibraryMod.HeatMap[15].Value, LogSpiralLibraryMod.AniTex[8].Value, 1600f, factor * 64f);
-
-
 
         return false;
     }

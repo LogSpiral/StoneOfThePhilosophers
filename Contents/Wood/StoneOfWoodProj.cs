@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.UI;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Wood;
 
@@ -11,8 +10,11 @@ public class StoneOfWoodProj : MagicArea
 {
     protected override StoneElements Elements => StoneElements.Wood;
     protected override int Cycle => Extra ? 18 : 24;//24
+
     public override void SpecialAttack(bool trigger) => SpecialAttackStatic(projectile, trigger, SpecialAttackIndex);
+
     public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
+
     public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
     {
         if (!trigger) return;
@@ -48,6 +50,7 @@ public class StoneOfWoodProj : MagicArea
                 }
         }
     }
+
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 2 == 1) return;
@@ -65,7 +68,6 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
         }
         if (Extra && player.HasBuff<WoodUltra>() && player.GetZenithTarget(Main.MouseWorld, 512, out int index))
         {
-
             NPC npc = Main.npc[index];
             for (int n = 0; n < 3; n++)
             {

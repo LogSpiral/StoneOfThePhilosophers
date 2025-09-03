@@ -1,6 +1,5 @@
 ﻿using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StoneOfThePhilosophers.Contents.Earth;
@@ -21,6 +20,7 @@ namespace StoneOfThePhilosophers.Contents.Philosopher;
 public class StoneOfThePhilosopher : MagicStone
 {
     public const string DebuffTexturePath = "StoneOfThePhilosophers/Contents/Philosopher/Attacks/DebuffTemplate";
+
     public override bool AltFunctionUse(Player player)
     {
         var cplr = player.GetModPlayer<ElementCombinePlayer>();
@@ -31,6 +31,7 @@ public class StoneOfThePhilosopher : MagicStone
         int index = (int)combination.MainElements - 1;
         return mplr.ElementChargeValue[index] >= mplr.GetElementCost(index);
     }
+
     public override void UpdateEquip(Player player)
     {
         int m = Main.debuff.Length;
@@ -39,6 +40,7 @@ public class StoneOfThePhilosopher : MagicStone
                 player.buffImmune[n] = true;
         base.UpdateEquip(player);
     }
+
     public override void AddRecipes()
     {
         CreateRecipe()
@@ -54,6 +56,7 @@ public class StoneOfThePhilosopher : MagicStone
             .AddTile(TileID.CrystalBall)
             .Register();
     }
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -61,20 +64,24 @@ public class StoneOfThePhilosopher : MagicStone
         Item.damage = 80;
         Item.mana = 5;
     }
+
     public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
     {
         mult = 0;
     }
 }
+
 public class StoneOfThePhilosopherEX : StoneOfThePhilosopher
 {
     public override bool Extra => true;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.damage = 120;
         Item.mana = 5;
     }
+
     public override void AddRecipes()
     {
         CreateRecipe()
@@ -90,15 +97,18 @@ public class StoneOfThePhilosopherEX : StoneOfThePhilosopher
             .Register();
     }
 }
+
 public partial class StoneOfThePhilosopherProj : ModProjectile
 {
     public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_1";
     public const float dis = 64;
 
     #region 辅助属性
+
     public Projectile projectile => Projectile;
     public Player player => Main.player[projectile.owner];
     public ElementCombinePlayer ElementPlr => player.GetModPlayer<ElementCombinePlayer>();
+
     public int Cycle
     {
         get
@@ -126,18 +136,22 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             return field;
         }
     } = -1;
+
     public Color MainColor => new(248, 191, 37);//Color.Yellow
     public bool UseMana => (int)Timer % Cycle == 0;
     public bool Extra { get; set; }
 
     public int SpecialAttackIndex { get; set; }
     protected int AttackCounter { get; private set; }
-    #endregion
+
+    #endregion 辅助属性
 
     #region 插值属性
+
     public bool Released => projectile.timeLeft < 12;
     public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(Timer / ChargeTime * 2, 0, 1);
     public float Theta => Timer / 120f * MathHelper.TwoPi;
+
     public float Alpha
     {
         get
@@ -146,11 +160,12 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             return MathHelper.SmoothStep(0, value, Utils.GetLerpValue(ChargeTime / 2, ChargeTime, Timer, true));
         }
     }
+
     public float ChargeTime => 45f;
     public float Beta => MathHelper.SmoothStep(0, 1, Timer / ChargeTime * 2) * (SpecialAttackIndex == 0 ? projectile.velocity.ToRotation() : -MathHelper.PiOver2);
     public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
-    #endregion
 
+    #endregion 插值属性
 
     public override void SetDefaults()
     {
@@ -163,15 +178,19 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
         projectile.penetrate = -1;
         projectile.hide = true;
     }
+
     public override bool ShouldUpdatePosition() => false;
+
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         Main.instance.DrawCacheProjsOverWiresUI.Add(index);
         base.DrawBehind(index, behindNPCsAndTiles, behindNPCs, behindProjectiles, overPlayers, overWiresUI);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         #region 顶点准备
+
         ElementCombination combination = Extra ? ElementPlr.CombinationEX : ElementPlr.Combination;
 
         int state = combination.Mode;
@@ -202,8 +221,11 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             //vertexInfos[n].Color = n < 4 ? Color.Red : Color.Cyan;
             vertexInfos[n].Position = new Vector4(n % 2, n / 2 % 2, 0, 1);
         }
-        #endregion
+
+        #endregion 顶点准备
+
         #region 顶点连接
+
         vertexCount = 6 * MagicFieldCount;
         CustomVertexInfoEX[] vertexs = new CustomVertexInfoEX[vertexCount];//三角形会共用顶点对吧，所以我就不得不准备个大一点的数组然后给所有的三角形安排上自己的顶点
         for (int n = 0; n < vertexCount; n++)
@@ -220,8 +242,11 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             index += n / 6 * 4;
             vertexs[n] = vertexInfos[index];
         }
-        #endregion
+
+        #endregion 顶点连接
+
         #region 矩阵生成与绘制
+
         float height = 2000f;
         Vector3 offset = new(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
         for (int n = 0; n < MagicFieldCount; n++)
@@ -262,7 +287,6 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
                 3 or _ => 3f
             } * Theta;
 
-
             if (state == 0 && n > 1)
                 theta = n * MathHelper.TwoPi / (Extra ? 7 : 5f) - Theta;
 
@@ -274,9 +298,11 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
                         float sinValue = .25f * MathF.Sin((Timer / 120f + (n - 2) / (Extra ? 7f : 5f)) * MathHelper.TwoPi);
                         scale = new Vector3(.5f, .5f, 1.5f + sinValue);
                         break;
+
                     case 1:
                         scale = new Vector3(1.25f, 1.25f, 1.5f);
                         break;
+
                     case 2:
                         sinValue = .25f * MathF.Sin(Timer / 120f * MathHelper.TwoPi);
                         scale = new Vector3(.5f, .5f, 1.5f + sinValue * (n % 2 == 0 ? 1 : -1));
@@ -317,8 +343,11 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
                 ModAsset.Style_4.Value, null,
                 new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * uTimeScaler, false, transform, pass, n == 0, false);
         }
-        #endregion
+
+        #endregion 矩阵生成与绘制
+
         #region 环环
+
         CustomVertexInfoEX[] loopVertexInfos = new CustomVertexInfoEX[62];
         for (int n = 0; n < 31; n++)
         {
@@ -350,20 +379,26 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             ModAsset.line_1.Value,
             ModAsset.Style_4.Value, null,
             new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * loopScaler, true, loopTransform, null, false, true);
-        #endregion
+
+        #endregion 环环
+
         return false;
     }
+
     public override void OnKill(int timeLeft)
     {
     }
+
     public float Timer
     {
         get => projectile.ai[0];
         set => projectile.ai[0] = value;
     }
+
     public override void AI()
     {
         #region UpdateProjectile
+
         Timer++;
         projectile.friendly = false;
         if (projectile.owner == Main.myPlayer)
@@ -374,15 +409,18 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
             projectile.netUpdate = true;
         }
         projectile.Center = player.Center;
-        #endregion
+
+        #endregion UpdateProjectile
 
         #region UpdatePlayer
+
         int dir = projectile.direction;
         player.ChangeDir(dir);
         player.itemTime = 2;
         player.itemAnimation = 2;
         player.itemRotation = (float)Math.Atan2(projectile.velocity.Y * dir, projectile.velocity.X * dir);
-        #endregion
+
+        #endregion UpdatePlayer
 
         ElementCombination combination = Extra ? ElementPlr.CombinationEX : ElementPlr.Combination;
         int state = combination.Mode;
@@ -402,7 +440,6 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
                 {
                     if (!player.CheckMana(player.inventory[player.selectedItem].mana, true))
                         projectile.timeLeft = 12;
-
                     else if (Timer >= ChargeTime)
                         ShootProj(combination);
                 }
@@ -411,6 +448,5 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
         else
             if (SpecialAttackIndex == 0)
             ShootProj(combination, true);
-
     }
 }

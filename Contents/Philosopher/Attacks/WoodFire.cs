@@ -1,25 +1,25 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using LogSpiralLibrary;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System;
-using Terraria.DataStructures;
 using Terraria.Utilities;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
-using Terraria.Audio;
 
 namespace StoneOfThePhilosophers.Contents.Philosopher.Attacks;
 
 public class WoodFireHandler : ModProjectile
 {
-    Player Owner => Main.player[Projectile.owner];
+    private Player Owner => Main.player[Projectile.owner];
     public override string Texture => $"Terraria/Images/Item_{ItemID.Wood}";
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 600;
@@ -37,11 +37,12 @@ public class WoodFireHandler : ModProjectile
     {
         Projectile.Center = Owner.Center;
         if (Projectile.timeLeft % 60 == 0)
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextFloat(-64,64) * Vector2.UnitX + Vector2.UnitY * 24, default, ModContent.ProjectileType<WoodFirePlant>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextFloat(-64, 64) * Vector2.UnitX + Vector2.UnitY * 24, default, ModContent.ProjectileType<WoodFirePlant>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 
         base.AI();
     }
 }
+
 public class WoodFirePlant : ModProjectile
 {
     public override void SetDefaults()
@@ -55,17 +56,18 @@ public class WoodFirePlant : ModProjectile
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
     }
+
     public override string Texture => $"Terraria/Images/Item_{ItemID.Wood}";
-    AshTree thornTree;
-    List<CustomVertexInfo> vertexs;
-    List<Vector4> endNodes;
-    float Factor => (60 - Projectile.timeLeft) / 60f;
+    private AshTree thornTree;
+    private List<CustomVertexInfo> vertexs;
+    private List<Vector4> endNodes;
+    private float Factor => (60 - Projectile.timeLeft) / 60f;
+
     public override void AI()
     {
         //Projectile.ai[1]++;
         float k = (1 - MathF.Cos(MathHelper.TwoPi * MathF.Sqrt(Factor))) * .5f;
         vertexs = thornTree.GetTreeVertex(-MathHelper.PiOver2, Projectile.Center - Vector2.UnitX * 8, out endNodes, k);
-
 
         if (Projectile.timeLeft == 45)
         {
@@ -77,11 +79,12 @@ public class WoodFirePlant : ModProjectile
                 {
                     var vec = Main.rand.Next(endNodes);
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), vec.XY(), -vec.Z.ToRotationVector2() * 16, ModContent.ProjectileType<WoodFireLeaf>(),
-                        Projectile.damage, Projectile.knockBack, Projectile.owner,Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
+                        Projectile.damage, Projectile.knockBack, Projectile.owner, Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
                 }
-            SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f});
+            SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f });
         }
     }
+
     public override void OnSpawn(IEntitySource source)
     {
         float stdSize = 96;
@@ -101,6 +104,7 @@ public class WoodFirePlant : ModProjectile
         });//
         thornTree.BuildTree(Main.rand, 8);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (vertexs == null)
@@ -146,6 +150,7 @@ public class WoodFirePlant : ModProjectile
         }
         return false;
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         if (vertexs == null) return false;
@@ -158,6 +163,7 @@ public class WoodFirePlant : ModProjectile
         return false;
     }
 }
+
 // 抄自最终分形的木
 public class AshTree
 {
@@ -180,34 +186,35 @@ public class AshTree
         /// </summary>
         public float fixedRotation;
     }
-    class Node(float length, float width, float rotation, bool main)
+
+    private class Node(float length, float width, float rotation, bool main)
     {
         /// <summary>
         /// 子节点
         /// </summary>
-        HashSet<Node> Children;
+        private HashSet<Node> Children;
 
         /// <summary>
         /// 节点始端到末端的长度
         /// </summary>
-        float length = length;
+        private float length = length;
 
         /// <summary>
         /// 节点末端的宽度
         /// </summary>
-        float width = width;
+        private float width = width;
 
         /// <summary>
         /// 相对于父节点的旋转量
         /// </summary>
-        float rotation = rotation;
+        private float rotation = rotation;
 
         /// <summary>
         /// 是否处于主干
         /// </summary>
-        bool mainBranch = main;
+        private bool mainBranch = main;
 
-        float getNormalRandom(UnifiedRandom random, float factor) => (float)random.GaussianRandom(factor, factor * .25 * .33);
+        private float getNormalRandom(UnifiedRandom random, float factor) => (float)random.GaussianRandom(factor, factor * .25 * .33);
 
         public void Generate(UnifiedRandom random, TreeGenerateInfo info, int maxTier, out int depth)
         {
@@ -250,8 +257,6 @@ public class AshTree
             if (MathF.Abs(rotation) < MathHelper.PiOver2)
                 nodePoint += MathF.Sign(rotation) * (normalUnit - (parentRotation + MathHelper.PiOver2).ToRotationVector2()) * parentWidth * .5f;
 
-
-
             float u = MathHelper.Clamp(factor, 0, 1);
             float realWidth = width * u * u;
             normalUnit *= .5f;
@@ -275,12 +280,11 @@ public class AshTree
             else
                 EndNodes.Add(new Vector4(nodePoint, realRotation, (float)Main.rand.GaussianRandom(1, 0.16f)));
         }
-
     }
 
-    Node mainNode;
-    TreeGenerateInfo genInfo;
-    int depth;
+    private Node mainNode;
+    private TreeGenerateInfo genInfo;
+    private int depth;
 
     public AshTree(float length, float width, float rotation, TreeGenerateInfo info)
     {
@@ -301,6 +305,7 @@ public class AshTree
         return vertexInfos;
     }
 }
+
 public class WoodFireLeaf : ModProjectile
 {
     public override void SetDefaults()
@@ -316,6 +321,7 @@ public class WoodFireLeaf : ModProjectile
         Projectile.localNPCHitCooldown = 5;
         Projectile.aiStyle = -1;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
@@ -325,6 +331,7 @@ public class WoodFireLeaf : ModProjectile
                 Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), 16, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
         return false;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int n = 0; n < 4 - Projectile.penetrate; n++)
@@ -340,6 +347,7 @@ public class WoodFireLeaf : ModProjectile
             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[2] += damageDone / ElementSkillPlayer.Devider;
         }
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         for (int k = 0; k < 15; k++)
@@ -348,6 +356,7 @@ public class WoodFireLeaf : ModProjectile
         }
         return base.OnTileCollide(oldVelocity);
     }
+
     public override void AI()
     {
         if (Projectile.timeLeft >= 170) goto Label;
@@ -375,8 +384,6 @@ public class WoodFireLeaf : ModProjectile
                 if (Projectile.timeLeft > 165) Projectile.timeLeft--;
                 if (Projectile.timeLeft < 15) Projectile.timeLeft++;
             }
-
-
         }
     Label:
         Projectile.rotation = Projectile.velocity.ToRotation();

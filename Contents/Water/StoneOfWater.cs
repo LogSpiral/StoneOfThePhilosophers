@@ -1,6 +1,6 @@
-﻿using Terraria.ID;
+﻿using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Water;
 
@@ -18,6 +18,7 @@ public class StoneOfWater : MagicStone
         recipe.AddIngredient(ItemID.WaterBucket);
         base.AddOtherIngredients(recipe);
     }
+
     public override void SetDefaults()
     {
         Item.shoot = ModContent.ProjectileType<StoneOfWaterProj>();
@@ -26,6 +27,7 @@ public class StoneOfWater : MagicStone
         Item.mana = 5;
     }
 }
+
 public class StoneOfWaterEX : StoneOfWater
 {
     public override void AddRecipes()
@@ -36,13 +38,12 @@ public class StoneOfWaterEX : StoneOfWater
         AddEXRequire<StoneOfWater>(recipe);
         recipe.Register();
     }
+
     public override bool Extra => true;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.damage = 30;
     }
 }
-
-
-

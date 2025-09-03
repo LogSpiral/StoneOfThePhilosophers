@@ -1,27 +1,30 @@
-﻿using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
+﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingContents;
 using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing.RenderDrawingEffects;
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 
 namespace StoneOfThePhilosophers.Contents.Moon;
+
 public class MoonAttack : ModProjectile
 {
     #region Canvas
-    const string CanvasName = nameof(StoneOfThePhilosophers) + ":" + nameof(StoneOfMoon);
-    readonly static AirDistortEffect airDistortEffect = new(16f, 2f, MathHelper.PiOver2, .05f);
-    readonly static MaskEffect maskEffect = Main.dedServ ? new() : new(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
-    readonly static BloomEffect bloomEffect = new(0, 1f, 2, 3, true, 0, true);
-    readonly static IRenderEffect[][] renderEffects = [[airDistortEffect], [maskEffect, bloomEffect]];
+
+    private const string CanvasName = nameof(StoneOfThePhilosophers) + ":" + nameof(StoneOfMoon);
+    private static readonly AirDistortEffect airDistortEffect = new(16f, 2f, MathHelper.PiOver2, .05f);
+    private static readonly MaskEffect maskEffect = Main.dedServ ? new() : new(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
+    private static readonly BloomEffect bloomEffect = new(0, 1f, 2, 3, true, 0, true);
+    private static readonly IRenderEffect[][] renderEffects = [[airDistortEffect], [maskEffect, bloomEffect]];
+
     public override void Load()
     {
         if (Main.dedServ) return;
@@ -29,7 +32,7 @@ public class MoonAttack : ModProjectile
         base.Load();
     }
 
-    UltraCanvas canvas;
+    private UltraCanvas canvas;
 
     public override void OnSpawn(IEntitySource source)
     {
@@ -37,7 +40,8 @@ public class MoonAttack : ModProjectile
             canvas = UltraCanvas.NewUltraCanvas(CanvasName, Projectile.timeLeft, (canvas, distortScaler) => DrawLaser(distortScaler, false));
         base.OnSpawn(source);
     }
-    void DrawLaser(float distortScaler, bool normalDrawing)
+
+    private void DrawLaser(float distortScaler, bool normalDrawing)
     {
         SpriteBatch spriteBatch = Main.spriteBatch;
         //Main.NewText(distortScaler);
@@ -70,7 +74,9 @@ public class MoonAttack : ModProjectile
             spriteBatch.Draw(texture, Projectile.Center + dirVec * 0.5f * fac - Main.screenPosition + Main.rand.NextVector2Unit() * factor * 8f, null, white * factor, Projectile.ai[0], origin, scaler * new Vector2(Projectile.ai[1] / 32f * fac, factor * .625f * distortScaler), 0, 0);
         }
         var randSize = factor * Main.rand.NextFloat(0.5f);
+
         #region 法阵
+
         Matrix transform =
             Matrix.CreateScale(2) *
             Matrix.CreateTranslation(-1, -1, -1) *
@@ -129,23 +135,26 @@ public class MoonAttack : ModProjectile
             vertexs[n] = vertexInfos[index];
         }
         DrawingMethods.VertexDraw(vertexs, boost ? ModAsset.MagicArea_2_Alpha.Value : ModAsset.MagicArea_5_Alpha.Value, TextureAssets.MagicPixel.Value, pass: "OriginColor", autoStart: false);
-        #endregion
+
+        #endregion 法阵
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         DrawLaser(1f, true);
         return false;
     }
 
-    void KillCanvas() 
+    private void KillCanvas()
     {
         if (canvas != null)
             canvas.timeLeft = 0;
     }
-    #endregion
 
-    bool boost;
-    Vector2 dirVec;
+    #endregion Canvas
+
+    private bool boost;
+    private Vector2 dirVec;
 
     public override void SetDefaults()
     {
@@ -172,7 +181,6 @@ public class MoonAttack : ModProjectile
 
         if (Projectile.timeLeft == 30)
             SoundEngine.PlaySound(SoundID.Item12, Projectile.Center);
-
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -207,5 +215,4 @@ public class MoonAttack : ModProjectile
     public override bool ShouldUpdatePosition() => false;
 
     public override void OnKill(int timeLeft) => KillCanvas();
-
 }

@@ -1,15 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Earth;
+
 public class StoneOfEarthProj : MagicArea
 {
     protected override StoneElements Elements => StoneElements.Soil;
     protected override int Cycle => Extra ? 24 : 36;
+
     public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+
     public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
 
     public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
@@ -29,7 +32,7 @@ public class StoneOfEarthProj : MagicArea
             Point mouseCen = Main.MouseWorld.ToTileCoordinates();
             while (k < 64)
             {
-                var tile = Main.tile[mouseCen + new Point(0, k)];
+                var tile = Framing.GetTileSafely(mouseCen + new Point(0, k));
                 if (tile.HasTile && Main.tileSolid[tile.TileType])
                     break;
                 k++;

@@ -1,22 +1,22 @@
-﻿using StoneOfThePhilosophers.UI;
+﻿using Microsoft.Xna.Framework;
+using StoneOfThePhilosophers.Contents.Philosopher;
+using StoneOfThePhilosophers.UI;
 using System.Collections.Generic;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.Contents.Philosopher;
 using Terraria.Localization;
-using Microsoft.Xna.Framework.Graphics;
+using Terraria.ModLoader;
 
 namespace StoneOfThePhilosophers.Contents;
 
 public abstract class MagicStone : ModItem
 {
-    int uiTimer;
+    private int uiTimer;
     public virtual bool Extra => false;
     public virtual StoneElements Elements => StoneElements.Empty;
+
     public override void SetDefaults()
     {
         var item = base.Item;
@@ -37,12 +37,14 @@ public abstract class MagicStone : ModItem
         item.damage = 30;
         item.mana = 15;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         var tooltip = new TooltipLine(Mod, "OpenUI", Language.GetTextValue("Mods.StoneOfThePhilosophers.Items.MagicStones.MiddleClickTip"));
         tooltips.Add(tooltip);
         base.ModifyTooltips(tooltips);
     }
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         var mplr = player.GetModPlayer<ElementSkillPlayer>();
@@ -71,7 +73,9 @@ public abstract class MagicStone : ModItem
         }
         return false;
     }
+
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] < 1;
+
     public override void HoldStyle(Player player, Rectangle heldItemFrame)
     {
         uiTimer--;
@@ -90,10 +94,8 @@ public abstract class MagicStone : ModItem
                 var combination = Extra ? mplr.CombinationEX : mplr.Combination;
                 bool controlSkill = combination.Mode == 1;
 
-
                 if (ElementCombineUI.Instance.Enabled)
                 {
-
                     ElementCombineUI.Close();
                     if (controlSkill)
                         ElementSkillUI.Close();
@@ -105,13 +107,12 @@ public abstract class MagicStone : ModItem
                     if (controlSkill)
                         ElementSkillUI.Open(Type, Main.MouseScreen + Vector2.UnitX * 180);
                 }
-
-
             }
             uiTimer = 15;
         }
         base.HoldStyle(player, heldItemFrame);
     }
+
     public override bool AltFunctionUse(Player player)
     {
         if (Elements == 0 || !Extra) return false;
@@ -119,6 +120,7 @@ public abstract class MagicStone : ModItem
         int index = (int)Elements - 1;
         return mplr.ElementChargeValue[index] >= mplr.GetElementCost(index);
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -127,6 +129,7 @@ public abstract class MagicStone : ModItem
         AddOtherIngredients(recipe);
         recipe.Register();
     }
+
     public static void AddEXRequire<T>(Recipe recipe, bool metalStone = false) where T : MagicStone
     {
         recipe.AddIngredient<T>();
@@ -137,9 +140,8 @@ public abstract class MagicStone : ModItem
         recipe.AddIngredient(ItemID.SoulofNight, 15);
         recipe.AddTile(TileID.CrystalBall);
     }
+
     public virtual void AddOtherIngredients(Recipe recipe)
     {
-
     }
-
 }

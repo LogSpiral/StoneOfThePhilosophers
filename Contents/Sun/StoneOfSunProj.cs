@@ -1,16 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using System;
 
 namespace StoneOfThePhilosophers.Contents.Sun;
+
 public class StoneOfSunProj : MagicArea
 {
     protected override StoneElements Elements => StoneElements.Solar;
     protected override int Cycle => 45;
+
     public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+
     public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(projectile, unit, dying, AttackCounter, Extra);
 
     public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
@@ -34,6 +36,7 @@ public class StoneOfSunProj : MagicArea
         proj.localNPCHitCooldown = 20;
         proj.extraUpdates = 0;
     }
+
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 3 != 0) return;

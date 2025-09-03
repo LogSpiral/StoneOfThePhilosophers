@@ -1,13 +1,16 @@
-﻿using StoneOfThePhilosophers.UI;
-using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
+
 namespace StoneOfThePhilosophers.Contents.Moon;
+
 public class StoneOfMoonProj : MagicArea
 {
     protected override StoneElements Elements => StoneElements.Lunar;
     protected override int Cycle => (int)((Main.dayTime ? 18 : 12) * (player.HasBuff<BlessingFromLunarGod>() ? 0.75f : 1f));
+
     public override void SpecialAttack(bool trigger) => SpecialAttackStatic(Projectile, trigger, SpecialAttackIndex);
+
     public override void ShootProj(Vector2 unit, bool dying = false) => ShootProjStatic(Projectile, unit, dying, AttackCounter, Extra);
 
     public static void SpecialAttackStatic(Projectile projectile, bool trigger, int SpecialAttackIndex)
@@ -15,6 +18,7 @@ public class StoneOfMoonProj : MagicArea
         if (trigger)
             Main.player[projectile.owner].AddBuff(ModContent.BuffType<BlessingFromLunarGod>(), 1200);
     }
+
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         var player = Main.player[projectile.owner];
@@ -27,8 +31,8 @@ public class StoneOfMoonProj : MagicArea
         {
             center = Main.npc[index].Center + Main.npc[index].velocity * 15;
         }
-        Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), center - v, default, 
-            ModContent.ProjectileType<MoonAttack>(), flag ? (int)(projectile.damage * 5 / 4) : projectile.damage, 
+        Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), center - v, default,
+            ModContent.ProjectileType<MoonAttack>(), flag ? (int)(projectile.damage * 5 / 4) : projectile.damage,
             projectile.knockBack, projectile.owner, v.ToRotation(), v.Length() * 2, flag ? 1 : 0);
     }
 }

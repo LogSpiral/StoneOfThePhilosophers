@@ -1,16 +1,17 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
+﻿using LogSpiralLibrary.CodeLibrary.Utilties;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using System;
+using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Earth;
+
 public class EarthAttack : ModProjectile
 {
     public override void SetDefaults()
@@ -26,6 +27,7 @@ public class EarthAttack : ModProjectile
         Projectile.timeLeft = 60;
         Projectile.ignoreWater = true;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         switch ((int)Projectile.ai[1])
@@ -118,6 +120,7 @@ public class EarthAttack : ModProjectile
         }
         return false;
     }
+
     public void SetDefaultStorm()
     {
         Projectile.width = 60;
@@ -132,6 +135,7 @@ public class EarthAttack : ModProjectile
         Projectile.localNPCHitCooldown = -1;
         Projectile.ignoreWater = true;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         //target.immune[Projectile.owner] = 3;
@@ -141,6 +145,7 @@ public class EarthAttack : ModProjectile
         }
         base.OnHitNPC(target, hit, damageDone);
     }
+
     public override void AI()
     {
         switch ((int)Projectile.ai[1])
@@ -292,10 +297,12 @@ public class EarthAttack : ModProjectile
         }
     }
 }
+
 public class EarthSpecialAttack : ModProjectile
 {
     public override string Texture => base.Texture.Replace("EarthSpecialAttack", "EarthAttack");
     public bool EarthQuake => Projectile.ai[1] != 0;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (!EarthQuake)
@@ -322,10 +329,10 @@ public class EarthSpecialAttack : ModProjectile
             Main.EntitySpriteDraw(ModAsset.crystal_reflection.Value, cen, null, lightColor, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1), 0, 0);
             Main.EntitySpriteDraw(ModAsset.big_crystal_a.Value, cen - new Vector2(16, 0), null, lightColor, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
             Main.EntitySpriteDraw(ModAsset.big_crystal_b.Value, cen + new Vector2(16, 0), null, lightColor, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
-
         }
         return false;
     }
+
     public override void AI()
     {
         if (Projectile.ai[1] == 1) ElementSkillPlayer.EarthQuaking = true;
@@ -336,7 +343,6 @@ public class EarthSpecialAttack : ModProjectile
 
             if (Projectile.timeLeft % 30 == 0)
             {
-
                 foreach (var npc in Main.npc)
                 {
                     if (npc.CanBeChasedBy() && !npc.friendly && npc.active && Math.Abs(npc.velocity.Y) < 0.01f)
@@ -345,7 +351,7 @@ public class EarthSpecialAttack : ModProjectile
                         int k = -1;
                         while (k < 5)
                         {
-                            var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
+                            var tile = Framing.GetTileSafely(npc.Bottom.ToTileCoordinates() + new Point(0, k));
                             if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
                             {
                                 flag = true;
@@ -370,7 +376,6 @@ public class EarthSpecialAttack : ModProjectile
                     }
                 }
             }
-
         }
         else
         {
@@ -394,7 +399,7 @@ public class EarthSpecialAttack : ModProjectile
                             int k = -1;
                             while (k < 5)
                             {
-                                var tile = Main.tile[npc.Bottom.ToTileCoordinates() + new Point(0, k)];
+                                var tile = Framing.GetTileSafely(npc.Bottom.ToTileCoordinates() + new Point(0, k));
                                 if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
                                 {
                                     flag = true;
@@ -423,6 +428,7 @@ public class EarthSpecialAttack : ModProjectile
         }
         base.AI();
     }
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = 600;

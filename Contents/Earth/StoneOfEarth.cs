@@ -1,19 +1,6 @@
-﻿using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.Audio;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using LogSpiralLibrary.CodeLibrary.Utilties;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
-using Terraria.GameContent;
 
 namespace StoneOfThePhilosophers.Contents.Earth;
 
@@ -31,6 +18,7 @@ public class StoneOfEarth : MagicStone
         recipe.AddIngredient(ItemID.Waterleaf, 5);
         base.AddOtherIngredients(recipe);
     }
+
     public override void SetDefaults()
     {
         Item.shoot = ModContent.ProjectileType<StoneOfEarthProj>();
@@ -39,6 +27,7 @@ public class StoneOfEarth : MagicStone
         base.SetDefaults();
     }
 }
+
 public class StoneOfEarthEX : StoneOfEarth
 {
     public override void AddRecipes()
@@ -50,12 +39,12 @@ public class StoneOfEarthEX : StoneOfEarth
         AddEXRequire<StoneOfEarth>(recipe);
         recipe.Register();
     }
+
     public override bool Extra => true;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.damage = 80;
     }
 }
-
-

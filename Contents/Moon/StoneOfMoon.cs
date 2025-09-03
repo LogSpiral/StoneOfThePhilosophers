@@ -1,12 +1,6 @@
-﻿using StoneOfThePhilosophers.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Moon;
 
@@ -29,6 +23,7 @@ public class StoneOfMoon : MagicStone
         recipe.AddTile(TileID.CrystalBall);
         recipe.Register();
     }
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -37,6 +32,3 @@ public class StoneOfMoon : MagicStone
         Item.mana = 5;
     }
 }
-
-
-

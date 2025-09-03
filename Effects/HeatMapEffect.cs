@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StoneOfThePhilosophers.Effects;
 
-static class HeatMapEffect
+internal static class HeatMapEffect
 {
     public static Effect HeatMap => ModAsset.HeatMapEffect.Value;
 }

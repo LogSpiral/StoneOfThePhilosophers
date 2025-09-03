@@ -1,23 +1,23 @@
-﻿using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
+﻿using LogSpiralLibrary;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using StoneOfThePhilosophers.UI;
+using Microsoft.Xna.Framework.Graphics;
+using StoneOfThePhilosophers.Contents.Philosopher;
 using System;
 using System.Collections.Generic;
-using Terraria.ModLoader;
-using Terraria;
-using StoneOfThePhilosophers.Contents.Philosopher;
-using LogSpiralLibrary;
 using System.IO;
+using Terraria;
+using Terraria.ModLoader;
 
 namespace StoneOfThePhilosophers.Contents;
+
 public abstract class MagicArea : ModProjectile
 {
-
     public const float dis = 64;
 
     #region 辅助属性
+
     public int SpecialAttackIndex { get; set; }
     public bool Extra { get; set; } = false;
     protected int AttackCounter { get; private set; }
@@ -25,20 +25,24 @@ public abstract class MagicArea : ModProjectile
     public Projectile projectile => Projectile;
     public Player player => Main.player[projectile.owner];
     public bool Released => projectile.timeLeft < 12;
-    protected Color MainColor 
+
+    protected Color MainColor
     {
-        get 
+        get
         {
             if (field == default)
                 field = StoneOfThePhilosopherProj.ElementColor[Elements];
             return field;
         }
     }
-    #endregion
+
+    #endregion 辅助属性
 
     #region 插值属性
+
     public float Light => Released ? MathHelper.Lerp(1, 0, (12 - projectile.timeLeft) / 12f) : MathHelper.Clamp(projectile.ai[0] / ChargeTime * 2, 0, 1);
     public float Theta => projectile.ai[0] / 60f * MathHelper.TwoPi;
+
     public float Alpha
     {
         get
@@ -47,19 +51,25 @@ public abstract class MagicArea : ModProjectile
             return MathHelper.SmoothStep(0, value, Utils.GetLerpValue(ChargeTime / 2, ChargeTime, projectile.ai[0], true));
         }
     }
+
     public float ChargeTime => Extra ? 45 : 75;
     public float Beta => MathHelper.SmoothStep(0, 1, projectile.ai[0] / ChargeTime * 2) * (SpecialAttackIndex == 0 ? projectile.velocity.ToRotation() : -MathHelper.PiOver2);
     public float Size => Released ? MathHelper.Lerp(96, 144, (12 - projectile.timeLeft) / 12f) : 96;
-    #endregion
+
+    #endregion 插值属性
 
     #region 虚属性
+
     protected virtual int Cycle => 60;
     protected virtual bool UseMana => (int)projectile.ai[0] % Cycle == 0;
     protected virtual StoneElements Elements => StoneElements.Empty;
-    #endregion
+
+    #endregion 虚属性
 
     #region 重写函数
+
     public override string Texture => "StoneOfThePhilosophers/Images/MagicArea_4";
+
     public override void SetDefaults()
     {
         projectile.width = 1;
@@ -71,9 +81,11 @@ public abstract class MagicArea : ModProjectile
         projectile.penetrate = -1;
         projectile.hide = true;
     }
+
     public override void AI()
     {
         #region UpdateProjectile
+
         projectile.friendly = false;
         projectile.ai[0]++;
         if (projectile.owner == Main.myPlayer)
@@ -84,21 +96,23 @@ public abstract class MagicArea : ModProjectile
             projectile.netUpdate = true;
         }
         projectile.Center = player.Center;
-        #endregion
+
+        #endregion UpdateProjectile
 
         #region UpdatePlayer
+
         int dir = projectile.direction;
         player.ChangeDir(dir);
         player.itemTime = 2;
         player.itemAnimation = 2;
         player.itemRotation = (float)Math.Atan2(projectile.velocity.Y * dir, projectile.velocity.X * dir);
-        #endregion
+
+        #endregion UpdatePlayer
 
         if (projectile.timeLeft > 12)
         {
             if (!(player.channel || (SpecialAttackIndex > 0 && projectile.ai[0] < 60)))
                 projectile.timeLeft = 12;
-
             else
             {
                 projectile.timeLeft = 14;
@@ -116,41 +130,45 @@ public abstract class MagicArea : ModProjectile
                         }
                     }
                 }
-                else 
+                else
                 {
                     SpecialAttackDustSpawning(projectile, MainColor, (int)projectile.ai[0] == 55);
                     SpecialAttack((int)projectile.ai[0] == 55);
                 }
-
             }
         }
-        else if (projectile.ai[0] > ChargeTime / 2 && SpecialAttackIndex == 0) 
+        else if (projectile.ai[0] > ChargeTime / 2 && SpecialAttackIndex == 0)
         {
             AttackCounter++;
             ShootProj(projectile.velocity.SafeNormalize(default), true);
         }
-
     }
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write((byte)SpecialAttackIndex);
         writer.Write((ushort)AttackCounter);
         base.SendExtraAI(writer);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         SpecialAttackIndex = reader.ReadByte();
         AttackCounter = reader.ReadUInt16();
     }
+
     public override bool ShouldUpdatePosition() => false;
+
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         Main.instance.DrawCacheProjsOverWiresUI.Add(index);
         base.DrawBehind(index, behindNPCsAndTiles, behindNPCs, behindProjectiles, overPlayers, overWiresUI);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         #region 顶点准备
+
         int MagicFieldCount = 2;
         int vertexCount = 4 * MagicFieldCount;
         CustomVertexInfoEX[] vertexInfos = new CustomVertexInfoEX[vertexCount];//这里是最基本的顶点们
@@ -165,8 +183,11 @@ public abstract class MagicArea : ModProjectile
             //vertexInfos[n].Color = n < 4 ? Color.Red : Color.Cyan;
             vertexInfos[n].Position = new Vector4(n % 2, n / 2 % 2, 0, 1);
         }
-        #endregion
+
+        #endregion 顶点准备
+
         #region 顶点连接
+
         vertexCount = 6 * MagicFieldCount;
         CustomVertexInfoEX[] vertexs = new CustomVertexInfoEX[vertexCount];//三角形会共用顶点对吧，所以我就不得不准备个大一点的数组然后给所有的三角形安排上自己的顶点
         for (int n = 0; n < vertexCount; n++)
@@ -183,8 +204,11 @@ public abstract class MagicArea : ModProjectile
             index += n / 6 * 4;
             vertexs[n] = vertexInfos[index];
         }
-        #endregion
+
+        #endregion 顶点连接
+
         #region 矩阵生成与绘制
+
         float height = 2000f;
         Vector3 offset = new(Main.screenPosition + new Vector2(Main.screenWidth, Main.screenHeight) * .5f, 0);
         for (int n = 0; n < MagicFieldCount; n++)
@@ -246,22 +270,25 @@ public abstract class MagicArea : ModProjectile
                 ModAsset.Style_4.Value, null,
                 new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * scaler, false, transform, pass, n == 0, n == 1);
         }
-        #endregion
+
+        #endregion 矩阵生成与绘制
+
         return false;
     }
-    #endregion
+
+    #endregion 重写函数
 
     #region 虚函数
+
     public virtual void ShootProj(Vector2 unit, bool dying = false)
     {
-
     }
 
     public virtual void SpecialAttack(bool trigger)
     {
-
     }
-    public static void SpecialAttackDustSpawning(Projectile projectile, Color dustColor, bool trigger) 
+
+    public static void SpecialAttackDustSpawning(Projectile projectile, Color dustColor, bool trigger)
     {
         var player = Main.player[projectile.owner];
         dustColor = Color.Lerp(Color.White, dustColor, 0.5f);
@@ -285,6 +312,6 @@ public abstract class MagicArea : ModProjectile
             }
         }
     }
-    #endregion
 
+    #endregion 虚函数
 }

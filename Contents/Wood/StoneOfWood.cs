@@ -1,6 +1,6 @@
-﻿using Terraria.ID;
+﻿using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
 
 namespace StoneOfThePhilosophers.Contents.Wood;
 
@@ -18,6 +18,7 @@ public class StoneOfWood : MagicStone
         recipe.AddIngredient(ItemID.Stinger, 5);
         base.AddOtherIngredients(recipe);
     }
+
     public override void SetDefaults()
     {
         Item.shoot = ModContent.ProjectileType<StoneOfWoodProj>();
@@ -25,6 +26,7 @@ public class StoneOfWood : MagicStone
         Item.damage = 20;
     }
 }
+
 public class StoneOfWoodEX : StoneOfWood
 {
     public override void AddRecipes()
@@ -36,14 +38,12 @@ public class StoneOfWoodEX : StoneOfWood
         AddEXRequire<StoneOfWood>(recipe);
         recipe.Register();
     }
+
     public override bool Extra => true;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.damage = 45;
     }
 }
-
-
-
-

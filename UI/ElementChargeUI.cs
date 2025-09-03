@@ -1,44 +1,41 @@
-﻿using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using StoneOfThePhilosophers.Contents;
-using StoneOfThePhilosophers.Contents.Earth;
-using StoneOfThePhilosophers.Contents.Fire;
-using StoneOfThePhilosophers.Contents.Metal;
-using StoneOfThePhilosophers.Contents.Moon;
 using StoneOfThePhilosophers.Contents.Philosopher;
-using StoneOfThePhilosophers.Contents.Sun;
-using StoneOfThePhilosophers.Contents.Water;
-using StoneOfThePhilosophers.Contents.Wood;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace StoneOfThePhilosophers.UI;
+
 public class ElementChargeSystem : ModSystem
 {
     #region Properties
+
     public static float Progress { get; set; }
 
     public static StoneElements CurrentElement { get; set; }
 
     public static float BarValue { get; set; }
-    #endregion
+
+    #endregion Properties
 
     #region Assets
+
     public static Asset<Texture2D> ElementPanelBorder => ModAsset.Element_Panel_Right_Border;
     public static Asset<Texture2D> ElementPanelContent => ModAsset.Element_Panel_Right_Content;
     public static Asset<Texture2D> ElementPanelMiddleBorder => ModAsset.Element_Panel_Middle_Border;
     public static Asset<Texture2D> ElementPanelMiddleGround => ModAsset.Element_Panel_Middle_Ground;
     public static Asset<Texture2D> ElementPanelFill => ModAsset.Element_Fill;
     public static Asset<Texture2D> ElementPanelEnd => ModAsset.Panel_Left;
-    #endregion
+
+    #endregion Assets
 
     #region Drawing
+
     public static void DrawChargeBar_Internal(CalculatedStyle destination, float elementBarProgress, float elementBarValue)
     {
         SpriteBatch spriteBatch = Main.spriteBatch;
@@ -48,7 +45,9 @@ public class ElementChargeSystem : ModSystem
         var flag = StoneOfThePhilosopherProj.ElementColor.TryGetValue(CurrentElement, out Color color);
         float factor1 = MathHelper.SmoothStep(0, 1, 2 * elementBarProgress);
         float factor2 = MathHelper.SmoothStep(0, 1, elementBarProgress * 2 - 1);
+
         #region Bar
+
         var offsetUnit = new Vector2(0, 12 * factor2);
         var offset = new Vector2(-30, 40);
         if (flag)
@@ -75,9 +74,10 @@ public class ElementChargeSystem : ModSystem
         for (int n = 0; n < 20; n++)
             spriteBatch.Draw(ElementPanelMiddleBorder.Value, topLeft + offset + offsetUnit * n + new Vector2(24, -12), new Rectangle(0, 0, (int)(12f * factor2 + 1), 24), Color.White * factor1 * factor1, MathHelper.PiOver2, default, 1f, 0, 0);
 
-        #endregion
+        #endregion Bar
 
         #region icon
+
         spriteBatch.Draw(ElementPanelEnd.Value, topLeft + offset + offsetUnit * 20 - new Vector2(0, 6), null, Color.White * factor1, -MathHelper.PiOver2, default, 1f, 0, 0);
 
         if (flag)
@@ -85,21 +85,23 @@ public class ElementChargeSystem : ModSystem
             spriteBatch.Draw(ElementPanelContent.Value, topLeft, null, color * factor1, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
             for (int n = 0; n < 3; n++)
                 spriteBatch.Draw(ElementPanelContent.Value, topLeft + Main.rand.NextVector2Unit() * elementBarValue * 4, null, Color.White with { A = 0 } * .25f * factor1 * elementBarValue, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
-
         }
         spriteBatch.Draw(ElementPanelBorder.Value, topLeft, null, Color.White * factor1, MathHelper.PiOver2, default, 1f, SpriteEffects.FlipHorizontally, 0);
-        #endregion
+
+        #endregion icon
 
         if (destination.ToRectangle().Contains(Main.MouseScreen.ToPoint()))
             Main.instance.MouseText((elementBarValue * 100).ToString("0.0") + "%");
     }
+
     public static bool DrawChargeBar()
     {
         if (Progress <= 0) return true;
 
-        DrawChargeBar_Internal(new(Main.screenWidth - 360,80, 40, 280), Progress, BarValue);
+        DrawChargeBar_Internal(new(Main.screenWidth - 360, 80, 40, 280), Progress, BarValue);
         return true;
     }
+
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
         int inventoryIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Inventory");
@@ -108,16 +110,18 @@ public class ElementChargeSystem : ModSystem
 
         base.ModifyInterfaceLayers(layers);
     }
-    #endregion
+
+    #endregion Drawing
 
     #region Update
+
     public override void PostUpdatePlayers()
     {
         Player player = Main.LocalPlayer;
         StoneElements elements = player?.HeldItem?.ModItem is MagicStone magicStone ? magicStone.Elements : StoneElements.Empty;
-        if (player?.HeldItem?.ModItem is StoneOfThePhilosopher philosopherStone && player.GetModPlayer<ElementCombinePlayer>() is var elementCombinePlr) 
+        if (player?.HeldItem?.ModItem is StoneOfThePhilosopher philosopherStone && player.GetModPlayer<ElementCombinePlayer>() is var elementCombinePlr)
         {
-            var combination = philosopherStone.Extra ? elementCombinePlr.CombinationEX: elementCombinePlr.Combination;
+            var combination = philosopherStone.Extra ? elementCombinePlr.CombinationEX : elementCombinePlr.Combination;
             if (combination.Mode == 1)
                 elements = combination.MainElements;
         }
@@ -141,5 +145,6 @@ public class ElementChargeSystem : ModSystem
 
         base.PostUpdatePlayers();
     }
-    #endregion
+
+    #endregion Update
 }

@@ -1,7 +1,8 @@
-﻿using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Microsoft.Xna.Framework;
 using Terraria.Localization;
+using Terraria.ModLoader;
+
 namespace StoneOfThePhilosophers.Contents;
 
 public class ElementSkillPlayer : ModPlayer
@@ -15,6 +16,7 @@ public class ElementSkillPlayer : ModPlayer
     public static float Devider => 200f;
     public static bool EarthQuaking;
     public float strengthOfShake;
+
     public override void ModifyScreenPosition()
     {
         strengthOfShake *= 0.8f;
@@ -22,6 +24,7 @@ public class ElementSkillPlayer : ModPlayer
         Main.screenPosition += Main.rand.NextVector2Unit() * strengthOfShake * 48;
         base.ModifyScreenPosition();
     }
+
     public override void ResetEffects()
     {
         for (int n = 0; n < 7; n++)
@@ -35,12 +38,12 @@ public class ElementSkillPlayer : ModPlayer
     /// <summary>
     /// 当前某元素所使用的技能的编号
     /// </summary>
-    public int[] skillIndex = [1,1,1,1,1,1,1];
+    public int[] skillIndex = [1, 1, 1, 1, 1, 1, 1];
 
     /// <summary>
     /// 符卡名，快乐打表
     /// </summary>
-    public static string GetSkillName(int idx,int idy) 
+    public static string GetSkillName(int idx, int idy)
     {
         string prefix = "Mods.StoneOfThePhilosophers.Items.";
         string elementName = idx switch
@@ -60,7 +63,8 @@ public class ElementSkillPlayer : ModPlayer
     /// <summary>
     /// 元素消耗打表
     /// </summary>
-    static float[,] skillCost = new float[7, 3];
+    private static float[,] skillCost = new float[7, 3];
+
     public static int[] skillCounts = [1, 2, 3, 1, 2, 1, 1];
 
     public override void Load()

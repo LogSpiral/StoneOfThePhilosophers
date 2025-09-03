@@ -1,20 +1,17 @@
 ﻿using LogSpiralLibrary.CodeLibrary.Utilties;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
+using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework;
-using LogSpiralLibrary.CodeLibrary.Utilties.Extensions;
 
 namespace StoneOfThePhilosophers.Contents.Wood;
+
 public class WoodAttack : ModProjectile
 {
-    bool Extra => Projectile.frameCounter != 0;
+    private bool Extra => Projectile.frameCounter != 0;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 8;
@@ -28,10 +25,12 @@ public class WoodAttack : ModProjectile
         Projectile.localNPCHitCooldown = 5;
         Projectile.aiStyle = -1;
     }
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
@@ -41,6 +40,7 @@ public class WoodAttack : ModProjectile
                 Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), Extra ? 16 : 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
         return false;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int n = 0; n < 4 - Projectile.penetrate; n++)
@@ -57,6 +57,7 @@ public class WoodAttack : ModProjectile
             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[2] += damageDone / ElementSkillPlayer.Devider;
         }
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         for (int k = 0; k < 15; k++)
@@ -65,6 +66,7 @@ public class WoodAttack : ModProjectile
         }
         return base.OnTileCollide(oldVelocity);
     }
+
     public override void AI()
     {
         NPC target = null;
@@ -91,8 +93,6 @@ public class WoodAttack : ModProjectile
                 if (Projectile.timeLeft > 165) Projectile.timeLeft--;
                 if (Projectile.timeLeft < 15) Projectile.timeLeft++;
             }
-
-
         }
         //else
         //{
@@ -108,14 +108,18 @@ public class WoodAttack : ModProjectile
         Projectile.oldRot[0] = Projectile.rotation;
     }
 }
+
 public class WoodAttackUltra : ModProjectile
 {
-    Projectile projectile => Projectile;
+    private Projectile projectile => Projectile;
+
     public override void SetStaticDefaults()
     {
         // DisplayName.SetDefault("粒子触手");
     }
+
     public override string Texture => base.Texture.Replace("Ultra", "");
+
     public override void SetDefaults()
     {
         projectile.scale = 1f;
@@ -132,6 +136,7 @@ public class WoodAttackUltra : ModProjectile
         projectile.height = 40;
         projectile.MaxUpdates = 3;
     }
+
     public override void AI()
     {
         Vector2 center10 = projectile.Center;
@@ -190,6 +195,7 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             return;
         }
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         //if (target.CanBeChasedBy())
@@ -202,9 +208,9 @@ ModContent.ProjectileType<WoodAttack>(), projectile.damage, projectile.knockBack
             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[3] += damageDone / ElementSkillPlayer.Devider;
         }
         target.immune[projectile.owner] = 5;
-
     }
 }
+
 public class WoodUltra : ModBuff
 {
 }
