@@ -322,7 +322,7 @@ public class SunAttack : ModProjectile
                     }
                     if (Projectile.timeLeft % 30 == 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Item74);
+                        SoundEngine.PlaySound(SoundID.Item74, Projectile.Center);
 
                         if (Projectile.timeLeft % 180 == 0)
                         {
@@ -442,7 +442,7 @@ public class SunAttack : ModProjectile
                             dust.velocity *= 0.5f;
                         }
                     }
-                    SoundEngine.PlaySound(SoundID.Item62);
+                    SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
                     break;
                 }
         }

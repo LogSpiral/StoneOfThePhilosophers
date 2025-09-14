@@ -31,7 +31,7 @@ public class StoneOfFireProj : MagicArea
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 2 == 1) return;
-        SoundEngine.PlaySound(SoundID.Item74);
+        SoundEngine.PlaySound(SoundID.Item74, projectile.Center);
         if (AttackCounter % 5 == 0 && Extra)
         {
             var proj = Projectile.NewProjectileDirect(projectile.GetSource_FromThis(), projectile.Center + 64 * unit, unit.RotatedByRandom(MathHelper.TwoPi / 48f * (dying ? 2 : 0)) * 32, ModContent.ProjectileType<FireAttack>(), (int)(projectile.damage * 1.25f), projectile.knockBack, projectile.owner, 4);

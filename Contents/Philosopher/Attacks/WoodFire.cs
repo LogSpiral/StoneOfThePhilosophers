@@ -81,7 +81,7 @@ public class WoodFirePlant : ModProjectile
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), vec.XY(), -vec.Z.ToRotationVector2() * 16, ModContent.ProjectileType<WoodFireLeaf>(),
                         Projectile.damage, Projectile.knockBack, Projectile.owner, Main.rand.Next(Main.rand.Next(5)), Main.rand.NextFloat(24, 48));
                 }
-            SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f });
+            SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f }, Projectile.Center);
         }
     }
 

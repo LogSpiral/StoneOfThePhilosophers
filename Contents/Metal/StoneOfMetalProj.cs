@@ -34,7 +34,7 @@ public class StoneOfMetalProj : MagicArea
     {
         var player = Main.player[projectile.owner];
         bool flag = dying && projectile.timeLeft % 3 != 0;
-        SoundEngine.PlaySound(SoundID.Item69);
+        SoundEngine.PlaySound(SoundID.Item69, projectile.Center);
         for (int n = 0; n < (flag ? 3 : 1); n++)
             Projectile.NewProjectile(projectile.GetSource_FromThis(), player.Center + (dying ? unit.RotatedByRandom(MathHelper.Pi / 3) : unit) * 64,
                 unit * 32 * (flag ? 1 : 1), ModContent.ProjectileType<MetalAttack>(), (int)(projectile.damage * Main.rand.NextFloat(1.25f, 0.95f)),

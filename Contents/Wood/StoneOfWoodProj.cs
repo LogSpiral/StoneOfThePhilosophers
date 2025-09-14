@@ -55,7 +55,7 @@ public class StoneOfWoodProj : MagicArea
     {
         if (dying && projectile.timeLeft % 2 == 1) return;
         var player = Main.player[projectile.owner];
-        SoundEngine.PlaySound(SoundID.Item74);
+        SoundEngine.PlaySound(SoundID.Item74, projectile.Center);
         int m = Main.rand.Next(4, 6) - (dying ? 2 : 0) + (Extra ? Main.rand.Next(3) : 0);
         float randAngle = Main.rand.NextFloat(-MathHelper.Pi / 12, MathHelper.Pi / 12);
         for (int n = 0; n < m; n++)

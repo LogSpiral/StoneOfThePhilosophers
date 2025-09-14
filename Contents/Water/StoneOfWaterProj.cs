@@ -97,6 +97,6 @@ public class StoneOfWaterProj : MagicArea
             }
         }
 
-        SoundEngine.PlaySound(SoundID.Item84);
+        SoundEngine.PlaySound(SoundID.Item84, projectile.Center);
     }
 }

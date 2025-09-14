@@ -75,7 +75,7 @@ public class FireAttack : ModProjectile
                                     dust.velocity *= 0.5f;
                                 }
                             }
-                            SoundEngine.PlaySound(SoundID.Item62);
+                            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
                         }
                     }
                     if (Style == 5)
@@ -160,7 +160,7 @@ public class FireAttack : ModProjectile
                     Dust.NewDustPerfect(proj.Center, MyDustId.Fire, Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 8), 0, default, Main.rand.NextFloat(0.5f, 2f));
                 }
             }
-            SoundEngine.PlaySound(SoundID.Item62);
+            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
         }
         base.AI();
     }
@@ -226,9 +226,7 @@ public class FireAttack : ModProjectile
                     dust.velocity *= 0.5f;
                 }
             }
-            var soundEff = SoundID.Item62;
-            soundEff.Volume *= .5f;
-            SoundEngine.PlaySound(soundEff);
+            SoundEngine.PlaySound(SoundID.Item62 with { Volume = .5f}, Projectile.Center);
             target.immune[Projectile.owner] = 2;
         }
         else if (Style == 6)

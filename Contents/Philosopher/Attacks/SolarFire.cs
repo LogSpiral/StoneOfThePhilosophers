@@ -91,13 +91,13 @@ public class SolarFireBall : ModProjectile
         {
             if (Projectile.owner == Main.myPlayer)
             {
-                Projectile.netImportant = true;
+                Projectile.netUpdate = true;
                 Projectile.velocity = (Main.MouseWorld - Projectile.Center).SafeNormalize(default) * 32;
             }
             if (Projectile.velocity != default)
                 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 
-            SoundEngine.PlaySound(SoundID.Item62);
+            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
 
             for (int n = 0; n < 20; n++)
                 Dust.NewDustPerfect(Projectile.Center, DustID.SolarFlare, Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, 4) - Projectile.velocity * .1f, 0, default, .5f);

@@ -154,7 +154,7 @@ public class SoilFireZone : ModProjectile
     public override void AI()
     {
         if (Projectile.timeLeft == 232)
-            SoundEngine.PlaySound(SoundID.Item74);
+            SoundEngine.PlaySound(SoundID.Item74, Projectile.Center);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

@@ -30,7 +30,7 @@ public class LunarFireTorch : ModProjectile
     public override void AI()
     {
         if (Projectile.timeLeft == 880)
-            SoundEngine.PlaySound(SoundID.Item62);
+            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
 
         Projectile.Center = Owner.Center - Vector2.UnitY * 96 + Vector2.UnitY * Owner.gfxOffY;
         if (Projectile.timeLeft is > 15 and < 885 && Projectile.timeLeft % 10 == 0)
@@ -49,7 +49,7 @@ public class LunarFireTorch : ModProjectile
                         Dust.NewDustPerfect(tCenter, DustID.Shadowflame, Main.rand.NextVector2Unit() * Main.rand.NextFloat(0, 16), 0, default, Main.rand.NextFloat(.5f, 1.25f));
                         Dust.NewDustPerfect(Vector2.Lerp(pCenter, tCenter, n / 29f), DustID.Shadowflame);
                     }
-                    SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f, MaxInstances = -1 });
+                    SoundEngine.PlaySound(SoundID.Item74 with { volume = .5f, MaxInstances = -1 }, Projectile.Center);
                 }
                 npc.AddBuff(ModContent.BuffType<LunarFireBuff>(), 180);
             }

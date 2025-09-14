@@ -40,7 +40,7 @@ public class StoneOfSunProj : MagicArea
     public static void ShootProjStatic(Projectile projectile, Vector2 unit, bool dying, int AttackCounter, bool Extra)
     {
         if (dying && projectile.timeLeft % 3 != 0) return;
-        SoundEngine.PlaySound(SoundID.Item74);
+        SoundEngine.PlaySound(SoundID.Item74, projectile.Center);
         if (dying)
         {
             unit = unit.RotatedBy((projectile.timeLeft / 3f - 2) * MathHelper.Pi / 8);

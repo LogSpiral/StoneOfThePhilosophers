@@ -93,7 +93,7 @@ public class WaterFireAttack : ModProjectile
     {
         for (int n = 0; n < 10; n++)
             Dust.NewDust(Projectile.position, 16, 16, DustID.FrostStaff);
-        SoundEngine.PlaySound(MySoundID.ProjectileHit with { volume = 0.5f, MaxInstances = -1 });
+        SoundEngine.PlaySound(MySoundID.ProjectileHit with { volume = 0.5f, MaxInstances = -1 }, Projectile.Center);
         return true;
     }
 
