@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using SilkyUIFramework;
 using SilkyUIFramework.Attributes;
-using SilkyUIFramework.BasicElements;
+using SilkyUIFramework.Elements;
 using SilkyUIFramework.Extensions;
 using StoneOfThePhilosophers.Contents;
 using StoneOfThePhilosophers.Contents.Philosopher;
@@ -16,7 +16,7 @@ using Terraria.ModLoader;
 namespace StoneOfThePhilosophers.UI;
 
 [RegisterUI("Vanilla: Radial Hotbars", $"{nameof(StoneOfThePhilosophers)}: {nameof(ElementSkillUI)}")]
-public class ElementSkillUI : BasicBody
+public class ElementSkillUI : BaseBody
 {
     public static ElementSkillUI Instance { get; private set; }
 
