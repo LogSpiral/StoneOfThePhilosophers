@@ -37,7 +37,7 @@ public class EarthAttack : ModProjectile
                     float alpha = (Projectile.timeLeft / 60f).SmoothSymmetricFactor(1 / 12f);
                     for (int n = 9; n > -1; n--)
                         Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "Piece").Value, Projectile.oldPos[n] - Main.screenPosition,
-                            new Rectangle((int)(16 * Projectile.frame), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                            new Rectangle((int)(16 * Projectile.frame), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0);
                     break;
                 }
             case 1:
@@ -110,10 +110,10 @@ public class EarthAttack : ModProjectile
 
                             color71.A = (byte)((float)(int)color71.A * 0.5f);
                             color71 *= num289;
-                            Main.EntitySpriteDraw(value108, position19, rectangle19, color71, num291 + num297, origin19, (1f + num298) * 0.8f, effects3, 0);
+                            Main.EntitySpriteDraw(value108, position19, rectangle19, color71, num291 + num297, origin19, (1f + num298) * 0.8f, effects3);
                         }
 
-                        Main.EntitySpriteDraw(value108, position19, rectangle19, color70, num291 + num297, origin19, 1f + num298, effects3, 0);
+                        Main.EntitySpriteDraw(value108, position19, rectangle19, color70, num291 + num297, origin19, 1f + num298, effects3);
                     }
                     break;
                 }
@@ -322,13 +322,13 @@ public class EarthSpecialAttack : ModProjectile
                 fac3 = MathHelper.SmoothStep(0, 1, fac3);
                 var color = lightColor with { A = 127 } * fac3;
                 var scaler = 1.5f - fac3 * .5f;
-                Main.EntitySpriteDraw(ModAsset.crystal_reflection.Value, cen, null, color, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1) * scaler, 0, 0);
-                Main.EntitySpriteDraw(ModAsset.big_crystal_a.Value, cen - new Vector2(16, 0), null, color, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0, 0);
-                Main.EntitySpriteDraw(ModAsset.big_crystal_b.Value, cen + new Vector2(16, 0), null, color, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0, 0);
+                Main.EntitySpriteDraw(ModAsset.crystal_reflection.Value, cen, null, color, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1) * scaler, 0);
+                Main.EntitySpriteDraw(ModAsset.big_crystal_a.Value, cen - new Vector2(16, 0), null, color, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0);
+                Main.EntitySpriteDraw(ModAsset.big_crystal_b.Value, cen + new Vector2(16, 0), null, color, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1) * scaler, 0);
             }
-            Main.EntitySpriteDraw(ModAsset.crystal_reflection.Value, cen, null, lightColor, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1), 0, 0);
-            Main.EntitySpriteDraw(ModAsset.big_crystal_a.Value, cen - new Vector2(16, 0), null, lightColor, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
-            Main.EntitySpriteDraw(ModAsset.big_crystal_b.Value, cen + new Vector2(16, 0), null, lightColor, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0, 0);
+            Main.EntitySpriteDraw(ModAsset.crystal_reflection.Value, cen, null, lightColor, 0, new Vector2(40, 96), new Vector2(1, 2) * factor1 * new Vector2(factor1, 1), 0);
+            Main.EntitySpriteDraw(ModAsset.big_crystal_a.Value, cen - new Vector2(16, 0), null, lightColor, -MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0);
+            Main.EntitySpriteDraw(ModAsset.big_crystal_b.Value, cen + new Vector2(16, 0), null, lightColor, MathHelper.Pi / 12, new Vector2(20, 64), new Vector2(1.5f, 2) * factor2 * new Vector2(factor2, 1), 0);
         }
         return false;
     }
@@ -370,7 +370,7 @@ public class EarthSpecialAttack : ModProjectile
                                 var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
                                 Dust.NewDustPerfect(npc.Bottom, MyDustId.BrownDirt, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
                             }
-                            Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction, false);
+                            Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction);
                             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[4] += damage / ElementSkillPlayer.Devider;
                         }
                     }
@@ -418,7 +418,7 @@ public class EarthSpecialAttack : ModProjectile
                                     var unit = (n * MathHelper.TwoPi / count).ToRotationVector2();
                                     Dust.NewDustPerfect(npc.Bottom, MyDustId.BrownDirt, unit * Main.rand.NextFloat(1, 3), 0, default, Main.rand.NextFloat(0.5f, 1f));
                                 }
-                                Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction, false);
+                                Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction);
                                 Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[4] += damage / ElementSkillPlayer.Devider;
                             }
                         }

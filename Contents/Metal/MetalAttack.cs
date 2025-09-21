@@ -40,17 +40,17 @@ public class MetalAttack : ModProjectile
             float alpha = (Projectile.timeLeft / 120f).SmoothSymmetricFactor(1 / 12f);
             float size = Utils.GetLerpValue(120, 80, Projectile.timeLeft, true);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + "EX").Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 12f * ((10 - n) * .1f) * size, 0);
         }
         else
         {
             float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                Main.EntitySpriteDraw(Extra ? ModContent.Request<Texture2D>(Texture + "EX").Value : TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), lightColor * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0);
             for (int n = TargetIndex == -1 ? 9 : 0; n > -1; n--)
-                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0, 0);
+                Main.EntitySpriteDraw(ModContent.Request<Texture2D>(GlowTexture + (Extra ? "EX" : "")).Value, Projectile.oldPos[n] - Main.screenPosition, new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.White with { A = 127 } * ((10 - n) * .1f) * alpha * (n == 0 ? 1 : .25f), Projectile.oldRot[n], new Vector2(8), 3f * ((10 - n) * .1f), 0);
         }
 
         return false;
@@ -233,7 +233,7 @@ public class MetalAttack : ModProjectile
                     {
                         var damage = Extra ? 60 : 20;
                         damage = (int)(damage * Main.rand.NextFloat(0.85f, 0.15f));
-                        Main.player[Projectile.owner].ApplyDamageToNPC(target, damage, 0, 0, false);
+                        Main.player[Projectile.owner].ApplyDamageToNPC(target, damage, 0, 0);
                         if (!target.friendly && target.active && target.CanBeChasedBy())
                         {
                             Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[3] += damage / ElementSkillPlayer.Devider;

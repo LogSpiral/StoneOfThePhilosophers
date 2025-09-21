@@ -98,7 +98,7 @@ public class ElementChargeSystem : ModSystem
     {
         if (Progress <= 0) return true;
 
-        DrawChargeBar_Internal(new(Main.screenWidth - 360, 80, 40, 280), Progress, BarValue);
+        DrawChargeBar_Internal(new CalculatedStyle(Main.screenWidth - 360, 80, 40, 280), Progress, BarValue);
         return true;
     }
 

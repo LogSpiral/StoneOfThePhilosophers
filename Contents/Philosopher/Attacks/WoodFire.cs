@@ -72,7 +72,7 @@ public class WoodFirePlant : ModProjectile
         if (Projectile.timeLeft == 45)
         {
             foreach (var vec in endNodes)
-                Gore.NewGore(vec.XY(), -vec.Z.ToRotationVector2() * 4, GoreID.TreeLeaf_TreeAsh, 1);
+                Gore.NewGore(vec.XY(), -vec.Z.ToRotationVector2() * 4, GoreID.TreeLeaf_TreeAsh);
 
             if (endNodes.Count > 0)
                 for (int n = 0; n < 10; n++)
@@ -88,7 +88,7 @@ public class WoodFirePlant : ModProjectile
     public override void OnSpawn(IEntitySource source)
     {
         float stdSize = 96;
-        thornTree = new AshTree(stdSize, stdSize * .25f, 0, new()
+        thornTree = new AshTree(stdSize, stdSize * .25f, 0, new AshTree.TreeGenerateInfo
         {
             lengthScaler = .7f,
             widthScaler = .4f,
@@ -289,7 +289,7 @@ public class AshTree
     public AshTree(float length, float width, float rotation, TreeGenerateInfo info)
     {
         genInfo = info;
-        mainNode = new(length, width, rotation, false);
+        mainNode = new Node(length, width, rotation, false);
     }
 
     public void BuildTree(UnifiedRandom random, int maxTier)
@@ -328,7 +328,7 @@ public class WoodFireLeaf : ModProjectile
 
         for (int n = 9; n > -1; n--)
             for (int m = 0; m < 5; m++)
-                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), 16, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0, 0);
+                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition + (m == 0 ? default : Main.rand.NextVector2Unit() * 4), new Rectangle((int)(16 * Projectile.ai[0]), 16, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 127 } * alpha * ((10 - n) * .1f) * (m == 0 ? 1 : Main.rand.NextFloat(0.25f, 0.5f)), Projectile.oldRot[n], new Vector2(8), 2f * ((10 - n) * .1f) * new Vector2(1.5f, 1f), 0);
         return false;
     }
 

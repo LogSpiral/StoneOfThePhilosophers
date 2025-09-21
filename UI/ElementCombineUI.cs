@@ -12,6 +12,7 @@ using SilkyUIFramework.Extensions;
 using StoneOfThePhilosophers.Contents;
 using StoneOfThePhilosophers.Contents.Philosopher;
 using System.Collections.Generic;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -48,7 +49,7 @@ public class ElementCombineUI : BaseBody
         ElementCombinePanelNeo.Join(this);
         BorderColor = Color.Transparent;
 
-        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new(renderInfos));
+        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new RenderingCanvas(renderInfos));
     }
 
     public static void Open(int itemID)
@@ -103,8 +104,10 @@ public class ElementCombinePanel : SUIDraggableView
 
     public ElementCombinePanel(UIElementGroup controlTarget) : base(controlTarget)
     {
-        CombineButton = new UITextView();
-        CombineButton.Text = "确定！";
+        CombineButton = new UITextView
+        {
+            Text = "确定！"
+        };
         CombineButton.SetLeft(0, 0, .5f);
         CombineButton.SetTop(0, 0, .95f);
         CombineButton.TextColor = Color.LightYellow;

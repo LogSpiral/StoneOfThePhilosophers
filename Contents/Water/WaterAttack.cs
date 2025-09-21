@@ -48,7 +48,7 @@ public class WaterAttack : ModProjectile
                     for (int n = 9; n > -1; n--)
                     {
                         for (int m = 0; m < 4; m++)
-                            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0, 0);
+                            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4) * MathF.Sqrt(m * .5f), new Rectangle((int)(16 * Projectile.ai[0]), 0, 16, 16), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha, Projectile.oldRot[n] + MathHelper.PiOver2, new Vector2(8), 1f * ((10 - n) * .1f), 0);
                     }
                     break;
                 }
@@ -56,18 +56,18 @@ public class WaterAttack : ModProjectile
                 {
                     float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
                     var tex = ModAsset.WaterAttackUltra.Value;
-                    Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
+                    Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0);
                     for (int n = 0; n < 4; n++)
                     {
-                        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0);
                     }
                     for (int n = 0; n < 4; n++)
                     {
-                        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0);
                     }
                     for (int n = 9; n > -1; n--)
                     {
-                        Main.EntitySpriteDraw(tex, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0, 0);
+                        Main.EntitySpriteDraw(tex, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0);
                     }
                     break;
                 }
@@ -96,7 +96,7 @@ public class WaterAttack : ModProjectile
 
                     #endregion Shader
 
-                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(16f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
+                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(16f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0);//
 
                     matrix =
                         Matrix.CreateTranslation(-0.5f, -0.5f, 0) *
@@ -107,7 +107,7 @@ public class WaterAttack : ModProjectile
                     HeatMapEffect.HeatMap.Parameters["uTransform"].SetValue(matrix);
                     HeatMapEffect.HeatMap.CurrentTechnique.Passes[0].Apply();
 
-                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(20f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, 0, new Vector2(16), new Vector2(20f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0);//
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                     break;
@@ -220,7 +220,7 @@ public class WaterAttack : ModProjectile
                                     }
                                     if (npc.CanBeChasedBy())
                                     {
-                                        Main.player[projectile.owner].ApplyDamageToNPC(npc, _damage, 0, projectile.direction, false);
+                                        Main.player[projectile.owner].ApplyDamageToNPC(npc, _damage, 0, projectile.direction);
                                         Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[1] += _damage / ElementSkillPlayer.Devider;
                                     }
                                 }
@@ -279,7 +279,7 @@ public class WaterAttack : ModProjectile
                                     }
                                     if (npc.CanBeChasedBy() || npc.type == NPCID.TargetDummy)
                                     {
-                                        Main.player[projectile.owner].ApplyDamageToNPC(npc, damage, 0, projectile.direction, false);
+                                        Main.player[projectile.owner].ApplyDamageToNPC(npc, damage, 0, projectile.direction);
                                         Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[1] += damage / ElementSkillPlayer.Devider;
                                     }
                                     npc.AddBuff(ModContent.BuffType<TidalErosion>(), 600);

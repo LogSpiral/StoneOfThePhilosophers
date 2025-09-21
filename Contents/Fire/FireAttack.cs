@@ -41,7 +41,7 @@ public class FireAttack : ModProjectile
             case 5:
                 {
                     Projectile.rotation = Projectile.velocity.ToRotation();
-                    Dust.NewDustPerfect(Projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White, 1f).noGravity = true;
+                    Dust.NewDustPerfect(Projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White).noGravity = true;
                     Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Unit() * 4, MyDustId.Fire, Main.rand.NextVector2Unit() + Projectile.velocity * .25f, 0, Color.White, Main.rand.NextFloat(1.5f, 3f)).noGravity = true;
 
                     for (int n = 9; n > 0; n--)
@@ -126,7 +126,7 @@ public class FireAttack : ModProjectile
                                     }
                                     if (npc.CanBeChasedBy() || npc.type == NPCID.TargetDummy)
                                     {
-                                        Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction, false);
+                                        Main.player[Projectile.owner].ApplyDamageToNPC(npc, damage, 0, Projectile.direction);
                                         Main.player[Projectile.owner].GetModPlayer<ElementSkillPlayer>().ElementChargeValue[0] += damage / ElementSkillPlayer.Devider;
                                     }
                                     npc.AddBuff(BuffID.Daybreak, 30);
@@ -294,18 +294,18 @@ public class FireAttack : ModProjectile
             case 0:
                 {
                     float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0);
                     for (int n = 0; n < 4; n++)
                     {
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0);
                     }
                     for (int n = 0; n < 4; n++)
                     {
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0);
                     }
                     for (int n = 9; n > -1; n--)
                     {
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.oldPos[n] - Main.screenPosition - (Projectile.velocity + Main.rand.NextVector2Unit() * 4), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(lightColor, Color.White, .5f) with { A = 0 } * ((10 - n) * .1f) * alpha * .25f, Projectile.oldRot[n], new Vector2(66, 21), 1f * ((10 - n) * .1f), 0);
                     }
                     break;
                 }
@@ -313,14 +313,14 @@ public class FireAttack : ModProjectile
             case 5:
                 {
                     float alpha = (Projectile.timeLeft / 180f).SmoothSymmetricFactor(1 / 12f);
-                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0, 0);
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, new Rectangle(0, (int)Main.GameUpdateCount / 2 % 4, 78, 42), Color.White with { A = 0 } * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), 0);
                     for (int n = 0; n < 8; n++)
                     {
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f), 0);
                     }
                     for (int n = 0; n < 8; n++)
                     {
-                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f) * 1.5f, 0, 0);
+                        Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12), new Rectangle(0, 42 * Main.rand.Next(4), 78, 42), Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, new Vector2(66, 21), new Vector2(2f, 1.5f) * 1.5f, 0);
                     }
                     DrawingMethods.VertexDraw(Projectile.TailVertexFromProj(default, 30, .5f, false, Color.Yellow * alpha),
                         ModAsset.Style_4.Value,
@@ -334,14 +334,14 @@ public class FireAttack : ModProjectile
                 {
                     var fac = 1 - Projectile.timeLeft / 21f;
                     for (int n = 0; n < 3; n++)
-                        Main.EntitySpriteDraw(ModAsset.ExplosionEffect.Value, Projectile.Center - Main.screenPosition + Main.rand.NextVector2Unit() * 4, new Rectangle(0, 588 - Projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2(1) * .75f, Projectile.rotation, new Vector2(49), 3f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                        Main.EntitySpriteDraw(ModAsset.ExplosionEffect.Value, Projectile.Center - Main.screenPosition + Main.rand.NextVector2Unit() * 4, new Rectangle(0, 588 - Projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2() * .75f, Projectile.rotation, new Vector2(49), 3f * fac, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
 
                     break;
                 }
             case 3:
                 {
                     var fac = 1 - Projectile.timeLeft / 21f;
-                    Main.EntitySpriteDraw(ModAsset.ExplosionEffect.Value, Projectile.Center - Main.screenPosition, new Rectangle(0, 588 - Projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2(1), Projectile.rotation, new Vector2(49), 2f * fac, 0, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
+                    Main.EntitySpriteDraw(ModAsset.ExplosionEffect.Value, Projectile.Center - Main.screenPosition, new Rectangle(0, 588 - Projectile.timeLeft / 3 * 98, 98, 98), new Color(255, 255, 255, 0) * fac.HillFactor2(), Projectile.rotation, new Vector2(49), 2f * fac, 0);//new Rectangle(0, projectile.timeLeft / 2, 52, 52)
                     break;
                 }
             case 4:
@@ -353,16 +353,16 @@ public class FireAttack : ModProjectile
                     //var origin = new Vector2(projectile.velocity.X > 0 ? 58 : 14, 42);
                     var origin = new Vector2(58, Projectile.velocity.X > 0 ? 42 : 34);
 
-                    Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, rect, Color.White with { A = 0 } * alpha, Projectile.rotation, origin, new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), spriteEffects, 0);
+                    Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, rect, Color.White with { A = 0 } * alpha, Projectile.rotation, origin, new Vector2(2.5f, 1.75f) * .5f * new Vector2(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * .25f + 1.75f, 1f), spriteEffects);
                     for (int n = 0; n < 8; n++)
                     {
                         Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 8 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(2, 6)
-                            , rect, Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, origin, new Vector2(3f, 1.5f), spriteEffects, 0);
+                            , rect, Color.Lerp(Color.White, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.125f * alpha, Projectile.rotation, origin, new Vector2(3f, 1.5f), spriteEffects);
                     }
                     for (int n = 0; n < 8; n++)
                     {
                         Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + (MathHelper.PiOver4 * n).ToRotationVector2() * 12 + Main.rand.NextVector2Unit() * Main.rand.NextFloat(6, 12)
-                            , rect, Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, origin, new Vector2(4f, 1.5f) * 1.5f, spriteEffects, 0);
+                            , rect, Color.Lerp(Color.Orange, Color.Red, Main.rand.NextFloat(0, .5f)) with { A = 0 } * 0.0625f * alpha, Projectile.rotation, origin, new Vector2(4f, 1.5f) * 1.5f, spriteEffects);
                     }
                     //for (int n = 9; n > -1; n--)
                     //{
@@ -396,9 +396,9 @@ public class FireAttack : ModProjectile
 
                     #endregion Shader
 
-                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, -2 * r, new Vector2(16), new Vector2(12f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0, 0);//
+                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, -2 * r, new Vector2(16), new Vector2(12f) * (-MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .25f + 1.25f), 0);//
 
-                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(16f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0, 0);//
+                    Main.EntitySpriteDraw(ModAsset.SunAttack.Value, Projectile.Center - Main.screenPosition, null, Color.White * alpha, r, new Vector2(16), new Vector2(16f) * (MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * .125f + 1f), 0);//
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                     break;

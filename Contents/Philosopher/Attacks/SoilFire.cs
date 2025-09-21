@@ -96,14 +96,14 @@ public class SoilFireZoneVisual : VertexDrawInfo
 public class SoilFireZone : ModProjectile
 {
     public const string CanvasName = $"{nameof(StoneOfThePhilosophers)}:{nameof(SoilFireZone)}";
-    private static readonly MaskEffect maskEffect = Main.dedServ ? new() : new(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
+    private static readonly MaskEffect maskEffect = Main.dedServ ? new MaskEffect() : new MaskEffect(LogSpiralLibraryMod.Mask[3].Value, Color.MediumPurple, 0.05f, 0.07f, default, false, false);
     private static readonly BloomEffect bloomEffect = new(0, 1f, 2, 3, true, 0, true);
     private static readonly IRenderEffect[][] renderEffects = [[maskEffect, bloomEffect]];
 
     public override void Load()
     {
         if (Main.dedServ) return;
-        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new(renderEffects));
+        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new RenderingCanvas(renderEffects));
 
         base.Load();
     }

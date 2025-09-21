@@ -378,7 +378,7 @@ public partial class StoneOfThePhilosopherProj : ModProjectile
         DrawingMethods.VertexDrawEX(loopVertexInfos,
             ModAsset.line_1.Value,
             ModAsset.Style_4.Value, null,
-            new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * loopScaler, true, loopTransform, null, false, true);
+            new Vector2(Main.GameUpdateCount, Main.GlobalTimeWrappedHourly) * loopScaler, true, loopTransform, null, false);
 
         #endregion 环环
 

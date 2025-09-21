@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StoneOfThePhilosophers.Effects;
 using System;
+using LogSpiralLibrary.CodeLibrary.DataStructures.Drawing;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -27,7 +28,7 @@ public class SunAttack : ModProjectile
 
     public override void Load()
     {
-        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new(renderEffects));
+        RenderCanvasSystem.RegisterCanvasFactory(CanvasName, () => new RenderingCanvas(renderEffects));
         base.Load();
     }
 
@@ -66,7 +67,7 @@ public class SunAttack : ModProjectile
     private void DrawExposion(float distortScaler)
     {
         var fac = 1 - Projectile.timeLeft / 21f;
-        var fac1 = fac.HillFactor2(1);
+        var fac1 = fac.HillFactor2();
         fac *= distortScaler;
         var origState = Main.graphics.GraphicsDevice.BlendState;
         Main.graphics.GraphicsDevice.BlendState = BlendState.Additive;
@@ -177,7 +178,7 @@ public class SunAttack : ModProjectile
             case 0:
                 {
                     Projectile.rotation = Projectile.velocity.ToRotation();
-                    Dust.NewDustPerfect(Projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White, 1f).noGravity = true;
+                    Dust.NewDustPerfect(Projectile.Center, MyDustId.Fire, new Vector2(0, 0), 0, Color.White).noGravity = true;
                     for (int n = 9; n > 0; n--)
                     {
                         Projectile.oldPos[n] = Projectile.oldPos[n - 1];
